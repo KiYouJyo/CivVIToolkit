@@ -5,12 +5,17 @@
 ## [Unreleased]
 
 ### Added
-- 自动签名的 x64 Signed Acceptance 工作流与 SHA-256 验收产物。
-- 简体中文、日本語、English 三语仓库文本和应用本地化基础。
-- Issue / PR 模板、贡献指南、支持、隐私、第三方声明、路线图与发布文档。
+- x64 MSIX 单项目打包基础、Package Identity、`runFullTrust` 与三语 Manifest 资源声明。
+- Signed MSIX Acceptance：自动构建、签名、完整验签、包内 Manifest 校验与 SHA-256 验收产物。
+- one-click 安装 ZIP：当前用户证书信任、`Add-AppxPackage` 安装辅助与三语说明。
+- `release/release.json` 版本 / 发布通道元数据。
+- 中 / 日 / 英三语 Release Notes 结构。
+- `Publish GitHub Release` 正式发布工作流与 dry-run 模式。
+- `Release Orchestrator` 一键发布入口，负责不可变版本 Tag 和正式发布工作流调度。
 
 ### Changed
-- 仓库主页与文档结构对齐 UrbanPlanToolbox 的治理方式。
+- Signed Acceptance 从“解压后直接运行的 self-contained WinUI 3 目录”迁移为签名 MSIX。
+- Release 结构对齐 UrbanPlanToolbox：版本元数据、签名产物、one-click 包、SHA-256、三语说明和幂等 Release reconciliation。
 
 ## [0.1.0] - 2026-08-17
 
