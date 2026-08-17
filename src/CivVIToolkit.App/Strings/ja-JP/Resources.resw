@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="AppDisplayName" xml:space="preserve"><value>Civ VI Toolkit</value></data>
+  <data name="AppDescription" xml:space="preserve"><value>Civilization VI ローカルツールキット</value></data>
+  <data name="Navigation_Root.PaneTitle" xml:space="preserve"><value>Civ VI Toolkit</value></data>
+  <data name="Navigation_Overview.Content" xml:space="preserve"><value>概要</value></data>
+  <data name="Navigation_Trainer.Content" xml:space="preserve"><value>Trainer</value></data>
+  <data name="Navigation_Saves.Content" xml:space="preserve"><value>セーブ管理</value></data>
+  <data name="Navigation_Maps.Content" xml:space="preserve"><value>マップとゲーム情報</value></data>
+  <data name="Navigation_Mods.Content" xml:space="preserve"><value>Mod 管理</value></data>
+  <data name="Navigation_Launcher.Content" xml:space="preserve"><value>クイック起動</value></data>
+  <data name="Navigation_Settings.Content" xml:space="preserve"><value>設定</value></data>
+  <data name="Overview_Title.Text" xml:space="preserve"><value>Civ VI Toolkit</value></data>
+  <data name="Overview_Subtitle.Text" xml:space="preserve"><value>ゲーム検出、シングルプレイヤー Trainer、セーブ、Mod、起動フローをまとめるモジュール型 Civilization VI ツールキットです。</value></data>
+  <data name="Overview_StatusScanning.Text" xml:space="preserve"><value>Civilization VI を検索しています…</value></data>
+  <data name="Overview_StatusDetecting.Text" xml:space="preserve"><value>Steam / Epic Games と DX11 / DX12 を判別しています</value></data>
+  <data name="Overview_CopyDiagnostics.Content" xml:space="preserve"><value>診断をコピー</value></data>
+  <data name="Common_Refresh.Content" xml:space="preserve"><value>更新</value></data>
+  <data name="Overview_StoreAwareTitle.Text" xml:space="preserve"><value>ストア自動判別</value></data>
+  <data name="Overview_StoreAwareDescription.Text" xml:space="preserve"><value>固定パスではなく Steam のライブラリ情報と Epic Launcher の manifest を読み取ります。</value></data>
+  <data name="Overview_RendererAwareTitle.Text" xml:space="preserve"><value>レンダラー自動判別</value></data>
+  <data name="Overview_RendererAwareDescription.Text" xml:space="preserve"><value>実行時に CivilizationVI.exe を DX11、CivilizationVI_DX12.exe を DX12 として判別します。</value></data>
+  <data name="Overview_ModuleReadyTitle.Text" xml:space="preserve"><value>モジュール拡張</value></data>
+  <data name="Overview_ModuleReadyDescription.Text" xml:space="preserve"><value>Trainer、セーブ、マップ、Mod、ランチャーを分離し、すべてをメモリ編集層に結合せず拡張できます。</value></data>
+  <data name="Trainer_Title.Text" xml:space="preserve"><value>シングルプレイヤー Trainer</value></data>
+  <data name="Trainer_StatusWaiting.Text" xml:space="preserve"><value>Civilization VI の起動を待っています。</value></data>
+  <data name="Trainer_Info.Title" xml:space="preserve"><value>v0.1 Trainer Core</value></data>
+  <data name="Trainer_Info.Message" xml:space="preserve"><value>プロセス、メモリ、AoB スキャン層は構築済みです。各機能は Steam/Epic・DX11/DX12 の実ゲーム Build でシグネチャが検証されるまで無効のままです。</value></data>
+  <data name="Trainer_SignaturePending.Text" xml:space="preserve"><value>シグネチャ待ち</value></data>
+  <data name="Placeholder_Info.Title" xml:space="preserve"><value>予定モジュール</value></data>
+  <data name="Placeholder_Info.Message" xml:space="preserve"><value>ナビゲーションとモジュール境界はすでに予約済みです。Trainer Core を再構築せずに後続バージョンで実装できます。</value></data>
+  <data name="Settings_Title.Text" xml:space="preserve"><value>設定</value></data>
+  <data name="Settings_Description.Text" xml:space="preserve"><value>CivVIToolkit のローカル動作を設定します。最初の設定基盤として表示言語に対応します。</value></data>
+  <data name="Settings_LanguageTitle.Text" xml:space="preserve"><value>言語</value></data>
+  <data name="Settings_LanguageDescription.Text" xml:space="preserve"><value>表示言語を選択します。設定はローカルに保存され、アプリ再起動後に完全適用されます。</value></data>
+  <data name="Settings_RestartInfo.Title" xml:space="preserve"><value>再起動が必要です</value></data>
+  <data name="Settings_RestartInfo.Message" xml:space="preserve"><value>言語設定を保存しました。CivVIToolkit を再起動すると新しい言語が完全に適用されます。</value></data>
+  <data name="Language_System" xml:space="preserve"><value>システムに従う</value></data>
+  <data name="Language_Chinese" xml:space="preserve"><value>简体中文</value></data>
+  <data name="Language_Japanese" xml:space="preserve"><value>日本語</value></data>
+  <data name="Language_English" xml:space="preserve"><value>English</value></data>
+  <data name="Status_DetectionFailed" xml:space="preserve"><value>検出に失敗しました</value></data>
+  <data name="Status_RunningTitle" xml:space="preserve"><value>Civilization VI は実行中です</value></data>
+  <data name="Status_RunningDetailsFormat" xml:space="preserve"><value>PID {0}  ·  バージョン {1}
+{2}</value></data>
+  <data name="Trainer_AttachedFormat" xml:space="preserve"><value>{0} / {1} に接続しました。メモリアクセスと AoB スキャン Core は準備済みですが、この Build の機能シグネチャはまだ検証待ちです。</value></data>
+  <data name="Status_InstallationDetectedTitle" xml:space="preserve"><value>Civilization VI のインストールを検出しました</value></data>
+  <data name="Status_InstallationDetectedBadgeFormat" xml:space="preserve"><value>{0} · ゲームは未起動</value></data>
+  <data name="Status_LaunchHint" xml:space="preserve"><value>通常どおりゲームを起動してください。プロセスが現れると CivVIToolkit が DX11 / DX12 を自動判別します。</value></data>
+  <data name="Trainer_InstallationFound" xml:space="preserve"><value>ゲームのインストールを確認しました。Civilization VI を起動すると Trainer Core に接続できます。</value></data>
+  <data name="Status_NotDetectedTitle" xml:space="preserve"><value>Civilization VI を検出できませんでした</value></data>
+  <data name="Status_ScanCompleted" xml:space="preserve"><value>Steam / Epic Games の検索が完了しました</value></data>
+  <data name="Status_NotDetectedHint" xml:space="preserve"><value>Steam または Epic Games Launcher からゲームをインストールし、更新を押してください。対応インストールでは手動パス指定は不要です。</value></data>
+  <data name="Trainer_WaitingSupported" xml:space="preserve"><value>対応する Civilization VI のインストールとプロセスを待っています。</value></data>
+  <data name="Status_NoMetadata" xml:space="preserve"><value>インストール情報が見つかりません。</value></data>
+  <data name="Diagnostics_Collecting" xml:space="preserve"><value>読み取り専用の実行時診断を収集中…</value></data>
+  <data name="Diagnostics_CopiedFormat" xml:space="preserve"><value>診断をコピーしました · SHA-256 {0}… · image {1:N0} bytes</value></data>
+  <data name="Diagnostics_FailedFormat" xml:space="preserve"><value>診断に失敗しました：{0}</value></data>
+  <data name="Common_UnknownStore" xml:space="preserve"><value>不明なストア</value></data>
+  <data name="Common_UnknownRenderer" xml:space="preserve"><value>不明なレンダラー</value></data>
+  <data name="Common_UnknownVersion" xml:space="preserve"><value>不明</value></data>
+  <data name="Installation_ExecutablesUnresolved" xml:space="preserve"><value>実行ファイル未解決</value></data>
+  <data name="Module_Saves_Title" xml:space="preserve"><value>セーブ管理</value></data>
+  <data name="Module_Saves_Description" xml:space="preserve"><value>Civilization VI のローカルセーブを検出、バックアップ、タグ付け、復元します。</value></data>
+  <data name="Module_Maps_Title" xml:space="preserve"><value>マップとゲーム情報</value></data>
+  <data name="Module_Maps_Description" xml:space="preserve"><value>マップ、ルールセット、DLC、現在のゲーム情報を確認します。</value></data>
+  <data name="Module_Mods_Title" xml:space="preserve"><value>Mod 管理</value></data>
+  <data name="Module_Mods_Description" xml:space="preserve"><value>ローカル Mod を検出し、検証、依存関係チェック、オン／オフ管理の共通入口を提供します。</value></data>
+  <data name="Module_Launcher_Title" xml:space="preserve"><value>クイック起動</value></data>
+  <data name="Module_Launcher_Description" xml:space="preserve"><value>検出した Steam / Epic インストールを DX11 / DX12 の選択に合わせて起動します。</value></data>
+  <data name="TrainerGroup_Player" xml:space="preserve"><value>プレイヤー</value></data>
+  <data name="TrainerGroup_Units" xml:space="preserve"><value>ユニット</value></data>
+  <data name="TrainerGroup_Cities" xml:space="preserve"><value>都市</value></data>
+  <data name="TrainerGroup_AI" xml:space="preserve"><value>AI</value></data>
+  <data name="TrainerGroup_Combat" xml:space="preserve"><value>戦闘</value></data>
+  <data name="TrainerFeature_player_unlimited_gold" xml:space="preserve"><value>ゴールド無限</value></data>
+  <data name="TrainerFeature_player_unlimited_faith" xml:space="preserve"><value>信仰力無限</value></data>
+  <data name="TrainerFeature_player_instant_research" xml:space="preserve"><value>研究を1ターンで完了</value></data>
+  <data name="TrainerFeature_player_instant_civic" xml:space="preserve"><value>社会制度を1ターンで完了</value></data>
+  <data name="TrainerFeature_player_add_influence" xml:space="preserve"><value>外交的支持を追加</value></data>
+  <data name="TrainerFeature_unit_unlimited_movement" xml:space="preserve"><value>ユニット移動力無限</value></data>
+  <data name="TrainerFeature_unit_unlimited_health" xml:space="preserve"><value>ユニット体力無限</value></data>
+  <data name="TrainerFeature_city_instant_production" xml:space="preserve"><value>建設 / 訓練を1ターンで完了</value></data>
+  <data name="TrainerFeature_player_unlimited_resources" xml:space="preserve"><value>高級 / 戦略資源無限</value></data>
+  <data name="TrainerFeature_unit_always_upgrade" xml:space="preserve"><value>ユニットを常にアップグレード可能</value></data>
+  <data name="TrainerFeature_city_max_population" xml:space="preserve"><value>都市人口最大</value></data>
+  <data name="TrainerFeature_player_add_gold" xml:space="preserve"><value>ゴールドを追加</value></data>
+  <data name="TrainerFeature_unit_unlimited_builder_charges" xml:space="preserve"><value>労働者の使用回数無限</value></data>
+  <data name="TrainerFeature_ai_zero_gold" xml:space="preserve"><value>AI のゴールドを0にする</value></data>
+  <data name="TrainerFeature_ai_zero_faith" xml:space="preserve"><value>AI の信仰力を0にする</value></data>
+  <data name="TrainerFeature_ai_block_research" xml:space="preserve"><value>AI の研究完了を禁止</value></data>
+  <data name="TrainerFeature_ai_block_civic" xml:space="preserve"><value>AI の社会制度完了を禁止</value></data>
+  <data name="TrainerFeature_ai_zero_influence" xml:space="preserve"><value>AI の外交的支持を0にする</value></data>
+  <data name="TrainerFeature_ai_block_movement" xml:space="preserve"><value>AI ユニットを移動不能にする</value></data>
+  <data name="TrainerFeature_combat_one_hit_kill" xml:space="preserve"><value>一撃必殺</value></data>
+  <data name="TrainerFeature_ai_block_production" xml:space="preserve"><value>AI の建設 / 訓練完了を禁止</value></data>
+  <data name="TrainerFeature_ai_zero_resources" xml:space="preserve"><value>AI の高級 / 戦略資源を消去</value></data>
+  <data name="Settings_SaveFailedTitle" xml:space="preserve"><value>保存に失敗しました</value></data>
+  <data name="Settings_SaveFailedMessage" xml:space="preserve"><value>ローカル設定ファイルを書き込めませんでした。現在のユーザーのローカル AppData への書き込み権限を確認してください。</value></data>
+</root>

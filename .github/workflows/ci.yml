@@ -10,12 +10,15 @@ permissions:
 
 jobs:
   build-and-test:
-    runs-on: windows-latest
+    runs-on: windows-2025-vs2026
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-dotnet@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v5
         with:
           dotnet-version: '10.0.x'
+      - name: Validate localization resources
+        shell: pwsh
+        run: ./scripts/Test-LocalizationConsistency.ps1
       - name: Restore
         run: dotnet restore CivVIToolkit.sln -p:Platform=x64
       - name: Build

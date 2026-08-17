@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="AppDisplayName" xml:space="preserve"><value>Civ VI Toolkit</value></data>
+  <data name="AppDescription" xml:space="preserve"><value>Civilization VI local toolkit</value></data>
+  <data name="Navigation_Root.PaneTitle" xml:space="preserve"><value>Civ VI Toolkit</value></data>
+  <data name="Navigation_Overview.Content" xml:space="preserve"><value>概览</value></data>
+  <data name="Navigation_Trainer.Content" xml:space="preserve"><value>修改器</value></data>
+  <data name="Navigation_Saves.Content" xml:space="preserve"><value>存档管理</value></data>
+  <data name="Navigation_Maps.Content" xml:space="preserve"><value>地图与游戏信息</value></data>
+  <data name="Navigation_Mods.Content" xml:space="preserve"><value>Mod 管理</value></data>
+  <data name="Navigation_Launcher.Content" xml:space="preserve"><value>快捷启动</value></data>
+  <data name="Navigation_Settings.Content" xml:space="preserve"><value>设置</value></data>
+  <data name="Overview_Title.Text" xml:space="preserve"><value>Civ VI Toolkit</value></data>
+  <data name="Overview_Subtitle.Text" xml:space="preserve"><value>用于游戏识别、单机修改、存档、Mod 与启动流程的模块化 Civilization VI 工具箱。</value></data>
+  <data name="Overview_StatusScanning.Text" xml:space="preserve"><value>正在扫描 Civilization VI…</value></data>
+  <data name="Overview_StatusDetecting.Text" xml:space="preserve"><value>正在识别 Steam / Epic Games 与 DX11 / DX12</value></data>
+  <data name="Overview_CopyDiagnostics.Content" xml:space="preserve"><value>复制诊断</value></data>
+  <data name="Common_Refresh.Content" xml:space="preserve"><value>刷新</value></data>
+  <data name="Overview_StoreAwareTitle.Text" xml:space="preserve"><value>识别游戏平台</value></data>
+  <data name="Overview_StoreAwareDescription.Text" xml:space="preserve"><value>读取 Steam Library metadata 与 Epic Launcher manifests，不依赖固定安装路径。</value></data>
+  <data name="Overview_RendererAwareTitle.Text" xml:space="preserve"><value>识别渲染器</value></data>
+  <data name="Overview_RendererAwareDescription.Text" xml:space="preserve"><value>运行时将 CivilizationVI.exe 识别为 DX11，将 CivilizationVI_DX12.exe 识别为 DX12。</value></data>
+  <data name="Overview_ModuleReadyTitle.Text" xml:space="preserve"><value>模块化扩展</value></data>
+  <data name="Overview_ModuleReadyDescription.Text" xml:space="preserve"><value>修改器、存档、地图信息、Mod 与启动器彼此分离，后续扩展不需要把所有能力耦合到内存修改层。</value></data>
+  <data name="Trainer_Title.Text" xml:space="preserve"><value>单机修改器</value></data>
+  <data name="Trainer_StatusWaiting.Text" xml:space="preserve"><value>正在等待 Civilization VI。</value></data>
+  <data name="Trainer_Info.Title" xml:space="preserve"><value>v0.1 Trainer Core</value></data>
+  <data name="Trainer_Info.Message" xml:space="preserve"><value>进程、内存与 AoB 扫描层已经建立。单项功能只有在 Steam/Epic、DX11/DX12 的真实游戏 Build 上完成特征码验证后才会启用。</value></data>
+  <data name="Trainer_SignaturePending.Text" xml:space="preserve"><value>等待特征码</value></data>
+  <data name="Placeholder_Info.Title" xml:space="preserve"><value>计划模块</value></data>
+  <data name="Placeholder_Info.Message" xml:space="preserve"><value>导航与模块边界已经预留。后续版本可以实现该模块，而无需重构 Trainer Core。</value></data>
+  <data name="Settings_Title.Text" xml:space="preserve"><value>设置</value></data>
+  <data name="Settings_Description.Text" xml:space="preserve"><value>配置 CivVIToolkit 的本地行为。当前首先建立语言设置基础。</value></data>
+  <data name="Settings_LanguageTitle.Text" xml:space="preserve"><value>语言</value></data>
+  <data name="Settings_LanguageDescription.Text" xml:space="preserve"><value>选择界面语言。更改会保存到本机，并在重新启动应用后完整生效。</value></data>
+  <data name="Settings_RestartInfo.Title" xml:space="preserve"><value>需要重新启动</value></data>
+  <data name="Settings_RestartInfo.Message" xml:space="preserve"><value>语言偏好已保存。请重新启动 CivVIToolkit 以完整应用新的语言。</value></data>
+  <data name="Language_System" xml:space="preserve"><value>跟随系统</value></data>
+  <data name="Language_Chinese" xml:space="preserve"><value>简体中文</value></data>
+  <data name="Language_Japanese" xml:space="preserve"><value>日本語</value></data>
+  <data name="Language_English" xml:space="preserve"><value>English</value></data>
+  <data name="Status_DetectionFailed" xml:space="preserve"><value>识别失败</value></data>
+  <data name="Status_RunningTitle" xml:space="preserve"><value>Civilization VI 正在运行</value></data>
+  <data name="Status_RunningDetailsFormat" xml:space="preserve"><value>PID {0}  ·  版本 {1}
+{2}</value></data>
+  <data name="Trainer_AttachedFormat" xml:space="preserve"><value>已连接 {0} / {1}。内存访问与 AoB 扫描 Core 已就绪；该 Build 的功能特征码仍需验证。</value></data>
+  <data name="Status_InstallationDetectedTitle" xml:space="preserve"><value>已识别 Civilization VI 安装</value></data>
+  <data name="Status_InstallationDetectedBadgeFormat" xml:space="preserve"><value>{0} · 游戏未运行</value></data>
+  <data name="Status_LaunchHint" xml:space="preserve"><value>正常启动游戏即可。进程出现后，CivVIToolkit 会自动判断 DX11 或 DX12。</value></data>
+  <data name="Trainer_InstallationFound" xml:space="preserve"><value>已找到游戏安装。启动 Civilization VI 后可连接 Trainer Core。</value></data>
+  <data name="Status_NotDetectedTitle" xml:space="preserve"><value>未识别到 Civilization VI</value></data>
+  <data name="Status_ScanCompleted" xml:space="preserve"><value>Steam / Epic Games 扫描完成</value></data>
+  <data name="Status_NotDetectedHint" xml:space="preserve"><value>请通过 Steam 或 Epic Games Launcher 安装游戏，然后点击刷新。支持的安装无需手动填写路径。</value></data>
+  <data name="Trainer_WaitingSupported" xml:space="preserve"><value>正在等待受支持的 Civilization VI 安装与进程。</value></data>
+  <data name="Status_NoMetadata" xml:space="preserve"><value>未找到安装元数据。</value></data>
+  <data name="Diagnostics_Collecting" xml:space="preserve"><value>正在收集只读运行时诊断…</value></data>
+  <data name="Diagnostics_CopiedFormat" xml:space="preserve"><value>诊断已复制 · SHA-256 {0}… · 映像 {1:N0} 字节</value></data>
+  <data name="Diagnostics_FailedFormat" xml:space="preserve"><value>诊断失败：{0}</value></data>
+  <data name="Common_UnknownStore" xml:space="preserve"><value>未知平台</value></data>
+  <data name="Common_UnknownRenderer" xml:space="preserve"><value>未知渲染器</value></data>
+  <data name="Common_UnknownVersion" xml:space="preserve"><value>未知</value></data>
+  <data name="Installation_ExecutablesUnresolved" xml:space="preserve"><value>未解析到可执行文件</value></data>
+  <data name="Module_Saves_Title" xml:space="preserve"><value>存档管理</value></data>
+  <data name="Module_Saves_Description" xml:space="preserve"><value>发现、备份、标记并恢复 Civilization VI 本地存档。</value></data>
+  <data name="Module_Maps_Title" xml:space="preserve"><value>地图与游戏信息</value></data>
+  <data name="Module_Maps_Description" xml:space="preserve"><value>查看地图、规则集、DLC 与当前游戏相关信息。</value></data>
+  <data name="Module_Mods_Title" xml:space="preserve"><value>Mod 管理</value></data>
+  <data name="Module_Mods_Description" xml:space="preserve"><value>发现本地 Mod，并为验证、依赖检查和启停管理建立统一入口。</value></data>
+  <data name="Module_Launcher_Title" xml:space="preserve"><value>快捷启动</value></data>
+  <data name="Module_Launcher_Description" xml:space="preserve"><value>按识别到的 Steam / Epic 安装与 DX11 / DX12 偏好快速启动游戏。</value></data>
+  <data name="TrainerGroup_Player" xml:space="preserve"><value>玩家</value></data>
+  <data name="TrainerGroup_Units" xml:space="preserve"><value>单位</value></data>
+  <data name="TrainerGroup_Cities" xml:space="preserve"><value>城市</value></data>
+  <data name="TrainerGroup_AI" xml:space="preserve"><value>AI</value></data>
+  <data name="TrainerGroup_Combat" xml:space="preserve"><value>战斗</value></data>
+  <data name="TrainerFeature_player_unlimited_gold" xml:space="preserve"><value>无限金钱</value></data>
+  <data name="TrainerFeature_player_unlimited_faith" xml:space="preserve"><value>无限信仰</value></data>
+  <data name="TrainerFeature_player_instant_research" xml:space="preserve"><value>一回合完成研究</value></data>
+  <data name="TrainerFeature_player_instant_civic" xml:space="preserve"><value>一回合完成市政</value></data>
+  <data name="TrainerFeature_player_add_influence" xml:space="preserve"><value>增加影响力</value></data>
+  <data name="TrainerFeature_unit_unlimited_movement" xml:space="preserve"><value>单位无限移动力</value></data>
+  <data name="TrainerFeature_unit_unlimited_health" xml:space="preserve"><value>单位无限生命</value></data>
+  <data name="TrainerFeature_city_instant_production" xml:space="preserve"><value>一回合建造 / 招募</value></data>
+  <data name="TrainerFeature_player_unlimited_resources" xml:space="preserve"><value>全部奢侈 / 战略资源</value></data>
+  <data name="TrainerFeature_unit_always_upgrade" xml:space="preserve"><value>单位随时可升级</value></data>
+  <data name="TrainerFeature_city_max_population" xml:space="preserve"><value>城市最大人口</value></data>
+  <data name="TrainerFeature_player_add_gold" xml:space="preserve"><value>增加金钱</value></data>
+  <data name="TrainerFeature_unit_unlimited_builder_charges" xml:space="preserve"><value>建造者无限使用次数</value></data>
+  <data name="TrainerFeature_ai_zero_gold" xml:space="preserve"><value>清空 AI 金钱</value></data>
+  <data name="TrainerFeature_ai_zero_faith" xml:space="preserve"><value>清空 AI 信仰</value></data>
+  <data name="TrainerFeature_ai_block_research" xml:space="preserve"><value>AI 无法完成研究</value></data>
+  <data name="TrainerFeature_ai_block_civic" xml:space="preserve"><value>AI 无法完成市政</value></data>
+  <data name="TrainerFeature_ai_zero_influence" xml:space="preserve"><value>清空 AI 影响力</value></data>
+  <data name="TrainerFeature_ai_block_movement" xml:space="preserve"><value>AI 单位无法移动</value></data>
+  <data name="TrainerFeature_combat_one_hit_kill" xml:space="preserve"><value>一击必杀</value></data>
+  <data name="TrainerFeature_ai_block_production" xml:space="preserve"><value>AI 无法完成建造 / 招募</value></data>
+  <data name="TrainerFeature_ai_zero_resources" xml:space="preserve"><value>清空 AI 奢侈 / 战略资源</value></data>
+  <data name="Settings_SaveFailedTitle" xml:space="preserve"><value>保存失败</value></data>
+  <data name="Settings_SaveFailedMessage" xml:space="preserve"><value>无法写入本地设置文件。请检查当前用户对本地应用数据目录的写入权限。</value></data>
+</root>

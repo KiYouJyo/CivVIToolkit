@@ -2,31 +2,32 @@
     x:Class="CivVIToolkit.App.MainWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:trainer="using:CivVIToolkit.Core.Trainer">
+    xmlns:localization="using:CivVIToolkit.App.Localization">
 
     <NavigationView
         x:Name="RootNavigation"
+        x:Uid="Navigation_Root"
         PaneTitle="Civ VI Toolkit"
         IsBackButtonVisible="Collapsed"
         IsSettingsVisible="False"
         SelectionChanged="RootNavigation_SelectionChanged">
 
         <NavigationView.MenuItems>
-            <NavigationViewItem Content="Overview" Tag="overview">
+            <NavigationViewItem x:Uid="Navigation_Overview" Content="Overview" Tag="overview">
                 <NavigationViewItem.Icon><SymbolIcon Symbol="Home" /></NavigationViewItem.Icon>
             </NavigationViewItem>
-            <NavigationViewItem Content="Trainer" Tag="trainer">
+            <NavigationViewItem x:Uid="Navigation_Trainer" Content="Trainer" Tag="trainer">
                 <NavigationViewItem.Icon><SymbolIcon Symbol="Play" /></NavigationViewItem.Icon>
             </NavigationViewItem>
             <NavigationViewItemSeparator />
-            <NavigationViewItem Content="Save Manager" Tag="saves" />
-            <NavigationViewItem Content="Maps &amp; Game Info" Tag="maps" />
-            <NavigationViewItem Content="Mod Manager" Tag="mods" />
-            <NavigationViewItem Content="Quick Launch" Tag="launcher" />
+            <NavigationViewItem x:Uid="Navigation_Saves" Content="Save Manager" Tag="saves" />
+            <NavigationViewItem x:Uid="Navigation_Maps" Content="Maps &amp; Game Info" Tag="maps" />
+            <NavigationViewItem x:Uid="Navigation_Mods" Content="Mod Manager" Tag="mods" />
+            <NavigationViewItem x:Uid="Navigation_Launcher" Content="Quick Launch" Tag="launcher" />
         </NavigationView.MenuItems>
 
         <NavigationView.FooterMenuItems>
-            <NavigationViewItem Content="Settings" Tag="settings">
+            <NavigationViewItem x:Uid="Navigation_Settings" Content="Settings" Tag="settings">
                 <NavigationViewItem.Icon><SymbolIcon Symbol="Setting" /></NavigationViewItem.Icon>
             </NavigationViewItem>
         </NavigationView.FooterMenuItems>
@@ -36,8 +37,8 @@
                 <ScrollViewer x:Name="OverviewPanel">
                     <StackPanel Spacing="18" MaxWidth="980" HorizontalAlignment="Left">
                         <StackPanel Spacing="4">
-                            <TextBlock Text="Civ VI Toolkit" Style="{StaticResource TitleTextBlockStyle}" />
-                            <TextBlock Text="A modular Civilization VI companion for detection, single-player trainer features, saves, mods and launch workflows." Opacity="0.72" TextWrapping="Wrap" />
+                            <TextBlock x:Uid="Overview_Title" Text="Civ VI Toolkit" Style="{StaticResource TitleTextBlockStyle}" />
+                            <TextBlock x:Uid="Overview_Subtitle" Text="A modular Civilization VI companion for detection, single-player trainer features, saves, mods and launch workflows." Opacity="0.72" TextWrapping="Wrap" />
                         </StackPanel>
 
                         <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="12" Padding="18">
@@ -54,12 +55,12 @@
                                 </Grid.ColumnDefinitions>
 
                                 <StackPanel Spacing="4">
-                                    <TextBlock x:Name="StatusTitleText" Text="Scanning for Civilization VI…" Style="{StaticResource SubtitleTextBlockStyle}" />
-                                    <TextBlock x:Name="StatusBadgeText" Text="Detecting Steam / Epic Games and DX11 / DX12" Opacity="0.72" />
+                                    <TextBlock x:Name="StatusTitleText" x:Uid="Overview_StatusScanning" Text="Scanning for Civilization VI…" Style="{StaticResource SubtitleTextBlockStyle}" />
+                                    <TextBlock x:Name="StatusBadgeText" x:Uid="Overview_StatusDetecting" Text="Detecting Steam / Epic Games and DX11 / DX12" Opacity="0.72" />
                                 </StackPanel>
                                 <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Top">
-                                    <Button x:Name="DiagnosticsButton" Content="Copy diagnostics" Click="DiagnosticsButton_Click" IsEnabled="False" />
-                                    <Button x:Name="RefreshButton" Content="Refresh" Click="RefreshButton_Click" />
+                                    <Button x:Name="DiagnosticsButton" x:Uid="Overview_CopyDiagnostics" Content="Copy diagnostics" Click="DiagnosticsButton_Click" IsEnabled="False" />
+                                    <Button x:Name="RefreshButton" x:Uid="Common_Refresh" Content="Refresh" Click="RefreshButton_Click" />
                                 </StackPanel>
 
                                 <TextBlock x:Name="DetectionDetailsText" Grid.Row="1" Grid.ColumnSpan="2" Margin="0,14,0,0" TextWrapping="Wrap" />
@@ -76,20 +77,20 @@
                             </Grid.ColumnDefinitions>
                             <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="12" Padding="16">
                                 <StackPanel Spacing="5">
-                                    <TextBlock Text="Store-aware" FontWeight="SemiBold" />
-                                    <TextBlock Text="Reads Steam library metadata and Epic launcher manifests instead of relying on a fixed install path." Opacity="0.7" TextWrapping="Wrap" />
+                                    <TextBlock x:Uid="Overview_StoreAwareTitle" Text="Store-aware" FontWeight="SemiBold" />
+                                    <TextBlock x:Uid="Overview_StoreAwareDescription" Text="Reads Steam library metadata and Epic launcher manifests instead of relying on a fixed install path." Opacity="0.7" TextWrapping="Wrap" />
                                 </StackPanel>
                             </Border>
                             <Border Grid.Column="1" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="12" Padding="16">
                                 <StackPanel Spacing="5">
-                                    <TextBlock Text="Renderer-aware" FontWeight="SemiBold" />
-                                    <TextBlock Text="Identifies CivilizationVI.exe as DX11 and CivilizationVI_DX12.exe as DX12 at runtime." Opacity="0.7" TextWrapping="Wrap" />
+                                    <TextBlock x:Uid="Overview_RendererAwareTitle" Text="Renderer-aware" FontWeight="SemiBold" />
+                                    <TextBlock x:Uid="Overview_RendererAwareDescription" Text="Identifies CivilizationVI.exe as DX11 and CivilizationVI_DX12.exe as DX12 at runtime." Opacity="0.7" TextWrapping="Wrap" />
                                 </StackPanel>
                             </Border>
                             <Border Grid.Column="2" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="12" Padding="16">
                                 <StackPanel Spacing="5">
-                                    <TextBlock Text="Module-ready" FontWeight="SemiBold" />
-                                    <TextBlock Text="Trainer, saves, maps, mods and launcher are separated so the toolkit can grow without coupling everything to memory editing." Opacity="0.7" TextWrapping="Wrap" />
+                                    <TextBlock x:Uid="Overview_ModuleReadyTitle" Text="Module-ready" FontWeight="SemiBold" />
+                                    <TextBlock x:Uid="Overview_ModuleReadyDescription" Text="Trainer, saves, maps, mods and launcher are separated so the toolkit can grow without coupling everything to memory editing." Opacity="0.7" TextWrapping="Wrap" />
                                 </StackPanel>
                             </Border>
                         </Grid>
@@ -99,19 +100,15 @@
                 <ScrollViewer x:Name="TrainerPanel" Visibility="Collapsed">
                     <StackPanel Spacing="16" MaxWidth="980" HorizontalAlignment="Left">
                         <StackPanel Spacing="4">
-                            <TextBlock Text="Single-player Trainer" Style="{StaticResource TitleTextBlockStyle}" />
-                            <TextBlock x:Name="TrainerStatusText" Text="Waiting for Civilization VI." Opacity="0.72" TextWrapping="Wrap" />
+                            <TextBlock x:Uid="Trainer_Title" Text="Single-player Trainer" Style="{StaticResource TitleTextBlockStyle}" />
+                            <TextBlock x:Name="TrainerStatusText" x:Uid="Trainer_StatusWaiting" Text="Waiting for Civilization VI." Opacity="0.72" TextWrapping="Wrap" />
                         </StackPanel>
 
-                        <InfoBar IsOpen="True" IsClosable="False" Severity="Informational" Title="v0.1 trainer core">
-                            <InfoBar.Message>
-                                The process, memory and AoB scanning layers are in place. Individual game signatures stay disabled until they are verified against real Steam/Epic DX11/DX12 builds.
-                            </InfoBar.Message>
-                        </InfoBar>
+                        <InfoBar x:Uid="Trainer_Info" IsOpen="True" IsClosable="False" Severity="Informational" Title="v0.1 Trainer Core" Message="The process, memory and AoB scanning layers are in place. Individual game signatures stay disabled until they are verified against real Steam/Epic DX11/DX12 builds." />
 
                         <ListView x:Name="TrainerList" SelectionMode="None" IsItemClickEnabled="False">
                             <ListView.ItemTemplate>
-                                <DataTemplate x:DataType="trainer:TrainerFeatureDefinition">
+                                <DataTemplate x:DataType="localization:LocalizedTrainerFeature">
                                     <Grid Padding="4,8" ColumnSpacing="14">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="120" />
@@ -125,7 +122,7 @@
                                             <TextBlock Text="{x:Bind DisplayName}" FontWeight="SemiBold" />
                                             <TextBlock Text="{x:Bind Group}" Opacity="0.62" FontSize="12" />
                                         </StackPanel>
-                                        <TextBlock Grid.Column="2" Text="Signature pending" Opacity="0.62" HorizontalAlignment="Right" VerticalAlignment="Center" />
+                                        <TextBlock x:Uid="Trainer_SignaturePending" Grid.Column="2" Text="Signature pending" Opacity="0.62" HorizontalAlignment="Right" VerticalAlignment="Center" />
                                     </Grid>
                                 </DataTemplate>
                             </ListView.ItemTemplate>
@@ -133,10 +130,33 @@
                     </StackPanel>
                 </ScrollViewer>
 
+                <ScrollViewer x:Name="SettingsPanel" Visibility="Collapsed">
+                    <StackPanel Spacing="18" MaxWidth="760" HorizontalAlignment="Left">
+                        <StackPanel Spacing="4">
+                            <TextBlock x:Uid="Settings_Title" Text="Settings" Style="{StaticResource TitleTextBlockStyle}" />
+                            <TextBlock x:Uid="Settings_Description" Text="Configure local CivVIToolkit behavior." Opacity="0.72" TextWrapping="Wrap" />
+                        </StackPanel>
+                        <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="12" Padding="18">
+                            <Grid ColumnSpacing="18">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="260" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Spacing="4">
+                                    <TextBlock x:Uid="Settings_LanguageTitle" Text="Language" FontWeight="SemiBold" />
+                                    <TextBlock x:Uid="Settings_LanguageDescription" Text="Choose the interface language." Opacity="0.7" TextWrapping="Wrap" />
+                                </StackPanel>
+                                <ComboBox x:Name="LanguageComboBox" Grid.Column="1" DisplayMemberPath="DisplayName" SelectionChanged="LanguageComboBox_SelectionChanged" HorizontalAlignment="Stretch" />
+                            </Grid>
+                        </Border>
+                        <InfoBar x:Name="LanguageRestartInfoBar" x:Uid="Settings_RestartInfo" IsOpen="False" IsClosable="True" Severity="Informational" Title="Restart required" Message="Restart CivVIToolkit to fully apply the new language." />
+                    </StackPanel>
+                </ScrollViewer>
+
                 <StackPanel x:Name="PlaceholderPanel" Visibility="Collapsed" Spacing="8" MaxWidth="760" HorizontalAlignment="Left" VerticalAlignment="Top">
                     <TextBlock x:Name="PlaceholderTitleText" Style="{StaticResource TitleTextBlockStyle}" />
                     <TextBlock x:Name="PlaceholderDescriptionText" Opacity="0.72" TextWrapping="Wrap" />
-                    <InfoBar IsOpen="True" IsClosable="False" Severity="Informational" Title="Planned module" Message="The navigation contract already reserves this module. Implementation will arrive in a later milestone without restructuring the trainer core." />
+                    <InfoBar x:Uid="Placeholder_Info" IsOpen="True" IsClosable="False" Severity="Informational" Title="Planned module" Message="The navigation contract already reserves this module. Implementation will arrive in a later milestone without restructuring the Trainer Core." />
                 </StackPanel>
             </Grid>
         </NavigationView.Content>

@@ -1,0 +1,61 @@
+name: Bug report
+about: 报告可复现的 CivVIToolkit 问题
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感谢反馈。请勿提交账号凭据、PFX、Token 或无关的完整内存转储。
+  - type: input
+    id: version
+    attributes:
+      label: CivVIToolkit 版本 / Commit
+      placeholder: v0.1.0-preview / commit SHA
+    validations:
+      required: true
+  - type: input
+    id: windows
+    attributes:
+      label: Windows 版本
+      placeholder: Windows 11 26H2 build ...
+    validations:
+      required: true
+  - type: dropdown
+    id: store
+    attributes:
+      label: Civilization VI 来源
+      options:
+        - Steam
+        - Epic Games
+        - 未识别 / 其他
+    validations:
+      required: true
+  - type: dropdown
+    id: renderer
+    attributes:
+      label: 图形后端
+      options:
+        - DX11
+        - DX12
+        - 未知
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: 复现步骤
+      description: 请按顺序描述如何稳定复现。
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: 预期结果与实际结果
+    validations:
+      required: true
+  - type: textarea
+    id: diagnostics
+    attributes:
+      label: Runtime Diagnostics（可选）
+      description: 可粘贴经过脱敏的 Copy diagnostics JSON。公开前可删除本机路径。
+      render: json
