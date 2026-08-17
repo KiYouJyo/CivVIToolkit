@@ -28,8 +28,20 @@
   <data name="Overview_ModuleReadyDescription.Text" xml:space="preserve"><value>Trainer, saves, maps, mods and launcher stay separated so the toolkit can grow without coupling everything to memory editing.</value></data>
   <data name="Trainer_Title.Text" xml:space="preserve"><value>Single-player Trainer</value></data>
   <data name="Trainer_StatusWaiting.Text" xml:space="preserve"><value>Waiting for Civilization VI.</value></data>
-  <data name="Trainer_Info.Title" xml:space="preserve"><value>v0.1 Trainer Core</value></data>
-  <data name="Trainer_Info.Message" xml:space="preserve"><value>The process, memory and AoB scanning layers are in place. Individual features stay disabled until signatures are verified against real Steam/Epic and DX11/DX12 game builds.</value></data>
+  <data name="Trainer_Info.Title" xml:space="preserve"><value>v0.2 Trainer Core</value></data>
+  <data name="Trainer_Info.Message" xml:space="preserve"><value>The verified Steam / DX12 1023995 exact profile exposes all 22 single-player trainer actions. Click a row or use its global hotkey; mismatched builds fail closed.</value></data>
+  <data name="Trainer_OperationHint.Text" xml:space="preserve"><value>Click a trainer row or use its corresponding global hotkey.</value></data>
+  <data name="Trainer_ProfileVerified" xml:space="preserve"><value>Steam / DX12 / Gathering Storm 1.0.12.68 (1023995) profile verified · 22 features available</value></data>
+  <data name="Trainer_StateReady" xml:space="preserve"><value>Ready</value></data>
+  <data name="Trainer_StateActionReady" xml:space="preserve"><value>Action ready</value></data>
+  <data name="Trainer_StateEnabled" xml:space="preserve"><value>Enabled</value></data>
+  <data name="Trainer_StateDisabled" xml:space="preserve"><value>Disabled</value></data>
+  <data name="Trainer_StateCompleted" xml:space="preserve"><value>Completed</value></data>
+  <data name="Trainer_StateExperimental" xml:space="preserve"><value>Experimental acceptance</value></data>
+  <data name="Trainer_StateNotAttached" xml:space="preserve"><value>Game not attached</value></data>
+  <data name="Trainer_StateUnsupported" xml:space="preserve"><value>Unsupported build</value></data>
+  <data name="Trainer_StateError" xml:space="preserve"><value>Runtime error</value></data>
+  <data name="Trainer_StateUnavailable" xml:space="preserve"><value>Currently unavailable</value></data>
   <data name="Trainer_SignaturePending.Text" xml:space="preserve"><value>Signature pending</value></data>
   <data name="Placeholder_Info.Title" xml:space="preserve"><value>Planned module</value></data>
   <data name="Placeholder_Info.Message" xml:space="preserve"><value>Navigation and module boundaries are already reserved. The module can be implemented later without restructuring the Trainer Core.</value></data>
