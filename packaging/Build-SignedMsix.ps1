@@ -43,7 +43,8 @@ dotnet build $projectPath -c Release -p:Platform=x64 -r win-x64 --no-restore `
     -p:UapAppxPackageBuildMode=SideloadOnly `
     -p:AppxPackageDir="$buildOutput\" `
     -p:SelfContained=true `
-    -p:WindowsAppSDKSelfContained=true
+    -p:WindowsAppSDKSelfContained=true `
+    -p:PublishReadyToRun=false
 if ($LASTEXITCODE -ne 0) { throw "MSIX build failed with exit code $LASTEXITCODE." }
 
 $candidates = Get-ChildItem -LiteralPath $buildOutput -Recurse -Filter '*.msix' -File |
