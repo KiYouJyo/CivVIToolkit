@@ -15,7 +15,9 @@
 - 监测 Civilization VI 进程，读取 PID、可执行文件路径和版本信息。
 - 提供进程内存读写、AoB 特征码解析与扫描基础。
 - 已建立经典 **22 项单机修改功能**的数据驱动框架与快捷键契约。
-- 对未验证游戏版本保持 `Signature pending`，不会使用猜测地址。
+- 已针对 Steam / DX12 / Gathering Storm `1.0.12.68 (1023995)` 建立首个精确 GameCore Profile。
+- v0.1.3 开始开放首个真实写入功能：`PageUp` / 应用内按钮 **增加金钱 +10,000**。
+- 每次写入前都会重新验证 GameCore SHA-256、13 个 AoB anchor、本地玩家与 Treasury 路径；其余 21 项仍保持 `Signature pending`。
 - 提供只读运行时诊断，便于建立 Steam / Epic、DX11 / DX12 的版本化 Signature Profile。
 - 已预留 Save Manager、Maps & Game Info、Mod Manager、Quick Launch 与 Settings 模块。
 
@@ -30,13 +32,13 @@
 
 ## Trainer 状态
 
-当前低层内存访问、AoB 扫描、快捷键与 22 项功能目录已经建立。真正修改游戏状态的项目只有在对应游戏 Build 的特征码与 Patch 语义完成验证后才会启用。
+当前低层内存访问、AoB 扫描、快捷键与 22 项功能目录已经建立。已验证 Build 上的单项功能会逐步开放；任何未完成 Profile、AoB、对象链或写入语义验证的功能仍保持不可用，不会使用猜测地址。
 
 兼容策略见 [Trainer Signature 文档](docs/TRAINER-SIGNATURES.md)，运行时 Build Fingerprint 见 [诊断文档](docs/RUNTIME-DIAGNOSTICS.md)。
 
 ## Signed Acceptance 验收包
 
-仓库提供自动签名的 x64 Preview 验收工作流。仓库内同源 PR 会自动执行，维护者也可以在 Actions 中手动运行 **Signed Acceptance**。工作流会完成 Restore、测试、Release 构建、自包含发布、证书签名、签名验证、SHA-256 清单生成和 Artifact 上传。
+仓库提供自动签名的 x64 Preview 验收工作流。仓库内同源 PR 会自动执行，维护者也可以在 Actions 中手动运行 **Signed MSIX Acceptance**。工作流会完成 Restore、测试、Release 构建、MSIX 签名、签名验证、SHA-256 清单生成和 Artifact 上传。
 
 验收包用于真实 Civilization VI 环境测试，不等同于正式 Release。详细流程见 [发布指南](docs/RELEASE.md)。
 
@@ -78,19 +80,16 @@ dotnet build CivVIToolkit.sln -c Release -p:Platform=x64 --no-restore
 ## 文档
 
 - [路线图与版本规划](docs/ROADMAP.md)
-- [发布与 Signed Acceptance](docs/RELEASE.md)
-- [文档治理](docs/DOCUMENTATION.md)
-- [本地化规范](docs/LOCALIZATION.md)
 - [架构](docs/ARCHITECTURE.md)
-- [Trainer Signature](docs/TRAINER-SIGNATURES.md)
+- [Trainer 特征码策略](docs/TRAINER-SIGNATURES.md)
 - [运行时诊断](docs/RUNTIME-DIAGNOSTICS.md)
-- [更改日志](CHANGELOG.md)
-- [支持](SUPPORT.md) · [隐私政策](PRIVACY.md) · [第三方声明](THIRD-PARTY-NOTICES.md)
+- [本地化](docs/LOCALIZATION.md)
+- [发布流程](docs/RELEASE.md)
 
 ## 使用范围
 
-Trainer 模块仅面向本地单机游戏。多人作弊、反作弊绕过与破坏在线游戏公平性的功能不在项目范围内。
+Trainer 功能仅面向 **Civilization VI 本地单机模式**。本项目不面向多人对战作弊，也不会为绕过联机反作弊机制提供支持。
 
-## License 与商标
+## License
 
-项目代码使用 [MIT License](LICENSE)。Sid Meier's Civilization、Civilization VI 及相关商标归其权利人所有；CivVIToolkit 是独立社区项目，与 Firaxis Games、2K 或 Take-Two Interactive 无隶属或背书关系。
+MIT
