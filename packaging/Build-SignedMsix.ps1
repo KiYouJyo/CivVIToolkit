@@ -89,14 +89,26 @@ if ($LASTEXITCODE -ne 0) { throw "signtool sign failed with exit code $LASTEXITC
 $cerPath = Join-Path $OutputDirectory "CivVIToolkit-$DisplayVersion.cer"
 Export-Certificate -Cert $certificate -FilePath $cerPath | Out-Null
 
-# Trust only the public certificate on the ephemeral runner so full chain verification is meaningful.
-Import-Certificate -FilePath $cerPath -CertStoreLocation Cert:\CurrentUser\TrustedPeople | Out-Null
-& $signtool.FullName verify /pa /v $msixPath
-if ($LASTEXITCODE -ne 0) { throw "signtool verify failed with exit code $LASTEXITCODE." }
+# The repository certificate is self-signed. For CI verification only, trust its public
+# certificate as a root in the ephemeral CurrentUser store, run a full WinVerifyTrust
+# verification, then remove that temporary trust anchor before the job exits. The
+# distributed one-click installer still uses TrustedPeople and never receives a private key.
+$rootStorePath = "Cert:\CurrentUser\Root\$($certificate.Thumbprint)"
+try {
+    Import-Certificate -FilePath $cerPath -CertStoreLocation Cert:\CurrentUser\Root | Out-Null
+    & $signtool.FullName verify /pa /v $msixPath
+    if ($LASTEXITCODE -ne 0) { throw "signtool verify failed with exit code $LASTEXITCODE." }
 
-$signature = Get-AuthenticodeSignature -FilePath $msixPath
-if (-not $signature.SignerCertificate -or $signature.SignerCertificate.Thumbprint -cne $ExpectedThumbprint) {
-    throw 'Signed MSIX does not carry the expected repository signer.'
+    $signature = Get-AuthenticodeSignature -FilePath $msixPath
+    if (-not $signature.SignerCertificate -or $signature.SignerCertificate.Thumbprint -cne $ExpectedThumbprint) {
+        throw 'Signed MSIX does not carry the expected repository signer.'
+    }
+    if ($signature.Status -ne 'Valid') {
+        throw "Authenticode verification did not resolve to Valid: $($signature.Status) / $($signature.StatusMessage)"
+    }
+}
+finally {
+    if (Test-Path -LiteralPath $rootStorePath) { Remove-Item -LiteralPath $rootStorePath -Force }
 }
 
 Remove-Item -LiteralPath $pfxPath -Force
