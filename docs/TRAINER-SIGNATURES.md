@@ -18,7 +18,7 @@ A profile is keyed by:
 - executable SHA-256 when available
 - loaded GameCore module name and SHA-256
 
-## First research profile: Steam / DX12 / build 1023995
+## First verified profile: Steam / DX12 / build 1023995
 
 The first real-machine validation supplied the exact Gathering Storm GameCore module for Civilization VI `1.0.12.68 (1023995)`.
 
@@ -27,7 +27,7 @@ The first real-machine validation supplied the exact Gathering Storm GameCore mo
 - GameCore SHA-256: `324c51e9ea3531758842e16c69e6cddbefbb226c5b675c3d6e60111646c2e98c`
 - GameCore image size: `0xC60000`
 
-Static analysis of that exact module established unique anchors for the game root/local-player path, Player Manager, Treasury, Religion/Faith and Influence paths, plus the Gold/Faith balance routines. The development probe verifies those anchors against the *loaded* module before reading any game state.
+Static and live validation established 13 runtime anchors spanning the game context, local-player path, real `Player::Manager`, live Treasury / Religion / Influence bridges, and the Gold/Faith routines.
 
 ### Live Player vs Player Cache
 
@@ -41,9 +41,15 @@ The second live run exposed that distinction directly: the live player's `+0xB0`
   - Treasury: `[player+0x780]`
 - `Player::Cache::Instance`: `[cache+0xB0] + component offset`
 
-The v0.1.2 probe follows the live branch and adds AoB anchors for the bridge routines themselves, so the direct component offsets are verified against code from the exact supported GameCore build rather than stored as unverified structure guesses.
+The corrected probe follows the live branch and validates the bridge routines themselves by AoB. The subsequent real-machine run matched the in-game Gold and Faith values, completing the read-chain acceptance gate.
 
-For this profile the probe remains deliberately read-only. It resolves the local human player, reads fixed-point Gold, Faith and Influence values, and compares them with the in-game UI before any write-capable trainer feature is enabled.
+## First verified write: Add Gold +10,000
+
+v0.1.3 enables only `player.add-gold` for the exact profile above.
+
+Before every write, CivVIToolkit re-runs the complete read-only probe so the GameCore fingerprint, all 13 AoB anchors, the local player, and the live Treasury pointer must still validate. The current Gold field is then read from the verified Treasury component at `+0xA8`, adjusted using Civilization VI's native 1/256 fixed-point representation, written once, and immediately read back for exact verification.
+
+The action is available through `PageUp` and the in-app acceptance button. The remaining 21 Trainer rows stay `SignaturePending`.
 
 The uploaded proprietary game DLL is never committed to this repository or included in build artifacts. Only hashes, independently derived layout metadata and short verification signatures are stored.
 
@@ -52,9 +58,9 @@ The uploaded proprietary game DLL is never committed to this repository or inclu
 1. Attach only to a detected Civilization VI process.
 2. Require the expected GameCore module to be loaded for Gathering Storm-specific features.
 3. Resolve the matching profile by store/renderer/build fingerprint.
-4. Scan and validate every requested feature before exposing its switch.
-5. Preserve original bytes/state before writing.
-6. Restore patches on disable, detach and normal application shutdown.
+4. Scan and validate every requested feature before exposing its switch or action.
+5. Preserve original bytes/state before patch-style toggles are introduced.
+6. Restore reversible patches on disable, detach and normal application shutdown.
 7. If a fingerprint/signature is absent or mismatched, show an unsupported/pending state rather than guessing.
 
-The current trainer engine deliberately keeps the 22 feature rows in `SignaturePending` until the live read/write path for each feature has been validated. The build probe is a development bridge: passing it proves the first profile's runtime pointer chain and signatures, but does not itself enable a cheat switch.
+The current verified write is a value action rather than a persistent code patch, so it does not leave modified instruction bytes behind. Future toggle features must additionally preserve and restore the original code bytes.
