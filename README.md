@@ -65,7 +65,7 @@ CivVIToolkit 不要求账户，也不包含遥测。安装发现、游戏进程�
 
 ## 使用范围
 
-Trainer 功能只面向 Civilization VI **本地单机模式**。项目不提供多人联机作弊或反作弊规避能力。
+Trainer 功能只面向 Civilization VI **本地单机模式**。
 
 ## 系统要求
 
