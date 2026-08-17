@@ -1,0 +1,24 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-test:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Restore
+        run: dotnet restore CivVIToolkit.sln -p:Platform=x64
+      - name: Build
+        run: dotnet build CivVIToolkit.sln -c Release -p:Platform=x64 --no-restore
+      - name: Test
+        run: dotnet test tests/CivVIToolkit.Tests/CivVIToolkit.Tests.csproj -c Release -p:Platform=x64 --no-build --logger "trx;LogFileName=test-results.trx"
