@@ -11,8 +11,8 @@ public sealed class SteamDx12Build1023995Probe : ITrainerBuildProbe
     public const string ProfileId = "steam-dx12-gs-1.0.12.68-1023995";
     public const string ExpectedGameCoreSha256 = "324c51e9ea3531758842e16c69e6cddbefbb226c5b675c3d6e60111646c2e98c";
 
-    private const long GameRootGlobalRva = 0xB8A720;
-    private const long PlayerManagerGlobalRva = 0xB8BEE0;
+    private const int GameRootGlobalRva = 0xB8A720;
+    private const int PlayerManagerGlobalRva = 0xB8BEE0;
     private const int GameRootGameOffset = 0x08;
     private const int LocalPlayerIdOffset = 0x16F8;
     private const int PlayerArrayOffset = 0x20;
@@ -166,5 +166,5 @@ public sealed class SteamDx12Build1023995Probe : ITrainerBuildProbe
         return Convert.ToHexString(digest).ToLowerInvariant();
     }
 
-    private sealed record SignatureCheck(string Name, long ExpectedRva, string Pattern);
+    private sealed record SignatureCheck(string Name, int ExpectedRva, string Pattern);
 }
