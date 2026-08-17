@@ -118,9 +118,9 @@ jobs:
             if (-not $signature.SignerCertificate) { throw "No signer certificate found on $target" }
             if ($signature.SignerCertificate.Thumbprint -cne $certificate.Thumbprint) { throw "Signer mismatch on $target" }
             if ($signature.Status -eq 'UnknownError') {
-              if ($signature.StatusMessage -notmatch '(?i)not trusted|trust provider|untrusted|self-signed') { throw "Unexpected Authenticode status for $target: $($signature.StatusMessage)" }
+              if ($signature.StatusMessage -notmatch '(?i)not trusted|trust provider|untrusted|self-signed') { throw "Unexpected Authenticode status for ${target}: $($signature.StatusMessage)" }
             } elseif ($signature.Status -ne 'Valid') {
-              throw "Authenticode verification failed for $target: $($signature.Status) / $($signature.StatusMessage)"
+              throw "Authenticode verification failed for ${target}: $($signature.Status) / $($signature.StatusMessage)"
             }
           }
 
