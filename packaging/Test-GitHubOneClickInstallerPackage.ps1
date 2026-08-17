@@ -35,7 +35,7 @@ foreach ($requiredContract in @('Cert:\LocalMachine\TrustedPeople', 'Start-Proce
         throw "Installer contract is missing: $requiredContract"
     }
 }
-if ($installerText -match 'Cert:\CurrentUser\TrustedPeople') {
+if ($installerText.Contains('Cert:\CurrentUser\TrustedPeople')) {
     throw 'Installer must not rely on CurrentUser TrustedPeople for MSIX sideload trust.'
 }
 
