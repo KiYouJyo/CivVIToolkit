@@ -13,18 +13,30 @@ if (-not (Test-Path -LiteralPath $root -PathType Container)) {
 
 $msix = Join-Path $root "CivVIToolkit_${ExpectedPackageVersion}_x64.msix"
 $cer = Join-Path $root "CivVIToolkit-$ExpectedDisplayVersion.cer"
-foreach ($required in @($msix, $cer, (Join-Path $root 'Install-CivVIToolkit.ps1'), (Join-Path $root 'Install-CivVIToolkit.cmd'), (Join-Path $root 'README-INSTALL.txt'))) {
+$installer = Join-Path $root 'Install-CivVIToolkit.ps1'
+foreach ($required in @($msix, $cer, $installer, (Join-Path $root 'Install-CivVIToolkit.cmd'), (Join-Path $root 'README-INSTALL.txt'))) {
     if (-not (Test-Path -LiteralPath $required -PathType Leaf)) { throw "Required package file is missing: $required" }
 }
 
 $certificate = Get-PfxCertificate -FilePath $cer
 if (-not $certificate) { throw 'Public certificate is unreadable.' }
 if ($certificate.HasPrivateKey) { throw 'Private key material leaked into the one-click package.' }
+if ($certificate.Subject -cne 'CN=AppPublisher') { throw "Unexpected public certificate subject: $($certificate.Subject)" }
 
 $signature = Get-AuthenticodeSignature -FilePath $msix
 if (-not $signature.SignerCertificate) { throw 'The MSIX is not Authenticode signed.' }
 if ($signature.SignerCertificate.Thumbprint -cne $certificate.Thumbprint) {
     throw 'MSIX signer and bundled public certificate do not match.'
+}
+
+$installerText = Get-Content -Raw -LiteralPath $installer
+foreach ($requiredContract in @('Cert:\LocalMachine\TrustedPeople', 'Start-Process', '-Verb RunAs', 'Add-AppxPackage', $ExpectedPackageVersion, $certificate.Thumbprint)) {
+    if ($installerText -notmatch [regex]::Escape($requiredContract)) {
+        throw "Installer contract is missing: $requiredContract"
+    }
+}
+if ($installerText -match 'Cert:\CurrentUser\TrustedPeople') {
+    throw 'Installer must not rely on CurrentUser TrustedPeople for MSIX sideload trust.'
 }
 
 $inspection = Join-Path $env:RUNNER_TEMP "CivVIToolkit-msix-inspection-$([Guid]::NewGuid().ToString('N'))"
@@ -42,6 +54,7 @@ if ($identity.Version -ne $ExpectedPackageVersion) {
     throw "MSIX version mismatch. Expected $ExpectedPackageVersion, found $($identity.Version)."
 }
 if ($identity.Publisher -ne 'CN=AppPublisher') { throw "Unexpected MSIX publisher: $($identity.Publisher)" }
+if ($identity.Name -ne '7F943FBD-0D20-4D24-B20E-F59ADF91A916') { throw "Unexpected MSIX identity name: $($identity.Name)" }
 
 $languages = @($manifest.SelectNodes("//*[local-name()='Resources']/*[local-name()='Resource']") | ForEach-Object Language)
 foreach ($language in @('zh-CN', 'ja-JP', 'en-US')) {
