@@ -117,7 +117,8 @@ public sealed partial class MainWindow : Window
     private async Task RefreshProcessStateAsync()
     {
         var next = _processMonitor.FindRunningSession(_installations);
-        var changed = next?.ProcessId != _session?.ProcessId;
+        var changed = next?.ProcessId != _session?.ProcessId
+            || !string.Equals(next?.GameCoreModulePath, _session?.GameCoreModulePath, StringComparison.OrdinalIgnoreCase);
         _session = next;
 
         if (changed)
