@@ -2,7 +2,7 @@
 
 # CivVIToolkit
 
-A modern Windows toolkit for **Sid Meier's Civilization VI**. The WinUI 3 application starts with a local single-player trainer core while keeping save management, map/game information, mod management and quick launch as independent future modules.
+A modern Windows toolkit for **Sid Meier's Civilization VI**. The WinUI 3 application starts with a local single-player trainer while keeping save management, maps/game information, Mod management, and quick launch as independent expansion modules.
 
 [![GitHub Release](https://img.shields.io/github/v/release/KiYouJyo/CivVIToolkit?display_name=tag&sort=semver&color=2F81F7&label=Release)](https://github.com/KiYouJyo/CivVIToolkit/releases) [![CI](https://github.com/KiYouJyo/CivVIToolkit/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/KiYouJyo/CivVIToolkit/actions/workflows/ci.yml) [![Closed PRs](https://img.shields.io/github/issues-pr-closed/KiYouJyo/CivVIToolkit?color=8250DF&label=Closed%20PRs)](https://github.com/KiYouJyo/CivVIToolkit/pulls?q=is%3Apr+is%3Aclosed) [![Last Commit](https://img.shields.io/github/last-commit/KiYouJyo/CivVIToolkit?color=57606A&label=Last%20Commit)](https://github.com/KiYouJyo/CivVIToolkit/commits/main/)
 
@@ -12,16 +12,18 @@ A modern Windows toolkit for **Sid Meier's Civilization VI**. The WinUI 3 applic
 
 - Automatic **Steam / Epic Games** installation discovery.
 - Automatic **DX11 / DX12** detection from the running game executable.
-- Civilization VI process monitoring with PID, executable path and file version.
+- Civilization VI process monitoring with PID, executable path, and file version.
 - Process-memory access and AoB signature scanning foundations.
 - A data-driven catalog and shortcut contract for the classic **22 trainer features**.
-- Unverified builds remain `Signature pending`; guessed fixed addresses are not enabled.
-- Read-only runtime diagnostics for building versioned Steam/Epic and DX11/DX12 signature profiles.
-- Reserved modules for Save Manager, Maps & Game Info, Mod Manager, Quick Launch and Settings.
+- The first exact profile targets Steam / DX12 / Gathering Storm `1.0.12.68 (1023995)`; v0.2.0 Preview implements all 22 entries for grouped live acceptance.
+- `PageUp` Add Gold +10,000 is already verified in a real single-player match. The other v0.2.0 entries are implemented for acceptance and are not yet described as fully live-verified.
+- Unsupported builds fail closed instead of using guessed fixed addresses.
+- Read-only runtime diagnostics support versioned Steam/Epic and DX11/DX12 Signature Profiles.
+- Save Manager, Maps & Game Info, Mod Manager, Quick Launch, and Settings remain independent expansion modules.
 
 ## Detection
 
-- Steam: Steam registry roots, library metadata and app manifest `289070`.
+- Steam: Steam registry roots, library metadata, and app manifest `289070`.
 - Epic Games: Epic Games Launcher local manifests.
 - DX11: `CivilizationVI.exe`.
 - DX12: `CivilizationVI_DX12.exe`.
@@ -30,28 +32,34 @@ The actual running executable path is used as a fallback when launcher metadata 
 
 ## Trainer status
 
-The memory layer, AoB scanner, hotkey contracts and 22-feature catalog are already in place. A feature that changes game state is enabled only after its signatures and patch semantics are verified against the detected game build.
+The first complete acceptance profile is locked to:
 
-See [Trainer Signatures](docs/TRAINER-SIGNATURES.md) and [Runtime Diagnostics](docs/RUNTIME-DIAGNOSTICS.md).
+- Steam / DX12 / Gathering Storm `1.0.12.68 (1023995)`
+- EXE SHA-256 `c2c3d40b86260a541d8a4d38cb70d50d3406ae1de374afc382d1e42bc1342f1e`
+- GameCore SHA-256 `324c51e9ea3531758842e16c69e6cddbefbb226c5b675c3d6e60111646c2e98c`
+
+v0.2.0 Preview connects all 22 catalog entries to clickable rows and their original hotkeys: Num 1–9, Num 0, Num ., PageUp, PageDown, and Alt+Num 1–9. Every operation remains exact-profile gated; a build, signature, pointer-chain, or patch-byte mismatch refuses execution.
+
+See [Trainer Signatures](docs/TRAINER-SIGNATURES.md) for implementation and acceptance status and [Runtime Diagnostics](docs/RUNTIME-DIAGNOSTICS.md) for build fingerprints.
 
 ## Signed Acceptance builds
 
-The repository includes an automatically signed x64 Preview acceptance workflow. Same-repository pull requests run **Signed Acceptance** automatically, and maintainers can also start it manually from Actions. It restores, tests, builds, publishes a self-contained x64 app, signs and verifies the binaries, generates SHA-256 checksums and uploads an artifact.
+The repository provides an automatically signed x64 Preview acceptance workflow. Same-repository PRs automatically run **Signed MSIX Acceptance**, and maintainers can also run it manually from Actions. Restore, tests, Release build, MSIX signing, signature verification, SHA-256 generation, and artifact upload are automated.
 
-Acceptance builds are for real-game validation and are not formal releases. See [docs/RELEASE.md](docs/RELEASE.md).
+Acceptance builds are for validation on real Civilization VI installations and are not automatically formal GitHub Releases. See [docs/RELEASE.md](docs/RELEASE.md).
 
 ## Planned modules
 
-- **Save Manager** — discovery, backups, tags, metadata and restore workflows.
-- **Maps & Game Info** — map, ruleset and current-session information.
-- **Mod Manager** — discovery, validation, dependencies and enable/disable workflows.
+- **Save Manager** — discovery, backups, tags, metadata, and restore workflows.
+- **Maps & Game Info** — map, ruleset, DLC, and current-game information.
+- **Mod Manager** — discovery, validation, dependencies, and enable/disable workflows.
 - **Quick Launch** — launch the detected storefront build with a selected renderer.
 
 See [Roadmap](docs/ROADMAP.md) and [Architecture](docs/ARCHITECTURE.md).
 
 ## Privacy and local design
 
-CivVIToolkit requires no account and contains no telemetry. Installation discovery, process detection, signature scanning and current diagnostics are local. Diagnostic JSON is copied only to the local clipboard and is never uploaded automatically. Redact local paths before posting diagnostics publicly if desired.
+CivVIToolkit requires no account and contains no telemetry. Installation discovery, process detection, signature scanning, and current diagnostics are local. Diagnostic JSON is copied only to the local clipboard and is never uploaded automatically.
 
 See [PRIVACY.md](PRIVACY.md).
 
@@ -63,7 +71,7 @@ See [PRIVACY.md](PRIVACY.md).
 
 ## Languages
 
-The repository and application localization foundation support Simplified Chinese, Japanese and English. All three resource sets must keep identical keys.
+The repository and application localization foundation support Simplified Chinese, Japanese, and English. All three resource sets must keep identical keys.
 
 ## Development
 
@@ -89,8 +97,8 @@ See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Scope
 
-The trainer is for local single-player use only. Multiplayer cheating, anti-cheat bypasses and features that undermine online fairness are out of scope.
+Trainer functionality is intended only for local Civilization VI single-player use.
 
 ## License and trademarks
 
-Code is licensed under the [MIT License](LICENSE). Sid Meier's Civilization, Civilization VI and related marks belong to their respective owners. CivVIToolkit is an independent community project and is not affiliated with or endorsed by Firaxis Games, 2K or Take-Two Interactive.
+Code is licensed under the [MIT License](LICENSE). Sid Meier's Civilization, Civilization VI, and related marks belong to their respective owners. CivVIToolkit is an independent community project and is not affiliated with or endorsed by Firaxis Games, 2K, or Take-Two Interactive.
