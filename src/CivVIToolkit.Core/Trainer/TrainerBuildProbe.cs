@@ -13,9 +13,9 @@ public sealed record TrainerBuildProbeSnapshot(
     int GoldRaw,
     int FaithRaw,
     int InfluencePointsRaw,
+    string ResourcePath,
     string PlayerManagerAddress,
     string PlayerAddress,
-    string ComponentsAddress,
     string TreasuryAddress,
     string ReligionAddress,
     string InfluenceAddress);
