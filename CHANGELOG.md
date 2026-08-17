@@ -17,6 +17,23 @@
 - Signed Acceptance 从“解压后直接运行的 self-contained WinUI 3 目录”迁移为签名 MSIX。
 - Release 结构对齐 UrbanPlanToolbox：版本元数据、签名产物、one-click 包、SHA-256、三语说明和幂等 Release reconciliation。
 
+## [0.1.1] - 2026-08-17
+
+### Added
+- Steam / DX12 / Gathering Storm `1.0.12.68 (1023995)` 的首个精确 GameCore Profile。
+- GameCore SHA-256 gating 与运行时 AoB 验证。
+- 本地玩家 Gold / Faith / Influence 只读 Probe。
+- Game Context current-game、Player Manager、Treasury、Religion、Influence、Gold/Faith setter 等 10 个运行时签名锚点。
+- Probe 原始定点数值和 Manager / Player / Component 地址诊断。
+
+### Fixed
+- 修正首轮真实对局验收发现的 Player Manager singleton 错误：由错误的 `GameCore+0xB8BEE0` 改为实际 `GameCore+0xB8E140`。
+- 修正 active-player slot table 偏移：由错误的 `+0x1460` 改为实际 `+0x2B48`。
+- 显式验证 Game Context 的 current-game getter 等价于读取 `[context+0x08]`，避免把未经验证的结构假设继续传递到写入阶段。
+
+### Safety
+- v0.1.1 仍只执行读取与验证；所有 Trainer 写入继续保持关闭，直到真实对局资源数值与 UI 完全吻合。
+
 ## [0.1.0] - 2026-08-17
 
 ### Added
