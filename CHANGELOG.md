@@ -17,6 +17,18 @@
 - Signed Acceptance 从“解压后直接运行的 self-contained WinUI 3 目录”迁移为签名 MSIX。
 - Release 结构对齐 UrbanPlanToolbox：版本元数据、签名产物、one-click 包、SHA-256、三语说明和幂等 Release reconciliation。
 
+## [0.1.3] - 2026-08-17
+
+### Added
+- 首个真实写入功能：`PageUp` / 应用内按钮“增加金钱 +10,000”。
+- 每次写入前重新执行完整 Steam / DX12 / Gathering Storm build 1023995 Profile 验证。
+- Gold 写入采用游戏原生 1/256 定点格式，并在写入后立即回读确认。
+
+### Safety
+- 只有 `player.add-gold` 在精确 GameCore SHA-256 与 13 个 AoB anchor 全部验证通过时可用。
+- 其余 21 项 Trainer 功能继续保持 Signature Pending。
+- 本阶段仍限定 Civilization VI 本地单机模式。
+
 ## [0.1.2] - 2026-08-17
 
 ### Fixed
