@@ -17,6 +17,20 @@
 - Signed Acceptance 从“解压后直接运行的 self-contained WinUI 3 目录”迁移为签名 MSIX。
 - Release 结构对齐 UrbanPlanToolbox：版本元数据、签名产物、one-click 包、SHA-256、三语说明和幂等 Release reconciliation。
 
+## [0.1.2] - 2026-08-17
+
+### Fixed
+- 修正第二轮真实对局验收发现的 live Player 资源对象链错误。
+- 明确区分 `Player::Instance` 与 `Player::Cache::Instance`：`Player::Manager` 返回 live Player，不能套用 Cache 的 `+0xB0` component block。
+- 根据 GameCore 自身 bridge 代码，live Player 改为直接读取 Religion `+0x720`、Influence `+0x748`、Treasury `+0x780` 指针。
+
+### Added
+- live Faith / Gold / Influence bridge 的运行时 AoB 验证。
+- Probe 输出 `ResourcePath` 与实际 Treasury / Religion / Influence 组件地址。
+
+### Safety
+- v0.1.2 仍只执行读取与验证；所有 Trainer 写入继续关闭，直到真实 UI 的 Gold / Faith 与 Probe 结果一致。
+
 ## [0.1.1] - 2026-08-17
 
 ### Added
