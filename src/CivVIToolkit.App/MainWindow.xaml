@@ -106,6 +106,20 @@
 
                         <InfoBar x:Uid="Trainer_Info" IsOpen="True" IsClosable="False" Severity="Informational" Title="v0.1 Trainer Core" Message="The process, memory and AoB scanning layers are in place. Individual game signatures stay disabled until they are verified against real Steam/Epic DX11/DX12 builds." />
 
+                        <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="10" Padding="14">
+                            <Grid ColumnSpacing="16">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Spacing="3">
+                                    <TextBlock x:Name="AddGoldPreviewTitleText" FontWeight="SemiBold" />
+                                    <TextBlock x:Name="AddGoldPreviewStatusText" Opacity="0.68" TextWrapping="Wrap" />
+                                </StackPanel>
+                                <Button x:Name="AddGoldButton" Grid.Column="1" Content="PageUp · +10,000" Click="AddGoldButton_Click" IsEnabled="False" VerticalAlignment="Center" />
+                            </Grid>
+                        </Border>
+
                         <ListView x:Name="TrainerList" SelectionMode="None" IsItemClickEnabled="False">
                             <ListView.ItemTemplate>
                                 <DataTemplate x:DataType="localization:LocalizedTrainerFeature">
