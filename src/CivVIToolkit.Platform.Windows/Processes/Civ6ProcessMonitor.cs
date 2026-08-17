@@ -6,6 +6,7 @@ namespace CivVIToolkit.Platform.Windows.Processes;
 
 public sealed partial class Civ6ProcessMonitor : IGameProcessMonitor
 {
+    private const string GatheringStormModuleName = "GameCore_XP2_FinalRelease.dll";
     private static readonly string[] ProcessNames = ["CivilizationVI_DX12", "CivilizationVI"];
 
     public GameSession? FindRunningSession(IReadOnlyList<GameInstallation> installations)
@@ -32,7 +33,8 @@ public sealed partial class Civ6ProcessMonitor : IGameProcessMonitor
     {
         try
         {
-            var executablePath = process.MainModule?.FileName;
+            var mainModule = process.MainModule;
+            var executablePath = mainModule?.FileName;
             if (string.IsNullOrWhiteSpace(executablePath))
             {
                 return null;
@@ -45,7 +47,9 @@ public sealed partial class Civ6ProcessMonitor : IGameProcessMonitor
 
             var matched = installations.FirstOrDefault(installation => IsUnder(executablePath, installation.InstallDirectory));
             var store = matched?.Store ?? InferStore(executablePath);
-            var fileVersion = ParseVersion(process.MainModule?.FileVersionInfo.FileVersion);
+            var fileVersionText = mainModule?.FileVersionInfo.FileVersion;
+            var fileVersion = ParseVersion(fileVersionText);
+            var gameCoreModulePath = FindLoadedModulePath(process, GatheringStormModuleName);
 
             return new GameSession(
                 process.Id,
@@ -55,12 +59,34 @@ public sealed partial class Civ6ProcessMonitor : IGameProcessMonitor
                 backend,
                 matched?.InstallDirectory ?? FindLikelyInstallRoot(executablePath),
                 fileVersion,
-                matched is not null);
+                matched is not null,
+                fileVersionText,
+                gameCoreModulePath);
         }
         catch (Exception exception) when (exception is InvalidOperationException or System.ComponentModel.Win32Exception or NotSupportedException)
         {
             return null;
         }
+    }
+
+    private static string? FindLoadedModulePath(Process process, string moduleName)
+    {
+        try
+        {
+            foreach (ProcessModule module in process.Modules)
+            {
+                if (string.Equals(module.ModuleName, moduleName, StringComparison.OrdinalIgnoreCase))
+                {
+                    return module.FileName;
+                }
+            }
+        }
+        catch (Exception exception) when (exception is InvalidOperationException or System.ComponentModel.Win32Exception or NotSupportedException)
+        {
+            return null;
+        }
+
+        return null;
     }
 
     private static bool IsUnder(string filePath, string directory)
@@ -110,10 +136,19 @@ public sealed partial class Civ6ProcessMonitor : IGameProcessMonitor
             return null;
         }
 
-        var match = VersionRegex().Match(text);
-        return match.Success && Version.TryParse(match.Value, out var version) ? version : null;
+        var match = CivVersionRegex().Match(text);
+        if (!match.Success)
+        {
+            return null;
+        }
+
+        return new Version(
+            int.Parse(match.Groups["major"].Value),
+            int.Parse(match.Groups["minor"].Value),
+            int.Parse(match.Groups["build"].Value),
+            int.Parse(match.Groups["revision"].Value));
     }
 
-    [GeneratedRegex(@"\d+(?:\.\d+){1,3}")]
-    private static partial Regex VersionRegex();
+    [GeneratedRegex(@"(?<major>\d+)\s*[,\.]\s*(?<minor>\d+)\s*[,\.]\s*(?<build>\d+)\s*[,\.]\s*(?<revision>\d+)")]
+    private static partial Regex CivVersionRegex();
 }

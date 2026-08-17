@@ -117,7 +117,8 @@ public sealed partial class MainWindow : Window
     private async Task RefreshProcessStateAsync()
     {
         var next = _processMonitor.FindRunningSession(_installations);
-        var changed = next?.ProcessId != _session?.ProcessId;
+        var changed = next?.ProcessId != _session?.ProcessId
+            || !string.Equals(next?.GameCoreModulePath, _session?.GameCoreModulePath, StringComparison.OrdinalIgnoreCase);
         _session = next;
 
         if (changed)
@@ -144,10 +145,13 @@ public sealed partial class MainWindow : Window
         {
             StatusTitleText.Text = _localization.GetString("Status_RunningTitle");
             StatusBadgeText.Text = $"{StoreLabel(_session.Store)} · {BackendLabel(_session.GraphicsBackend)}";
+            var displayVersion = _session.FileVersionText
+                ?? _session.FileVersion?.ToString()
+                ?? _localization.GetString("Common_UnknownVersion");
             DetectionDetailsText.Text = _localization.GetFormattedString(
                 "Status_RunningDetailsFormat",
                 _session.ProcessId,
-                _session.FileVersion?.ToString() ?? _localization.GetString("Common_UnknownVersion"),
+                displayVersion,
                 _session.ExecutablePath);
             TrainerStatusText.Text = _localization.GetFormattedString(
                 "Trainer_AttachedFormat",
