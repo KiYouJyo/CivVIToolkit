@@ -17,10 +17,14 @@ public sealed class SteamDx12Build1023995Probe : ITrainerBuildProbe
     private const int LocalPlayerIdOffset = 0x16F8;
     private const int PlayerArrayOffset = 0x20;
     private const int PlayerStateArrayOffset = 0x2B48;
-    private const int PlayerComponentsOffset = 0xB0;
-    private const int ReligionComponentOffset = 0x1090;
-    private const int TreasuryComponentOffset = 0x1260;
-    private const int InfluenceComponentOffset = 0x1450;
+
+    // The live Player::Instance returned by Player::Manager does not use the
+    // Player::Cache component block at +0xB0. The game's own bridge functions
+    // at 0x59CE70/0x59CEE0/0x59CFD0 prove these direct component pointers.
+    private const int LivePlayerReligionPointerOffset = 0x720;
+    private const int LivePlayerInfluencePointerOffset = 0x748;
+    private const int LivePlayerTreasuryPointerOffset = 0x780;
+
     private const int FaithBalanceOffset = 0xB0;
     private const int GoldBalanceOffset = 0xA8;
     private const int InfluencePointsOffset = 0xB8;
@@ -32,9 +36,12 @@ public sealed class SteamDx12Build1023995Probe : ITrainerBuildProbe
         new("game-context-current-game", 0x956030, "48 8B 41 08 C3 CC CC CC CC CC CC CC CC CC CC CC 48 89 5C 24 10"),
         new("local-player-id", 0x696CC0, "8B 81 F8 16 00 00 C3 CC CC CC CC CC CC CC CC CC 40 53 48 83 EC 20"),
         new("player-manager", 0x306B80, "48 8B 05 B9 75 88 00 C3 CC CC CC CC CC CC CC CC 48 8D 81 E0 2D 00 00"),
-        new("treasury-accessor", 0xBDCD0, "48 8B 81 B0 00 00 00 48 05 60 12 00 00 C3"),
-        new("religion-accessor", 0xBE2C0, "48 8B 81 B0 00 00 00 48 05 90 10 00 00 C3"),
-        new("influence-accessor", 0xBDC90, "48 8B 81 B0 00 00 00 48 05 50 14 00 00 C3"),
+        new("cache-treasury-accessor", 0xBDCD0, "48 8B 81 B0 00 00 00 48 05 60 12 00 00 C3"),
+        new("cache-religion-accessor", 0xBE2C0, "48 8B 81 B0 00 00 00 48 05 90 10 00 00 C3"),
+        new("cache-influence-accessor", 0xBDC90, "48 8B 81 B0 00 00 00 48 05 50 14 00 00 C3"),
+        new("live-faith-bridge", 0x59CE70, "40 53 48 83 EC 20 48 8B 41 08 48 8B DA 48 85 C0 74 ?? 48 8B 80 20 07 00 00 8B 88 B0 00 00 00"),
+        new("live-gold-bridge", 0x59CEE0, "40 53 48 83 EC 20 48 8B 41 08 48 8B DA 48 85 C0 74 ?? 48 8B 80 80 07 00 00 8B 88 A8 00 00 00"),
+        new("live-influence-bridge", 0x59CFD0, "40 53 48 83 EC 20 48 83 79 08 00 48 8B D9 B9 20 00 00 00 74 ??"),
         new("change-gold", 0x3432E0, "48 83 EC 28 44 8B 02 4C 8B C9 8B 91 A8 00 00 00 45 85 C0 78 ?? B8 FF FF FF 7F"),
         new("set-gold", 0x343D30, "40 53 48 83 EC 30 8B 02 48 8B D9 39 81 A8 00 00 00 74 ?? 44 0F B6 44 24 40"),
         new("set-faith", 0x316090, "48 89 5C 24 10 57 48 83 EC 20 8B 02 48 8B FA 48 8B D9 39 81 B0 00 00 00 74 ??"),
@@ -92,9 +99,6 @@ public sealed class SteamDx12Build1023995Probe : ITrainerBuildProbe
             verified[check.Name] = $"0x{rva:X}";
         }
 
-        // The verified game-context vtable getter at RVA 0x956030 is exactly
-        // `mov rax, [rcx+8]; ret`, so reading +0x08 is equivalent to the game's
-        // own current-game accessor without executing code in the target process.
         var gameRoot = ReadPointer(memory, moduleBase + GameRootGlobalRva, "game root");
         var game = ReadPointer(memory, gameRoot + GameRootGameOffset, "game instance");
         var localPlayerId = ReadInt32(memory, game + LocalPlayerIdOffset, "local player ID");
@@ -103,9 +107,6 @@ public sealed class SteamDx12Build1023995Probe : ITrainerBuildProbe
             throw new InvalidOperationException($"Local player ID {localPlayerId} is outside the expected 0-64 range.");
         }
 
-        // Player::Manager::Get at RVA 0x306B80 resolves the singleton from
-        // GameCore+0xB8E140. Its active-slot table is at +0x2B48 and the player
-        // pointer table is at +0x20; both contracts are visible in the same build.
         var manager = ReadPointer(memory, moduleBase + PlayerManagerGlobalRva, "player manager");
         var states = ReadPointer(memory, manager + PlayerStateArrayOffset, "player state array");
         var state = ReadInt32(memory, states + (localPlayerId * sizeof(int)), "local player state");
@@ -116,10 +117,15 @@ public sealed class SteamDx12Build1023995Probe : ITrainerBuildProbe
 
         var players = ReadPointer(memory, manager + PlayerArrayOffset, "player array");
         var player = ReadPointer(memory, players + (localPlayerId * IntPtr.Size), "local player");
-        var components = ReadPointer(memory, player + PlayerComponentsOffset, "local player component block");
-        var religion = components + ReligionComponentOffset;
-        var treasury = components + TreasuryComponentOffset;
-        var influence = components + InfluenceComponentOffset;
+
+        // The first corrected live run proved that Player::Manager returns a live
+        // Player::Instance whose +0xB0 cache-component pointer is null. Static
+        // analysis of the exact DLL shows the game's own abstraction bridge takes
+        // live resources from direct pointers at +0x720/+0x748/+0x780, while the
+        // +0xB0 plus-component-offset accessors belong to Player::Cache::Instance.
+        var religion = ReadPointer(memory, player + LivePlayerReligionPointerOffset, "live player religion component");
+        var treasury = ReadPointer(memory, player + LivePlayerTreasuryPointerOffset, "live player treasury component");
+        var influence = ReadPointer(memory, player + LivePlayerInfluencePointerOffset, "live player influence component");
 
         var faithRaw = ReadInt32(memory, religion + FaithBalanceOffset, "faith balance");
         var goldRaw = ReadInt32(memory, treasury + GoldBalanceOffset, "gold balance");
@@ -136,9 +142,9 @@ public sealed class SteamDx12Build1023995Probe : ITrainerBuildProbe
             goldRaw,
             faithRaw,
             influenceRaw,
+            "Player::Manager live instance -> direct component pointers",
             FormatAddress(manager),
             FormatAddress(player),
-            FormatAddress(components),
             FormatAddress(treasury),
             FormatAddress(religion),
             FormatAddress(influence));
