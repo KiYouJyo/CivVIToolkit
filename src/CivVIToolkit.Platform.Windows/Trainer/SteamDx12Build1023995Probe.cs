@@ -41,7 +41,7 @@ public sealed class SteamDx12Build1023995Probe : ITrainerBuildProbe
         new("cache-influence-accessor", 0xBDC90, "48 8B 81 B0 00 00 00 48 05 50 14 00 00 C3"),
         new("live-faith-bridge", 0x59CE70, "40 53 48 83 EC 20 48 8B 41 08 48 8B DA 48 85 C0 74 ?? 48 8B 80 20 07 00 00 8B 88 B0 00 00 00"),
         new("live-gold-bridge", 0x59CEE0, "40 53 48 83 EC 20 48 8B 41 08 48 8B DA 48 85 C0 74 ?? 48 8B 80 80 07 00 00 8B 88 A8 00 00 00"),
-        new("live-influence-bridge", 0x59CFD0, "40 53 48 83 EC 20 48 83 79 08 00 48 8B D9 B9 20 00 00 00 74 ??"),
+        new("live-influence-bridge", 0x59CFD0, "40 53 48 83 EC 20 48 83 79 08 00 48 8B D9 B9 20 00 00 00 74 ?? E8 ?? ?? ?? ?? 48 85 C0 74 ?? 48 8B 4B 08 48 8B 91 48 07 00 00"),
         new("change-gold", 0x3432E0, "48 83 EC 28 44 8B 02 4C 8B C9 8B 91 A8 00 00 00 45 85 C0 78 ?? B8 FF FF FF 7F"),
         new("set-gold", 0x343D30, "40 53 48 83 EC 30 8B 02 48 8B D9 39 81 A8 00 00 00 74 ?? 44 0F B6 44 24 40"),
         new("set-faith", 0x316090, "48 89 5C 24 10 57 48 83 EC 20 8B 02 48 8B FA 48 8B D9 39 81 B0 00 00 00 74 ??"),
