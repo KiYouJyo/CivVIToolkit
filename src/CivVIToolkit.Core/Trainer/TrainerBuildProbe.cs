@@ -9,7 +9,16 @@ public sealed record TrainerBuildProbeSnapshot(
     double Gold,
     double Faith,
     double InfluencePoints,
-    IReadOnlyDictionary<string, string> VerifiedSignatures);
+    IReadOnlyDictionary<string, string> VerifiedSignatures,
+    int GoldRaw,
+    int FaithRaw,
+    int InfluencePointsRaw,
+    string PlayerManagerAddress,
+    string PlayerAddress,
+    string ComponentsAddress,
+    string TreasuryAddress,
+    string ReligionAddress,
+    string InfluenceAddress);
 
 public interface ITrainerBuildProbe
 {
