@@ -27,9 +27,23 @@ The first real-machine validation supplied the exact Gathering Storm GameCore mo
 - GameCore SHA-256: `324c51e9ea3531758842e16c69e6cddbefbb226c5b675c3d6e60111646c2e98c`
 - GameCore image size: `0xC60000`
 
-Static analysis of that exact module established unique anchors for the game root/local-player path, player manager, Treasury, Religion/Faith and Influence component accessors, plus the Gold/Faith balance routines. The development probe verifies those anchors against the *loaded* module before reading any game state.
+Static analysis of that exact module established unique anchors for the game root/local-player path, Player Manager, Treasury, Religion/Faith and Influence paths, plus the Gold/Faith balance routines. The development probe verifies those anchors against the *loaded* module before reading any game state.
 
-For this profile the first live probe is deliberately read-only. It resolves the local human player through the game's own local-player state, then reads the fixed-point Gold, Faith and Influence values so the pointer chain can be compared against the in-game UI before any write-capable trainer feature is enabled.
+### Live Player vs Player Cache
+
+The first probe iteration followed the `Player::Cache::Instance` layout (`[player+0xB0] + component offset`) and therefore did not represent the live `Player::Instance` returned by `Player::Manager`.
+
+The second live run exposed that distinction directly: the live player's `+0xB0` cache-component pointer is null. Inspection of the exact GameCore shows that the game's own bridge layer has two branches:
+
+- live `Player::Instance`: direct component pointers
+  - Religion: `[player+0x720]`
+  - Influence: `[player+0x748]`
+  - Treasury: `[player+0x780]`
+- `Player::Cache::Instance`: `[cache+0xB0] + component offset`
+
+The v0.1.2 probe follows the live branch and adds AoB anchors for the bridge routines themselves, so the direct component offsets are verified against code from the exact supported GameCore build rather than stored as unverified structure guesses.
+
+For this profile the probe remains deliberately read-only. It resolves the local human player, reads fixed-point Gold, Faith and Influence values, and compares them with the in-game UI before any write-capable trainer feature is enabled.
 
 The uploaded proprietary game DLL is never committed to this repository or included in build artifacts. Only hashes, independently derived layout metadata and short verification signatures are stored.
 
