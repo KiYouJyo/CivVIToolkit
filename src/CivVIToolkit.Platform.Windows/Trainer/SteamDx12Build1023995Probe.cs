@@ -12,11 +12,11 @@ public sealed class SteamDx12Build1023995Probe : ITrainerBuildProbe
     public const string ExpectedGameCoreSha256 = "324c51e9ea3531758842e16c69e6cddbefbb226c5b675c3d6e60111646c2e98c";
 
     private const int GameRootGlobalRva = 0xB8A720;
-    private const int PlayerManagerGlobalRva = 0xB8BEE0;
+    private const int PlayerManagerGlobalRva = 0xB8E140;
     private const int GameRootGameOffset = 0x08;
     private const int LocalPlayerIdOffset = 0x16F8;
     private const int PlayerArrayOffset = 0x20;
-    private const int PlayerStateArrayOffset = 0x1460;
+    private const int PlayerStateArrayOffset = 0x2B48;
     private const int PlayerComponentsOffset = 0xB0;
     private const int ReligionComponentOffset = 0x1090;
     private const int TreasuryComponentOffset = 0x1260;
@@ -29,8 +29,9 @@ public sealed class SteamDx12Build1023995Probe : ITrainerBuildProbe
     private static readonly SignatureCheck[] SignatureChecks =
     [
         new("game-root", 0xA200, "48 8B 05 19 05 B8 00 C3 CC CC CC CC CC CC CC CC 48 83 EC 28 48 8B 01"),
+        new("game-context-current-game", 0x956030, "48 8B 41 08 C3 CC CC CC CC CC CC CC CC CC CC CC 48 89 5C 24 10"),
         new("local-player-id", 0x696CC0, "8B 81 F8 16 00 00 C3 CC CC CC CC CC CC CC CC CC 40 53 48 83 EC 20"),
-        new("player-manager", 0xBF4D0, "48 8B 05 09 CA AC 00 C3 CC CC CC CC CC CC CC CC 48 89 5C 24 10"),
+        new("player-manager", 0x306B80, "48 8B 05 B9 75 88 00 C3 CC CC CC CC CC CC CC CC 48 8D 81 E0 2D 00 00"),
         new("treasury-accessor", 0xBDCD0, "48 8B 81 B0 00 00 00 48 05 60 12 00 00 C3"),
         new("religion-accessor", 0xBE2C0, "48 8B 81 B0 00 00 00 48 05 90 10 00 00 C3"),
         new("influence-accessor", 0xBDC90, "48 8B 81 B0 00 00 00 48 05 50 14 00 00 C3"),
@@ -91,14 +92,20 @@ public sealed class SteamDx12Build1023995Probe : ITrainerBuildProbe
             verified[check.Name] = $"0x{rva:X}";
         }
 
+        // The verified game-context vtable getter at RVA 0x956030 is exactly
+        // `mov rax, [rcx+8]; ret`, so reading +0x08 is equivalent to the game's
+        // own current-game accessor without executing code in the target process.
         var gameRoot = ReadPointer(memory, moduleBase + GameRootGlobalRva, "game root");
         var game = ReadPointer(memory, gameRoot + GameRootGameOffset, "game instance");
         var localPlayerId = ReadInt32(memory, game + LocalPlayerIdOffset, "local player ID");
-        if ((uint)localPlayerId >= 64)
+        if ((uint)localPlayerId >= 0x41)
         {
-            throw new InvalidOperationException($"Local player ID {localPlayerId} is outside the expected 0-63 range.");
+            throw new InvalidOperationException($"Local player ID {localPlayerId} is outside the expected 0-64 range.");
         }
 
+        // Player::Manager::Get at RVA 0x306B80 resolves the singleton from
+        // GameCore+0xB8E140. Its active-slot table is at +0x2B48 and the player
+        // pointer table is at +0x20; both contracts are visible in the same build.
         var manager = ReadPointer(memory, moduleBase + PlayerManagerGlobalRva, "player manager");
         var states = ReadPointer(memory, manager + PlayerStateArrayOffset, "player state array");
         var state = ReadInt32(memory, states + (localPlayerId * sizeof(int)), "local player state");
