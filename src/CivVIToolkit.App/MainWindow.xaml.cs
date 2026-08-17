@@ -3,10 +3,12 @@ using System.Text.Json.Serialization;
 using CivVIToolkit.App.Localization;
 using CivVIToolkit.App.Settings;
 using CivVIToolkit.Core.Game;
+using CivVIToolkit.Core.Hotkeys;
 using CivVIToolkit.Core.Localization;
 using CivVIToolkit.Core.Trainer;
 using CivVIToolkit.Platform.Windows.Diagnostics;
 using CivVIToolkit.Platform.Windows.Discovery;
+using CivVIToolkit.Platform.Windows.Hotkeys;
 using CivVIToolkit.Platform.Windows.Processes;
 using CivVIToolkit.Platform.Windows.Trainer;
 using Microsoft.UI.Dispatching;
@@ -19,6 +21,9 @@ namespace CivVIToolkit.App;
 
 public sealed partial class MainWindow : Window
 {
+    private const string AddGoldFeatureId = "player.add-gold";
+    private const long AddGoldAmount = 10_000;
+
     private static readonly JsonSerializerOptions DiagnosticsJsonOptions = new()
     {
         WriteIndented = true,
@@ -28,8 +33,8 @@ public sealed partial class MainWindow : Window
     private readonly IGameDiscoveryService _discovery = new WindowsGameDiscoveryService();
     private readonly IGameProcessMonitor _processMonitor = new Civ6ProcessMonitor();
     private readonly IGameRuntimeDiagnosticsService _diagnostics = new GameRuntimeDiagnosticsService();
-    private readonly ITrainerBuildProbe _buildProbe = new SteamDx12Build1023995Probe();
-    private readonly ITrainerEngine _trainer = new PendingSignatureTrainerEngine();
+    private readonly SteamDx12Build1023995Probe _buildProbe;
+    private readonly ITrainerEngine _trainer;
     private readonly ILocalizationService _localization = LocalizationService.Default;
     private readonly AppSettingsService _settingsService = AppSettingsService.Default;
     private readonly DispatcherQueueTimer _processTimer;
@@ -37,8 +42,11 @@ public sealed partial class MainWindow : Window
     private IReadOnlyList<GameInstallation> _installations = [];
     private GameSession? _session;
     private AppSettings _settings;
+    private Win32HotkeyRegistrationService? _hotkeys;
+    private IDisposable? _addGoldHotkey;
     private bool _refreshInProgress;
     private bool _languageInitializing;
+    private bool _trainerActionInProgress;
 
     public MainWindow()
     {
@@ -46,10 +54,14 @@ public sealed partial class MainWindow : Window
         Title = _localization.GetString("AppDisplayName");
         SystemBackdrop = new MicaBackdrop();
 
+        _buildProbe = new SteamDx12Build1023995Probe();
+        _trainer = new SteamDx12Build1023995TrainerEngine(_buildProbe);
         _settings = _settingsService.Load();
         TrainerList.ItemsSource = TrainerCatalog.All.Select(feature => LocalizedTrainerFeature.From(feature, _localization)).ToList();
+        AddGoldPreviewTitleText.Text = $"{_localization.GetString("TrainerFeature_player_add_gold")} · PageUp · +{AddGoldAmount:N0}";
         InitializeLanguageOptions();
         RootNavigation.SelectedItem = RootNavigation.MenuItems[0];
+        InitializeHotkeys();
 
         _processTimer = DispatcherQueue.CreateTimer();
         _processTimer.Interval = TimeSpan.FromSeconds(2);
@@ -59,6 +71,22 @@ public sealed partial class MainWindow : Window
 
         Closed += MainWindow_Closed;
         _ = RefreshDiscoveryAsync();
+    }
+
+    private void InitializeHotkeys()
+    {
+        try
+        {
+            var windowHandle = WinRT.Interop.WindowNative.GetWindowHandle(this);
+            _hotkeys = new Win32HotkeyRegistrationService(windowHandle);
+            _addGoldHotkey = _hotkeys.Register(
+                ShortcutGesture.Parse("PageUp"),
+                () => DispatcherQueue.TryEnqueue(() => _ = ExecuteAddGoldAsync()));
+        }
+        catch (Exception exception)
+        {
+            AddGoldPreviewStatusText.Text = $"PageUp: {exception.Message}";
+        }
     }
 
     private void InitializeLanguageOptions()
@@ -125,6 +153,7 @@ public sealed partial class MainWindow : Window
         if (changed)
         {
             DiagnosticsStatusText.Text = string.Empty;
+            AddGoldPreviewStatusText.Text = string.Empty;
             if (_session is null)
             {
                 await _trainer.DetachAsync();
@@ -154,10 +183,14 @@ public sealed partial class MainWindow : Window
                 _session.ProcessId,
                 displayVersion,
                 _session.ExecutablePath);
-            TrainerStatusText.Text = _localization.GetFormattedString(
-                "Trainer_AttachedFormat",
-                StoreLabel(_session.Store),
-                BackendLabel(_session.GraphicsBackend));
+
+            var addGoldState = GetAddGoldState();
+            TrainerStatusText.Text = addGoldState?.Availability == TrainerAvailability.Available
+                ? $"{StoreLabel(_session.Store)} / {BackendLabel(_session.GraphicsBackend)} · {_localization.GetString("TrainerFeature_player_add_gold")} · PageUp ✓"
+                : _localization.GetFormattedString(
+                    "Trainer_AttachedFormat",
+                    StoreLabel(_session.Store),
+                    BackendLabel(_session.GraphicsBackend));
         }
         else if (_installations.Count > 0)
         {
@@ -178,7 +211,19 @@ public sealed partial class MainWindow : Window
         InstallationsText.Text = _installations.Count == 0
             ? _localization.GetString("Status_NoMetadata")
             : string.Join("\n", _installations.Select(FormatInstallation));
+
+        UpdateTrainerActionAvailability();
     }
+
+    private void UpdateTrainerActionAvailability()
+    {
+        AddGoldButton.IsEnabled = !_trainerActionInProgress
+            && _session is not null
+            && GetAddGoldState()?.Availability == TrainerAvailability.Available;
+    }
+
+    private TrainerFeatureState? GetAddGoldState() =>
+        _trainer.Features.FirstOrDefault(state => state.Definition.Id == AddGoldFeatureId);
 
     private string FormatInstallation(GameInstallation installation)
     {
@@ -205,6 +250,41 @@ public sealed partial class MainWindow : Window
     private async void RefreshButton_Click(object sender, RoutedEventArgs e)
     {
         await RefreshDiscoveryAsync();
+    }
+
+    private async void AddGoldButton_Click(object sender, RoutedEventArgs e)
+    {
+        await ExecuteAddGoldAsync();
+    }
+
+    private async Task ExecuteAddGoldAsync()
+    {
+        if (_trainerActionInProgress
+            || _session is null
+            || GetAddGoldState()?.Availability != TrainerAvailability.Available)
+        {
+            return;
+        }
+
+        _trainerActionInProgress = true;
+        UpdateTrainerActionAvailability();
+        try
+        {
+            var before = await _buildProbe.ProbeAsync(_session);
+            await _trainer.ExecuteAsync(AddGoldFeatureId, AddGoldAmount);
+            var after = await _buildProbe.ProbeAsync(_session);
+            var featureName = _localization.GetString("TrainerFeature_player_add_gold");
+            AddGoldPreviewStatusText.Text = $"{featureName}: {before.Gold:N1} → {after.Gold:N1}";
+        }
+        catch (Exception exception)
+        {
+            AddGoldPreviewStatusText.Text = exception.Message;
+        }
+        finally
+        {
+            _trainerActionInProgress = false;
+            UpdateTrainerActionAvailability();
+        }
     }
 
     private async void DiagnosticsButton_Click(object sender, RoutedEventArgs e)
@@ -304,6 +384,8 @@ public sealed partial class MainWindow : Window
     private void MainWindow_Closed(object sender, WindowEventArgs args)
     {
         _processTimer.Stop();
+        _addGoldHotkey?.Dispose();
+        _hotkeys?.Dispose();
         _trainer.Dispose();
     }
 
