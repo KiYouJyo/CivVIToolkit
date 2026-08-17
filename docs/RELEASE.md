@@ -1,6 +1,6 @@
 # 发布、MSIX 与一键 Release
 
-CivVIToolkit 将开发验收和正式 GitHub Release 分开，但两条链路共用同一套 **x64 MSIX 构建、证书签名、签名验证和 one-click 安装包**逻辑。
+CivVIToolkit 将开发验收和正式 GitHub Release 分开，但两条链路共用同一套 **x64 MSIX 构建、证书签名、签名身份验证和 one-click 安装包**逻辑。
 
 ## 为什么改用 MSIX
 
@@ -10,7 +10,7 @@ CivVIToolkit 将开发验收和正式 GitHub Release 分开，但两条链路共
 - Manifest 明确声明 `runFullTrust`，保留本地单机 Trainer 所需的桌面进程访问能力；
 - 包内固定声明 `zh-CN` / `ja-JP` / `en-US`；
 - MSIX 与仓库发布证书的 Publisher 必须一致；
-- Actions 会在上传前验证签名和包内 Manifest。
+- Actions 会在上传前验证签名者 Subject / Thumbprint 和包内 Manifest。
 
 当前只发布 Windows x64。未来增加 ARM64 时，可把直接 `.msix` 提升为 `.msixbundle`，而不需要改变 release 元数据契约。
 
@@ -25,10 +25,10 @@ CivVIToolkit 将开发验收和正式 GitHub Release 分开，但两条链路共
 5. 从 GitHub Actions Secrets 临时导入发布证书；
 6. 验证 Publisher、证书 Subject 和 Thumbprint；
 7. 使用 SHA-256 + RFC 3161 timestamp 对 MSIX 签名；
-8. 在 Runner 上信任公开证书并执行完整 `signtool verify`；
+8. 读取 MSIX 的 Authenticode 签名并核对嵌入的签名者 Subject / Thumbprint；由于仓库证书是自签名证书，干净 Runner 上允许预期的 `UnknownError / untrusted root`，不会为了 CI 修改系统根证书库；
 9. 导出公开 `.cer`；
 10. 生成 one-click 安装 ZIP；
-11. 解包 MSIX 并验证版本、三语 Resources 与 `runFullTrust`；
+11. 解包 MSIX 并验证版本、Identity、三语 Resources、`runFullTrust` 和安装脚本契约；
 12. 生成 `SHA256SUMS.txt` 并上传 14 天 Artifact。
 
 ### Actions Secrets
@@ -49,7 +49,9 @@ Artifact 包含：
 - `CivVIToolkit-X.Y.Z.cer`
 - `SHA256SUMS.txt`
 
-one-click ZIP 内的 `Install-CivVIToolkit.cmd` 会调用 PowerShell，只为**当前用户**信任公开证书，然后执行 `Add-AppxPackage`。不需要管理员权限，也不会导入私钥。
+one-click ZIP 内的 `Install-CivVIToolkit.cmd` 会调用 PowerShell。首次安装若发布证书尚未受信任，会通过 UAC 提升一个只负责证书导入的辅助步骤，把**公开证书**加入 `LocalMachine\TrustedPeople`；随后回到普通安装流程，验证 MSIX 签名、执行 `Add-AppxPackage`，并核对已安装包的版本、x64 架构和 `Ok` 状态。安装包从不包含 PFX 或私钥。
+
+这与 UrbanPlanToolbox 当前的侧载证书边界保持一致：自签名 MSIX 的信任建立在本机 `TrustedPeople`，而不是依赖 `CurrentUser\TrustedPeople`。
 
 ## release/release.json
 
