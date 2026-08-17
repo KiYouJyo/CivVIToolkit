@@ -28,6 +28,7 @@ public sealed partial class MainWindow : Window
     private readonly IGameDiscoveryService _discovery = new WindowsGameDiscoveryService();
     private readonly IGameProcessMonitor _processMonitor = new Civ6ProcessMonitor();
     private readonly IGameRuntimeDiagnosticsService _diagnostics = new GameRuntimeDiagnosticsService();
+    private readonly ITrainerBuildProbe _buildProbe = new SteamDx12Build1023995Probe();
     private readonly ITrainerEngine _trainer = new PendingSignatureTrainerEngine();
     private readonly ILocalizationService _localization = LocalizationService.Default;
     private readonly AppSettingsService _settingsService = AppSettingsService.Default;
@@ -218,6 +219,19 @@ public sealed partial class MainWindow : Window
         try
         {
             var snapshot = await _diagnostics.CaptureAsync(_session);
+            if (_session.IsGatheringStormCoreLoaded)
+            {
+                try
+                {
+                    var trainerProbe = await _buildProbe.ProbeAsync(_session);
+                    snapshot = snapshot with { TrainerProbe = trainerProbe };
+                }
+                catch (Exception exception)
+                {
+                    snapshot = snapshot with { TrainerProbeError = exception.Message };
+                }
+            }
+
             var json = JsonSerializer.Serialize(snapshot, DiagnosticsJsonOptions);
             var package = new DataPackage();
             package.SetText(json);
