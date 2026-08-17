@@ -144,10 +144,13 @@ public sealed partial class MainWindow : Window
         {
             StatusTitleText.Text = _localization.GetString("Status_RunningTitle");
             StatusBadgeText.Text = $"{StoreLabel(_session.Store)} · {BackendLabel(_session.GraphicsBackend)}";
+            var displayVersion = _session.FileVersionText
+                ?? _session.FileVersion?.ToString()
+                ?? _localization.GetString("Common_UnknownVersion");
             DetectionDetailsText.Text = _localization.GetFormattedString(
                 "Status_RunningDetailsFormat",
                 _session.ProcessId,
-                _session.FileVersion?.ToString() ?? _localization.GetString("Common_UnknownVersion"),
+                displayVersion,
                 _session.ExecutablePath);
             TrainerStatusText.Text = _localization.GetFormattedString(
                 "Trainer_AttachedFormat",
