@@ -9,9 +9,16 @@ public sealed record LocalizedTrainerFeature(
     string Shortcut,
     TrainerFeatureKind Kind,
     long? DefaultValue,
-    string? Notes)
+    string? Notes,
+    string Status,
+    bool IsEnabled,
+    TrainerAvailability Availability)
 {
-    public static LocalizedTrainerFeature From(TrainerFeatureDefinition definition, ILocalizationService localization)
+    public static LocalizedTrainerFeature From(
+        TrainerFeatureDefinition definition,
+        ILocalizationService localization,
+        TrainerFeatureState? state = null,
+        string? status = null)
     {
         ArgumentNullException.ThrowIfNull(definition);
         ArgumentNullException.ThrowIfNull(localization);
@@ -34,6 +41,7 @@ public sealed record LocalizedTrainerFeature(
             displayName = definition.DisplayName;
         }
 
+        var availability = state?.Availability ?? TrainerAvailability.SignaturePending;
         return new LocalizedTrainerFeature(
             definition.Id,
             group,
@@ -41,6 +49,9 @@ public sealed record LocalizedTrainerFeature(
             definition.Shortcut,
             definition.Kind,
             definition.DefaultValue,
-            definition.Notes);
+            definition.Notes,
+            status ?? state?.StatusMessage ?? string.Empty,
+            state?.IsEnabled ?? false,
+            availability);
     }
 }
