@@ -1,4 +1,4 @@
-name: Signed Acceptance
+name: Signed MSIX Acceptance
 
 on:
   workflow_dispatch:
@@ -9,12 +9,12 @@ permissions:
   contents: read
 
 concurrency:
-  group: signed-acceptance-${{ github.event.pull_request.number || github.ref }}
+  group: signed-msix-acceptance-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 jobs:
   acceptance:
-    name: Validate, publish, sign, and package x64
+    name: Validate, build, sign, and package x64 MSIX
     if: github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.full_name == github.repository
     runs-on: windows-2025-vs2026
     timeout-minutes: 45
@@ -30,21 +30,37 @@ jobs:
         with:
           dotnet-version: 10.0.x
 
+      - name: Resolve and validate release metadata
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $release = Get-Content -Raw 'release/release.json' | ConvertFrom-Json
+          $version = [string]$release.product.version
+          $packageVersion = [string]$release.product.packageVersion
+          if ($version -notmatch '^\d+\.\d+\.\d+$') { throw "Invalid display version: $version" }
+          if ($packageVersion -ne "$version.0") { throw "packageVersion must be $version.0, found $packageVersion" }
+          [xml]$project = Get-Content -Raw 'src/CivVIToolkit.App/CivVIToolkit.App.csproj'
+          $projectVersion = @($project.Project.PropertyGroup | ForEach-Object Version | Where-Object { $_ })[0]
+          if ($projectVersion -ne $version) { throw "csproj version mismatch: $projectVersion" }
+          [xml]$manifest = Get-Content -Raw 'src/CivVIToolkit.App/Package.appxmanifest'
+          $identity = $manifest.SelectSingleNode("//*[local-name()='Identity']")
+          if ($identity.Version -ne $packageVersion) { throw "manifest version mismatch: $($identity.Version)" }
+          if ($identity.Publisher -ne 'CN=AppPublisher') { throw "manifest publisher mismatch: $($identity.Publisher)" }
+          "DISPLAY_VERSION=$version" | Out-File $env:GITHUB_ENV -Encoding utf8 -Append
+          "PACKAGE_VERSION=$packageVersion" | Out-File $env:GITHUB_ENV -Encoding utf8 -Append
+          "ACCEPTANCE_NAME=CivVIToolkit-v$version-x64-signed-msix-acceptance" | Out-File $env:GITHUB_ENV -Encoding utf8 -Append
+
       - name: Validate localization resources
         shell: pwsh
         run: ./scripts/Test-LocalizationConsistency.ps1
 
       - name: Restore x64 dependencies
         shell: pwsh
-        run: dotnet restore CivVIToolkit.sln -p:Platform=x64
+        run: dotnet restore CivVIToolkit.sln -p:Platform=x64 -r win-x64
 
       - name: Run tests
         shell: pwsh
-        run: dotnet test tests/CivVIToolkit.Tests/CivVIToolkit.Tests.csproj -c Release -p:Platform=x64 --no-restore --verbosity normal
-
-      - name: Build Release x64
-        shell: pwsh
-        run: dotnet build CivVIToolkit.sln -c Release -p:Platform=x64 --no-restore
+        run: dotnet test tests/CivVIToolkit.Tests/CivVIToolkit.Tests.csproj -c Release -p:Platform=x64 -r win-x64 --no-restore --verbosity normal
 
       - name: Validate signing configuration
         shell: pwsh
@@ -53,156 +69,69 @@ jobs:
           RELEASE_CERTIFICATE_PASSWORD: ${{ secrets.GH_RELEASE_CERTIFICATE_PASSWORD }}
         run: |
           if ([string]::IsNullOrWhiteSpace($env:RELEASE_CERTIFICATE_BASE64) -or [string]::IsNullOrWhiteSpace($env:RELEASE_CERTIFICATE_PASSWORD)) {
-            throw 'GitHub release signing secrets are not configured. Expected GH_RELEASE_CERTIFICATE_BASE64 and GH_RELEASE_CERTIFICATE_PASSWORD.'
+            throw 'Expected GH_RELEASE_CERTIFICATE_BASE64 and GH_RELEASE_CERTIFICATE_PASSWORD.'
           }
 
-      - name: Resolve preview version
-        shell: pwsh
-        run: |
-          $ErrorActionPreference = 'Stop'
-          [xml]$project = Get-Content -Raw 'src/CivVIToolkit.App/CivVIToolkit.App.csproj'
-          $version = @($project.Project.PropertyGroup | ForEach-Object Version | Where-Object { $_ })[0]
-          $informational = @($project.Project.PropertyGroup | ForEach-Object InformationalVersion | Where-Object { $_ })[0]
-          if ([string]::IsNullOrWhiteSpace($version)) { throw 'App Version is missing.' }
-          if ([string]::IsNullOrWhiteSpace($informational)) { $informational = "$version-preview" }
-          "APP_VERSION=$version" | Out-File $env:GITHUB_ENV -Encoding utf8 -Append
-          "APP_INFORMATIONAL_VERSION=$informational" | Out-File $env:GITHUB_ENV -Encoding utf8 -Append
-          "ARTIFACT_NAME=CivVIToolkit-v$version-x64-signed-acceptance" | Out-File $env:GITHUB_ENV -Encoding utf8 -Append
-
-      - name: Publish self-contained x64 preview
-        shell: pwsh
-        run: |
-          $ErrorActionPreference = 'Stop'
-          $publish = Join-Path $env:RUNNER_TEMP 'CivVIToolkit-publish'
-          dotnet publish 'src/CivVIToolkit.App/CivVIToolkit.App.csproj' -c Release -p:Platform=x64 -r win-x64 --self-contained true -p:WindowsAppSDKSelfContained=true -p:PublishSingleFile=false -o $publish
-          if ($LASTEXITCODE -ne 0) { throw "dotnet publish failed: $LASTEXITCODE" }
-          $exe = Join-Path $publish 'CivVIToolkit.App.exe'
-          if (-not (Test-Path -LiteralPath $exe)) { throw "Published executable not found: $exe" }
-          "PUBLISH_DIR=$publish" | Out-File $env:GITHUB_ENV -Encoding utf8 -Append
-          "PUBLISHED_EXE=$exe" | Out-File $env:GITHUB_ENV -Encoding utf8 -Append
-
-      - name: Sign and verify CivVIToolkit binaries
+      - name: Build and sign x64 MSIX
         shell: pwsh
         env:
           RELEASE_CERTIFICATE_BASE64: ${{ secrets.GH_RELEASE_CERTIFICATE_BASE64 }}
           RELEASE_CERTIFICATE_PASSWORD: ${{ secrets.GH_RELEASE_CERTIFICATE_PASSWORD }}
         run: |
           $ErrorActionPreference = 'Stop'
-          $working = Join-Path $env:RUNNER_TEMP 'CivVIToolkit-signing'
-          New-Item -ItemType Directory -Force -Path $working | Out-Null
-          $pfx = Join-Path $working 'release-signing.pfx'
-          [IO.File]::WriteAllBytes($pfx, [Convert]::FromBase64String($env:RELEASE_CERTIFICATE_BASE64))
-          $securePassword = ConvertTo-SecureString $env:RELEASE_CERTIFICATE_PASSWORD -AsPlainText -Force
-          $certificate = Import-PfxCertificate -FilePath $pfx -CertStoreLocation Cert:\CurrentUser\My -Password $securePassword
-          if (-not $certificate -or -not $certificate.HasPrivateKey) { throw 'Signing certificate with private key could not be imported.' }
-
-          $kitsRoot = [Environment]::GetEnvironmentVariable('ProgramFiles(x86)')
-          $signtool = Get-ChildItem (Join-Path $kitsRoot 'Windows Kits\10\bin') -Recurse -Filter signtool.exe |
-            Where-Object FullName -match '\\x64\\signtool.exe$' |
-            Sort-Object FullName -Descending |
-            Select-Object -First 1
-          if (-not $signtool) { throw 'x64 signtool.exe was not found.' }
-
-          $targets = @(
-            'CivVIToolkit.App.exe',
-            'CivVIToolkit.App.dll',
-            'CivVIToolkit.Core.dll',
-            'CivVIToolkit.Platform.Windows.dll'
-          ) | ForEach-Object { Join-Path $env:PUBLISH_DIR $_ } | Where-Object { Test-Path -LiteralPath $_ }
-          if ($targets.Count -eq 0) { throw 'No CivVIToolkit binaries were found to sign.' }
-
-          foreach ($target in $targets) {
-            & $signtool.FullName sign /fd SHA256 /sha1 $certificate.Thumbprint /tr http://timestamp.digicert.com /td SHA256 $target
-            if ($LASTEXITCODE -ne 0) { throw "signtool sign failed for $target with exit code $LASTEXITCODE" }
-            $signature = Get-AuthenticodeSignature -FilePath $target
-            if (-not $signature.SignerCertificate) { throw "No signer certificate found on $target" }
-            if ($signature.SignerCertificate.Thumbprint -cne $certificate.Thumbprint) { throw "Signer mismatch on $target" }
-            if ($signature.Status -eq 'UnknownError') {
-              if ($signature.StatusMessage -notmatch '(?i)not trusted|trust provider|untrusted|self-signed') { throw "Unexpected Authenticode status for ${target}: $($signature.StatusMessage)" }
-            } elseif ($signature.Status -ne 'Valid') {
-              throw "Authenticode verification failed for ${target}: $($signature.Status) / $($signature.StatusMessage)"
-            }
-          }
-
-          $cer = Join-Path $working 'CivVIToolkit-Acceptance.cer'
-          Export-Certificate -Cert $certificate -FilePath $cer | Out-Null
-          Remove-Item -LiteralPath $pfx -Force
-          "SIGNING_CERTIFICATE_PATH=$cer" | Out-File $env:GITHUB_ENV -Encoding utf8 -Append
-          "SIGNING_CERTIFICATE_SUBJECT=$($certificate.Subject)" | Out-File $env:GITHUB_ENV -Encoding utf8 -Append
-          "SIGNING_CERTIFICATE_THUMBPRINT=$($certificate.Thumbprint)" | Out-File $env:GITHUB_ENV -Encoding utf8 -Append
-          Write-Host "Verified signing certificate: $($certificate.Subject) / $($certificate.Thumbprint)"
-
-      - name: Build portable signed acceptance package
-        shell: pwsh
-        run: |
-          $ErrorActionPreference = 'Stop'
-          $assets = Join-Path $env:RUNNER_TEMP $env:ARTIFACT_NAME
-          $packageRoot = Join-Path $assets "CivVIToolkit-v$($env:APP_VERSION)-preview-x64"
-          New-Item -ItemType Directory -Force -Path $packageRoot | Out-Null
-          Copy-Item -Path (Join-Path $env:PUBLISH_DIR '*') -Destination $packageRoot -Recurse -Force
-          Copy-Item -LiteralPath $env:SIGNING_CERTIFICATE_PATH -Destination (Join-Path $packageRoot 'CivVIToolkit-Acceptance.cer') -Force
-
-          $installCert = @'
-          $ErrorActionPreference = 'Stop'
-          $certificatePath = Join-Path $PSScriptRoot 'CivVIToolkit-Acceptance.cer'
-          if (-not (Test-Path -LiteralPath $certificatePath)) { throw 'Acceptance certificate not found.' }
-          $certificate = Import-Certificate -FilePath $certificatePath -CertStoreLocation Cert:\CurrentUser\TrustedPeople
-          Write-Host "Trusted acceptance certificate installed for the current user: $($certificate.Thumbprint)"
-          '@
-          Set-Content -LiteralPath (Join-Path $packageRoot 'Install-AcceptanceCertificate.ps1') -Value $installCert -Encoding utf8
-
-          $readme = @"
-          CivVIToolkit v$($env:APP_VERSION) Signed Acceptance / 验收包 / 検収ビルド
-
-          简体中文：
-          1. 这是 Preview 验收包，不是正式 Release。
-          2. 如需信任自签名证书，可运行 Install-AcceptanceCertificate.ps1；只写入当前用户 TrustedPeople。
-          3. 运行 CivVIToolkit.App.exe。启动 Civilization VI 后确认 Steam/Epic 与 DX11/DX12 自动识别，再使用 Copy diagnostics。
-
-          日本語：
-          1. これは Preview 検収ビルドで、正式 Release ではありません。
-          2. 自己署名証明書を信頼する場合は Install-AcceptanceCertificate.ps1 を実行してください。現在のユーザーの TrustedPeople のみを変更します。
-          3. CivVIToolkit.App.exe を起動し、Civilization VI 起動後に Steam/Epic と DX11/DX12 の自動検出を確認してから Copy diagnostics を使用してください。
-
-          English:
-          1. This is a Preview acceptance build, not a formal release.
-          2. To trust the self-signed certificate, run Install-AcceptanceCertificate.ps1. It changes only the current user's TrustedPeople store.
-          3. Run CivVIToolkit.App.exe. After Civilization VI starts, verify Steam/Epic and DX11/DX12 detection, then use Copy diagnostics.
-
-          Signer: $($env:SIGNING_CERTIFICATE_SUBJECT)
-          Thumbprint: $($env:SIGNING_CERTIFICATE_THUMBPRINT)
-          "@
-          Set-Content -LiteralPath (Join-Path $packageRoot 'README-ACCEPTANCE.txt') -Value $readme -Encoding utf8
-
-          $zip = Join-Path $assets "$($env:ARTIFACT_NAME).zip"
-          Compress-Archive -Path (Join-Path $packageRoot '*') -DestinationPath $zip -CompressionLevel Optimal
-          Copy-Item -LiteralPath $env:SIGNING_CERTIFICATE_PATH -Destination (Join-Path $assets 'CivVIToolkit-Acceptance.cer') -Force
+          $assets = Join-Path $env:RUNNER_TEMP $env:ACCEPTANCE_NAME
+          New-Item -ItemType Directory -Force -Path $assets | Out-Null
+          ./packaging/Build-SignedMsix.ps1 `
+            -DisplayVersion $env:DISPLAY_VERSION `
+            -PackageVersion $env:PACKAGE_VERSION `
+            -OutputDirectory $assets `
+            -CertificateBase64 $env:RELEASE_CERTIFICATE_BASE64 `
+            -CertificatePassword $env:RELEASE_CERTIFICATE_PASSWORD
           "ACCEPTANCE_ASSETS=$assets" | Out-File $env:GITHUB_ENV -Encoding utf8 -Append
-          "ACCEPTANCE_ZIP=$zip" | Out-File $env:GITHUB_ENV -Encoding utf8 -Append
 
-      - name: Verify packaged executable and generate SHA-256 manifest
+      - name: Build one-click installer package
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
-          $verify = Join-Path $env:RUNNER_TEMP 'CivVIToolkit-acceptance-verify'
-          Expand-Archive -LiteralPath $env:ACCEPTANCE_ZIP -DestinationPath $verify -Force
-          $exe = Join-Path $verify 'CivVIToolkit.App.exe'
-          if (-not (Test-Path -LiteralPath $exe)) { throw 'Packaged executable is missing.' }
-          $signature = Get-AuthenticodeSignature -FilePath $exe
-          if (-not $signature.SignerCertificate -or $signature.SignerCertificate.Thumbprint -cne $env:SIGNING_CERTIFICATE_THUMBPRINT) {
-            throw 'Packaged executable signature does not match the repository signing certificate.'
-          }
-          $files = Get-ChildItem $env:ACCEPTANCE_ASSETS -File | Sort-Object Name
+          $msix = Join-Path $env:ACCEPTANCE_ASSETS "CivVIToolkit_$($env:PACKAGE_VERSION)_x64.msix"
+          $cer = Join-Path $env:ACCEPTANCE_ASSETS "CivVIToolkit-$($env:DISPLAY_VERSION).cer"
+          ./packaging/New-GitHubOneClickInstallerPackage.ps1 `
+            -MsixPath $msix `
+            -CertificatePath $cer `
+            -OutputDirectory $env:ACCEPTANCE_ASSETS `
+            -DisplayVersion $env:DISPLAY_VERSION `
+            -PackageVersion $env:PACKAGE_VERSION
+          ./packaging/Test-GitHubOneClickInstallerPackage.ps1 `
+            -PackageDirectory $env:ACCEPTANCE_ASSETS `
+            -ExpectedDisplayVersion $env:DISPLAY_VERSION `
+            -ExpectedPackageVersion $env:PACKAGE_VERSION
+
+      - name: Generate SHA-256 manifest
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $files = @(
+            (Join-Path $env:ACCEPTANCE_ASSETS "CivVIToolkit_$($env:PACKAGE_VERSION)_x64.msix"),
+            (Join-Path $env:ACCEPTANCE_ASSETS "CivVIToolkit-v$($env:DISPLAY_VERSION)-x64-one-click.zip"),
+            (Join-Path $env:ACCEPTANCE_ASSETS "CivVIToolkit-$($env:DISPLAY_VERSION).cer")
+          )
           $manifest = foreach ($file in $files) {
-            "{0}  {1}" -f (Get-FileHash -LiteralPath $file.FullName -Algorithm SHA256).Hash.ToLowerInvariant(), $file.Name
+            if (-not (Test-Path -LiteralPath $file)) { throw "Expected acceptance asset missing: $file" }
+            "{0}  {1}" -f (Get-FileHash -LiteralPath $file -Algorithm SHA256).Hash.ToLowerInvariant(), (Split-Path $file -Leaf)
           }
           Set-Content -LiteralPath (Join-Path $env:ACCEPTANCE_ASSETS 'SHA256SUMS.txt') -Value $manifest -Encoding ascii
           Get-Content -LiteralPath (Join-Path $env:ACCEPTANCE_ASSETS 'SHA256SUMS.txt')
 
-      - name: Upload signed acceptance artifact
+      - name: Remove expanded one-click staging folder
+        shell: pwsh
+        run: |
+          $folder = Join-Path $env:ACCEPTANCE_ASSETS "CivVIToolkit-v$($env:DISPLAY_VERSION)-x64-one-click"
+          if (Test-Path -LiteralPath $folder) { Remove-Item -LiteralPath $folder -Recurse -Force }
+
+      - name: Upload signed MSIX acceptance artifact
         uses: actions/upload-artifact@v6
         with:
-          name: ${{ env.ARTIFACT_NAME }}
+          name: ${{ env.ACCEPTANCE_NAME }}
           path: ${{ env.ACCEPTANCE_ASSETS }}
           if-no-files-found: error
           retention-days: 14

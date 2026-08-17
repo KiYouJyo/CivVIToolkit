@@ -1,0 +1,235 @@
+name: Publish GitHub Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version without v, for example 0.1.0'
+        required: true
+        type: string
+      dry_run:
+        description: 'Build and validate assets without creating a GitHub Release'
+        required: true
+        default: true
+        type: boolean
+
+permissions:
+  contents: write
+
+concurrency:
+  group: github-release-${{ github.event_name == 'push' && github.ref_name || inputs.version }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: windows-2025-vs2026
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Resolve release request
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          if ('${{ github.event_name }}' -eq 'push') {
+            $tag = '${{ github.ref_name }}'
+            if ($tag -notmatch '^v(\d+\.\d+\.\d+)$') { throw "Invalid release tag: $tag" }
+            $version = $Matches[1]
+            $dryRun = $false
+          } else {
+            $version = '${{ inputs.version }}'.Trim()
+            if ($version -notmatch '^\d+\.\d+\.\d+$') { throw "Invalid version: $version" }
+            $tag = "v$version"
+            $dryRun = [System.Convert]::ToBoolean('${{ inputs.dry_run }}')
+            $tagExists = $null -ne (git tag -l $tag | Select-Object -First 1)
+            if ($tagExists) {
+              git checkout --detach $tag
+              if ($LASTEXITCODE -ne 0) { throw "Unable to checkout $tag" }
+            } elseif (-not $dryRun) {
+              throw "Tag $tag does not exist. Use Release Orchestrator to create the immutable release tag first."
+            }
+          }
+          "DISPLAY_VERSION=$version" | Out-File $env:GITHUB_ENV -Encoding utf8 -Append
+          "PACKAGE_VERSION=$version.0" | Out-File $env:GITHUB_ENV -Encoding utf8 -Append
+          "RELEASE_TAG=$tag" | Out-File $env:GITHUB_ENV -Encoding utf8 -Append
+          "DRY_RUN=$($dryRun.ToString().ToLowerInvariant())" | Out-File $env:GITHUB_ENV -Encoding utf8 -Append
+
+      - name: Setup .NET 10
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Validate release metadata and source versions
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $release = Get-Content -Raw 'release/release.json' | ConvertFrom-Json
+          if ([string]$release.product.version -ne $env:DISPLAY_VERSION) {
+            throw "release.json version mismatch. Expected $env:DISPLAY_VERSION, found $($release.product.version)."
+          }
+          if ([string]$release.product.packageVersion -ne $env:PACKAGE_VERSION) {
+            throw "release.json packageVersion mismatch. Expected $env:PACKAGE_VERSION, found $($release.product.packageVersion)."
+          }
+          [xml]$project = Get-Content -Raw 'src/CivVIToolkit.App/CivVIToolkit.App.csproj'
+          $projectVersion = @($project.Project.PropertyGroup | ForEach-Object Version | Where-Object { $_ })[0]
+          if ($projectVersion -ne $env:DISPLAY_VERSION) { throw "csproj version mismatch: $projectVersion" }
+          [xml]$manifest = Get-Content -Raw 'src/CivVIToolkit.App/Package.appxmanifest'
+          $identity = $manifest.SelectSingleNode("//*[local-name()='Identity']")
+          if ($identity.Version -ne $env:PACKAGE_VERSION) { throw "manifest version mismatch: $($identity.Version)" }
+          if ($identity.Publisher -ne 'CN=AppPublisher') { throw "manifest publisher mismatch: $($identity.Publisher)" }
+          foreach ($key in @('zh-CN','ja-JP','en-US')) {
+            $path = [string]$release.notes.$key
+            if ([string]::IsNullOrWhiteSpace($path) -or -not (Test-Path -LiteralPath $path)) {
+              throw "Release notes are missing for $key."
+            }
+          }
+
+      - name: Validate localization resources
+        shell: pwsh
+        run: ./scripts/Test-LocalizationConsistency.ps1
+
+      - name: Restore x64 dependencies
+        shell: pwsh
+        run: dotnet restore CivVIToolkit.sln -p:Platform=x64 -r win-x64
+
+      - name: Run tests
+        shell: pwsh
+        run: dotnet test tests/CivVIToolkit.Tests/CivVIToolkit.Tests.csproj -c Release -p:Platform=x64 -r win-x64 --no-restore --verbosity normal
+
+      - name: Validate signing configuration
+        shell: pwsh
+        env:
+          RELEASE_CERTIFICATE_BASE64: ${{ secrets.GH_RELEASE_CERTIFICATE_BASE64 }}
+          RELEASE_CERTIFICATE_PASSWORD: ${{ secrets.GH_RELEASE_CERTIFICATE_PASSWORD }}
+        run: |
+          if ([string]::IsNullOrWhiteSpace($env:RELEASE_CERTIFICATE_BASE64) -or [string]::IsNullOrWhiteSpace($env:RELEASE_CERTIFICATE_PASSWORD)) {
+            throw 'Expected GH_RELEASE_CERTIFICATE_BASE64 and GH_RELEASE_CERTIFICATE_PASSWORD.'
+          }
+
+      - name: Build and sign release MSIX
+        shell: pwsh
+        env:
+          RELEASE_CERTIFICATE_BASE64: ${{ secrets.GH_RELEASE_CERTIFICATE_BASE64 }}
+          RELEASE_CERTIFICATE_PASSWORD: ${{ secrets.GH_RELEASE_CERTIFICATE_PASSWORD }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $assets = Join-Path $env:RUNNER_TEMP "CivVIToolkit-v$($env:DISPLAY_VERSION)-release"
+          New-Item -ItemType Directory -Force -Path $assets | Out-Null
+          ./packaging/Build-SignedMsix.ps1 `
+            -DisplayVersion $env:DISPLAY_VERSION `
+            -PackageVersion $env:PACKAGE_VERSION `
+            -OutputDirectory $assets `
+            -CertificateBase64 $env:RELEASE_CERTIFICATE_BASE64 `
+            -CertificatePassword $env:RELEASE_CERTIFICATE_PASSWORD
+          "RELEASE_ASSETS=$assets" | Out-File $env:GITHUB_ENV -Encoding utf8 -Append
+
+      - name: Build and validate one-click installer package
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $msix = Join-Path $env:RELEASE_ASSETS "CivVIToolkit_$($env:PACKAGE_VERSION)_x64.msix"
+          $cer = Join-Path $env:RELEASE_ASSETS "CivVIToolkit-$($env:DISPLAY_VERSION).cer"
+          ./packaging/New-GitHubOneClickInstallerPackage.ps1 `
+            -MsixPath $msix `
+            -CertificatePath $cer `
+            -OutputDirectory $env:RELEASE_ASSETS `
+            -DisplayVersion $env:DISPLAY_VERSION `
+            -PackageVersion $env:PACKAGE_VERSION
+          ./packaging/Test-GitHubOneClickInstallerPackage.ps1 `
+            -PackageDirectory $env:RELEASE_ASSETS `
+            -ExpectedDisplayVersion $env:DISPLAY_VERSION `
+            -ExpectedPackageVersion $env:PACKAGE_VERSION
+          $folder = Join-Path $env:RELEASE_ASSETS "CivVIToolkit-v$($env:DISPLAY_VERSION)-x64-one-click"
+          if (Test-Path -LiteralPath $folder) { Remove-Item -LiteralPath $folder -Recurse -Force }
+
+      - name: Generate release body and SHA-256 checksums
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $release = Get-Content -Raw 'release/release.json' | ConvertFrom-Json
+          $body = Join-Path $env:RELEASE_ASSETS 'RELEASE_BODY.md'
+          ./packaging/New-GitHubReleaseBody.ps1 `
+            -Version $env:DISPLAY_VERSION `
+            -ChineseNotes ([string]$release.notes.'zh-CN') `
+            -JapaneseNotes ([string]$release.notes.'ja-JP') `
+            -EnglishNotes ([string]$release.notes.'en-US') `
+            -OutputPath $body
+          $releaseFiles = @(
+            (Join-Path $env:RELEASE_ASSETS "CivVIToolkit_$($env:PACKAGE_VERSION)_x64.msix"),
+            (Join-Path $env:RELEASE_ASSETS "CivVIToolkit-v$($env:DISPLAY_VERSION)-x64-one-click.zip"),
+            (Join-Path $env:RELEASE_ASSETS "CivVIToolkit-$($env:DISPLAY_VERSION).cer")
+          )
+          $manifest = foreach ($file in $releaseFiles) {
+            if (-not (Test-Path -LiteralPath $file)) { throw "Expected release asset missing: $file" }
+            "{0}  {1}" -f (Get-FileHash -LiteralPath $file -Algorithm SHA256).Hash.ToLowerInvariant(), (Split-Path $file -Leaf)
+          }
+          Set-Content -LiteralPath (Join-Path $env:RELEASE_ASSETS 'SHA256SUMS.txt') -Value $manifest -Encoding ascii
+
+      - name: Upload dry-run artifact
+        if: env.DRY_RUN == 'true'
+        uses: actions/upload-artifact@v6
+        with:
+          name: CivVIToolkit-v${{ env.DISPLAY_VERSION }}-release-dry-run
+          path: ${{ env.RELEASE_ASSETS }}
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Create or reconcile GitHub Release
+        if: env.DRY_RUN != 'true'
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $tag = $env:RELEASE_TAG
+          $body = Join-Path $env:RELEASE_ASSETS 'RELEASE_BODY.md'
+          $expected = @(
+            (Join-Path $env:RELEASE_ASSETS "CivVIToolkit_$($env:PACKAGE_VERSION)_x64.msix"),
+            (Join-Path $env:RELEASE_ASSETS "CivVIToolkit-v$($env:DISPLAY_VERSION)-x64-one-click.zip"),
+            (Join-Path $env:RELEASE_ASSETS "CivVIToolkit-$($env:DISPLAY_VERSION).cer"),
+            (Join-Path $env:RELEASE_ASSETS 'SHA256SUMS.txt')
+          )
+
+          gh release view $tag --repo $env:GITHUB_REPOSITORY *> $null
+          if ($LASTEXITCODE -ne 0) {
+            gh release create $tag --repo $env:GITHUB_REPOSITORY --title "CivVIToolkit v$($env:DISPLAY_VERSION)" --notes-file $body --prerelease
+            if ($LASTEXITCODE -ne 0) { throw "Failed to create release $tag." }
+          } else {
+            gh release edit $tag --repo $env:GITHUB_REPOSITORY --title "CivVIToolkit v$($env:DISPLAY_VERSION)" --notes-file $body --prerelease
+            if ($LASTEXITCODE -ne 0) { throw "Failed to reconcile release metadata for $tag." }
+          }
+
+          $releaseJson = gh api "repos/$env:GITHUB_REPOSITORY/releases/tags/$tag" | ConvertFrom-Json
+          foreach ($file in $expected) {
+            $name = Split-Path $file -Leaf
+            $asset = @($releaseJson.assets | Where-Object name -eq $name | Select-Object -First 1)
+            if ($asset.Count -gt 0) {
+              $temp = Join-Path $env:RUNNER_TEMP "existing-$name"
+              gh api -H 'Accept: application/octet-stream' $asset[0].url > $temp
+              if ($LASTEXITCODE -ne 0) { throw "Failed to download existing release asset $name." }
+              $localHash = (Get-FileHash -LiteralPath $file -Algorithm SHA256).Hash
+              $remoteHash = (Get-FileHash -LiteralPath $temp -Algorithm SHA256).Hash
+              if ($localHash -ne $remoteHash) {
+                throw "Release asset conflict for $name. Existing asset has a different SHA-256."
+              }
+              Write-Host "Release asset already matches: $name"
+            } else {
+              gh release upload $tag $file --repo $env:GITHUB_REPOSITORY
+              if ($LASTEXITCODE -ne 0) { throw "Failed to upload release asset $name." }
+            }
+          }
+
+      - name: Publish summary
+        shell: pwsh
+        run: |
+          "### CivVIToolkit v$($env:DISPLAY_VERSION)" | Out-File $env:GITHUB_STEP_SUMMARY -Encoding utf8 -Append
+          "- Signed x64 MSIX: `CivVIToolkit_$($env:PACKAGE_VERSION)_x64.msix`" | Out-File $env:GITHUB_STEP_SUMMARY -Encoding utf8 -Append
+          "- One-click package: `CivVIToolkit-v$($env:DISPLAY_VERSION)-x64-one-click.zip`" | Out-File $env:GITHUB_STEP_SUMMARY -Encoding utf8 -Append
+          "- Dry run: $($env:DRY_RUN)" | Out-File $env:GITHUB_STEP_SUMMARY -Encoding utf8 -Append

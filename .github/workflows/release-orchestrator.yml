@@ -1,0 +1,115 @@
+name: Release Orchestrator
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version from release/release.json, for example 0.1.0'
+        required: true
+        type: string
+      confirmation:
+        description: 'Type exactly: PUBLISH X.Y.Z'
+        required: true
+        type: string
+  push:
+    branches: [ main ]
+    paths:
+      - 'release/release.json'
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: release-orchestrator
+  cancel-in-progress: false
+
+jobs:
+  orchestrate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Resolve authorization
+        id: release
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $release = Get-Content -Raw 'release/release.json' | ConvertFrom-Json
+          $version = [string]$release.product.version
+          $packageVersion = [string]$release.product.packageVersion
+          if ($version -notmatch '^\d+\.\d+\.\d+$') { throw "Invalid release version: $version" }
+          if ($packageVersion -ne "$version.0") { throw "packageVersion must be $version.0." }
+
+          if ('${{ github.event_name }}' -eq 'workflow_dispatch') {
+            $requested = '${{ inputs.version }}'.Trim()
+            $confirmation = '${{ inputs.confirmation }}'.Trim()
+            if ($requested -ne $version) { throw "Requested version $requested does not match release/release.json $version." }
+            if ($confirmation -cne "PUBLISH $version") { throw "Confirmation must be exactly: PUBLISH $version" }
+            $authorized = $true
+          } else {
+            $authorized = [bool]$release.channels.github.publish
+          }
+
+          "version=$version" | Out-File $env:GITHUB_OUTPUT -Encoding utf8 -Append
+          "tag=v$version" | Out-File $env:GITHUB_OUTPUT -Encoding utf8 -Append
+          "authorized=$($authorized.ToString().ToLowerInvariant())" | Out-File $env:GITHUB_OUTPUT -Encoding utf8 -Append
+
+      - name: Skip informational metadata update
+        if: steps.release.outputs.authorized != 'true'
+        shell: pwsh
+        run: |
+          "release/release.json does not authorize GitHub publication. No tag or Release was created." | Out-File $env:GITHUB_STEP_SUMMARY -Encoding utf8 -Append
+
+      - name: Validate release source and create immutable tag
+        if: steps.release.outputs.authorized == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          VERSION='${{ steps.release.outputs.version }}'
+          TAG='${{ steps.release.outputs.tag }}'
+          PROJECT_VERSION=$(python - <<'PY'
+          import xml.etree.ElementTree as ET
+          root = ET.parse('src/CivVIToolkit.App/CivVIToolkit.App.csproj').getroot()
+          print(next(x.text for x in root.iter('Version') if x.text))
+          PY
+          )
+          MANIFEST_VERSION=$(python - <<'PY'
+          import xml.etree.ElementTree as ET
+          root = ET.parse('src/CivVIToolkit.App/Package.appxmanifest').getroot()
+          identity = next(x for x in root.iter() if x.tag.endswith('Identity'))
+          print(identity.attrib['Version'])
+          PY
+          )
+          test "$PROJECT_VERSION" = "$VERSION"
+          test "$MANIFEST_VERSION" = "$VERSION.0"
+
+          HEAD_SHA=$(git rev-parse HEAD)
+          if git rev-parse "$TAG^{commit}" >/dev/null 2>&1; then
+            TAG_SHA=$(git rev-parse "$TAG^{commit}")
+            test "$TAG_SHA" = "$HEAD_SHA" || { echo "Tag $TAG already exists at $TAG_SHA, not $HEAD_SHA."; exit 1; }
+            echo "Tag $TAG already points at this immutable source commit."
+          else
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git tag -a "$TAG" -m "CivVIToolkit $TAG"
+            git push origin "$TAG"
+          fi
+
+      - name: Dispatch GitHub Release workflow
+        if: steps.release.outputs.authorized == 'true'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh workflow run publish-github-release.yml \
+            --repo "$GITHUB_REPOSITORY" \
+            --ref main \
+            -f version='${{ steps.release.outputs.version }}' \
+            -f dry_run=false
+          echo "Dispatched Publish GitHub Release for v${{ steps.release.outputs.version }}." >> "$GITHUB_STEP_SUMMARY"
