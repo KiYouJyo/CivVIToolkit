@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "product": {
     "name": "CivVIToolkit",
-    "version": "0.1.3",
-    "packageVersion": "0.1.3.0",
+    "version": "0.2.0",
+    "packageVersion": "0.2.0.0",
     "status": "preview"
   },
   "channels": {
@@ -12,8 +12,8 @@
     }
   },
   "notes": {
-    "zh-CN": "docs/releases/v0.1.3.zh-CN.md",
-    "ja-JP": "docs/releases/v0.1.3.ja-JP.md",
-    "en-US": "docs/releases/v0.1.3.en-US.md"
+    "zh-CN": "docs/releases/v0.2.0.zh-CN.md",
+    "ja-JP": "docs/releases/v0.2.0.ja-JP.md",
+    "en-US": "docs/releases/v0.2.0.en-US.md"
   }
 }
