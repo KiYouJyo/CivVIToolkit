@@ -1,7 +1,9 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using CivVIToolkit.App.Localization;
+using CivVIToolkit.App.Settings;
 using CivVIToolkit.Core.Game;
-using CivVIToolkit.Core.Modules;
+using CivVIToolkit.Core.Localization;
 using CivVIToolkit.Core.Trainer;
 using CivVIToolkit.Platform.Windows.Diagnostics;
 using CivVIToolkit.Platform.Windows.Discovery;
@@ -27,19 +29,25 @@ public sealed partial class MainWindow : Window
     private readonly IGameProcessMonitor _processMonitor = new Civ6ProcessMonitor();
     private readonly IGameRuntimeDiagnosticsService _diagnostics = new GameRuntimeDiagnosticsService();
     private readonly ITrainerEngine _trainer = new PendingSignatureTrainerEngine();
+    private readonly ILocalizationService _localization = LocalizationService.Default;
+    private readonly AppSettingsService _settingsService = AppSettingsService.Default;
     private readonly DispatcherQueueTimer _processTimer;
 
     private IReadOnlyList<GameInstallation> _installations = [];
     private GameSession? _session;
+    private AppSettings _settings;
     private bool _refreshInProgress;
+    private bool _languageInitializing;
 
     public MainWindow()
     {
         InitializeComponent();
-        Title = "Civ VI Toolkit";
+        Title = _localization.GetString("AppDisplayName");
         SystemBackdrop = new MicaBackdrop();
 
-        TrainerList.ItemsSource = TrainerCatalog.All;
+        _settings = _settingsService.Load();
+        TrainerList.ItemsSource = TrainerCatalog.All.Select(feature => LocalizedTrainerFeature.From(feature, _localization)).ToList();
+        InitializeLanguageOptions();
         RootNavigation.SelectedItem = RootNavigation.MenuItems[0];
 
         _processTimer = DispatcherQueue.CreateTimer();
@@ -50,6 +58,28 @@ public sealed partial class MainWindow : Window
 
         Closed += MainWindow_Closed;
         _ = RefreshDiscoveryAsync();
+    }
+
+    private void InitializeLanguageOptions()
+    {
+        _languageInitializing = true;
+        try
+        {
+            var options = new[]
+            {
+                new LanguageOption(LanguagePreference.SystemValue, _localization.GetString("Language_System")),
+                new LanguageOption("zh-CN", _localization.GetString("Language_Chinese")),
+                new LanguageOption("ja-JP", _localization.GetString("Language_Japanese")),
+                new LanguageOption("en-US", _localization.GetString("Language_English")),
+            };
+            LanguageComboBox.ItemsSource = options;
+            var selected = LanguagePreference.Normalize(_settings.Language);
+            LanguageComboBox.SelectedItem = options.First(option => option.Value == selected);
+        }
+        finally
+        {
+            _languageInitializing = false;
+        }
     }
 
     private async void ProcessTimer_Tick(DispatcherQueueTimer sender, object args)
@@ -73,7 +103,7 @@ public sealed partial class MainWindow : Window
         }
         catch (Exception exception)
         {
-            StatusTitleText.Text = "Detection failed";
+            StatusTitleText.Text = _localization.GetString("Status_DetectionFailed");
             StatusBadgeText.Text = exception.GetType().Name;
             DetectionDetailsText.Text = exception.Message;
         }
@@ -112,54 +142,59 @@ public sealed partial class MainWindow : Window
 
         if (_session is not null)
         {
-            StatusTitleText.Text = "Civilization VI is running";
+            StatusTitleText.Text = _localization.GetString("Status_RunningTitle");
             StatusBadgeText.Text = $"{StoreLabel(_session.Store)} · {BackendLabel(_session.GraphicsBackend)}";
-            DetectionDetailsText.Text =
-                $"PID {_session.ProcessId}  ·  Version {(_session.FileVersion?.ToString() ?? "unknown")}\n{_session.ExecutablePath}";
-            TrainerStatusText.Text =
-                $"Attached to {StoreLabel(_session.Store)} / {BackendLabel(_session.GraphicsBackend)}. Core memory access and AoB scanning are ready; feature signatures are still pending verification.";
+            DetectionDetailsText.Text = _localization.GetFormattedString(
+                "Status_RunningDetailsFormat",
+                _session.ProcessId,
+                _session.FileVersion?.ToString() ?? _localization.GetString("Common_UnknownVersion"),
+                _session.ExecutablePath);
+            TrainerStatusText.Text = _localization.GetFormattedString(
+                "Trainer_AttachedFormat",
+                StoreLabel(_session.Store),
+                BackendLabel(_session.GraphicsBackend));
         }
         else if (_installations.Count > 0)
         {
             var stores = string.Join(" + ", _installations.Select(installation => StoreLabel(installation.Store)).Distinct());
-            StatusTitleText.Text = "Civilization VI installation detected";
-            StatusBadgeText.Text = $"{stores} · game is not running";
-            DetectionDetailsText.Text = "Launch the game normally. CivVIToolkit will identify DX11 or DX12 automatically when the process appears.";
-            TrainerStatusText.Text = "Installation found. Start Civilization VI to attach the trainer core.";
+            StatusTitleText.Text = _localization.GetString("Status_InstallationDetectedTitle");
+            StatusBadgeText.Text = _localization.GetFormattedString("Status_InstallationDetectedBadgeFormat", stores);
+            DetectionDetailsText.Text = _localization.GetString("Status_LaunchHint");
+            TrainerStatusText.Text = _localization.GetString("Trainer_InstallationFound");
         }
         else
         {
-            StatusTitleText.Text = "Civilization VI was not detected";
-            StatusBadgeText.Text = "Steam / Epic Games scan completed";
-            DetectionDetailsText.Text = "Install the game through Steam or Epic Games Launcher, then press Refresh. No manual game path is required for supported installations.";
-            TrainerStatusText.Text = "Waiting for a supported Civilization VI installation and process.";
+            StatusTitleText.Text = _localization.GetString("Status_NotDetectedTitle");
+            StatusBadgeText.Text = _localization.GetString("Status_ScanCompleted");
+            DetectionDetailsText.Text = _localization.GetString("Status_NotDetectedHint");
+            TrainerStatusText.Text = _localization.GetString("Trainer_WaitingSupported");
         }
 
         InstallationsText.Text = _installations.Count == 0
-            ? "No installation metadata found."
+            ? _localization.GetString("Status_NoMetadata")
             : string.Join("\n", _installations.Select(FormatInstallation));
     }
 
-    private static string FormatInstallation(GameInstallation installation)
+    private string FormatInstallation(GameInstallation installation)
     {
         var renderers = installation.Executables.Count == 0
-            ? "executables not resolved"
+            ? _localization.GetString("Installation_ExecutablesUnresolved")
             : string.Join(", ", installation.Executables.Select(executable => BackendLabel(executable.GraphicsBackend)).Distinct());
         return $"{StoreLabel(installation.Store)} · {renderers} · {installation.InstallDirectory}";
     }
 
-    private static string StoreLabel(GameStore store) => store switch
+    private string StoreLabel(GameStore store) => store switch
     {
         GameStore.Steam => "Steam",
         GameStore.EpicGames => "Epic Games",
-        _ => "Unknown store",
+        _ => _localization.GetString("Common_UnknownStore"),
     };
 
-    private static string BackendLabel(GraphicsBackend backend) => backend switch
+    private string BackendLabel(GraphicsBackend backend) => backend switch
     {
         GraphicsBackend.DirectX11 => "DX11",
         GraphicsBackend.DirectX12 => "DX12",
-        _ => "Unknown renderer",
+        _ => _localization.GetString("Common_UnknownRenderer"),
     };
 
     private async void RefreshButton_Click(object sender, RoutedEventArgs e)
@@ -175,7 +210,7 @@ public sealed partial class MainWindow : Window
         }
 
         DiagnosticsButton.IsEnabled = false;
-        DiagnosticsStatusText.Text = "Collecting read-only runtime diagnostics…";
+        DiagnosticsStatusText.Text = _localization.GetString("Diagnostics_Collecting");
         try
         {
             var snapshot = await _diagnostics.CaptureAsync(_session);
@@ -184,16 +219,42 @@ public sealed partial class MainWindow : Window
             package.SetText(json);
             Clipboard.SetContent(package);
             Clipboard.Flush();
-            DiagnosticsStatusText.Text = $"Diagnostics copied · SHA-256 {snapshot.ExecutableSha256[..12]}… · image {snapshot.ModuleImageSize:N0} bytes";
+            DiagnosticsStatusText.Text = _localization.GetFormattedString(
+                "Diagnostics_CopiedFormat",
+                snapshot.ExecutableSha256[..12],
+                snapshot.ModuleImageSize);
         }
         catch (Exception exception)
         {
-            DiagnosticsStatusText.Text = $"Diagnostics failed: {exception.Message}";
+            DiagnosticsStatusText.Text = _localization.GetFormattedString("Diagnostics_FailedFormat", exception.Message);
         }
         finally
         {
             DiagnosticsButton.IsEnabled = _session is not null;
         }
+    }
+
+    private void LanguageComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (_languageInitializing || LanguageComboBox.SelectedItem is not LanguageOption option)
+        {
+            return;
+        }
+
+        _settings.Language = option.Value;
+        if (_settingsService.Save(_settings))
+        {
+            LanguageRestartInfoBar.Severity = InfoBarSeverity.Informational;
+            LanguageRestartInfoBar.Title = _localization.GetString("Settings_RestartInfo.Title");
+            LanguageRestartInfoBar.Message = _localization.GetString("Settings_RestartInfo.Message");
+        }
+        else
+        {
+            LanguageRestartInfoBar.Severity = InfoBarSeverity.Error;
+            LanguageRestartInfoBar.Title = _localization.GetString("Settings_SaveFailedTitle");
+            LanguageRestartInfoBar.Message = _localization.GetString("Settings_SaveFailedMessage");
+        }
+        LanguageRestartInfoBar.IsOpen = true;
     }
 
     private void RootNavigation_SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
@@ -205,21 +266,20 @@ public sealed partial class MainWindow : Window
 
         OverviewPanel.Visibility = tag == "overview" ? Visibility.Visible : Visibility.Collapsed;
         TrainerPanel.Visibility = tag == "trainer" ? Visibility.Visible : Visibility.Collapsed;
-        PlaceholderPanel.Visibility = tag is not ("overview" or "trainer") ? Visibility.Visible : Visibility.Collapsed;
+        SettingsPanel.Visibility = tag == "settings" ? Visibility.Visible : Visibility.Collapsed;
+        PlaceholderPanel.Visibility = tag is "saves" or "maps" or "mods" or "launcher" ? Visibility.Visible : Visibility.Collapsed;
 
         if (PlaceholderPanel.Visibility == Visibility.Visible)
         {
-            var module = tag switch
+            var (titleKey, descriptionKey) = tag switch
             {
-                "saves" => ToolkitModuleCatalog.All.First(m => m.Id == ToolkitModuleId.Saves),
-                "maps" => ToolkitModuleCatalog.All.First(m => m.Id == ToolkitModuleId.MapsAndGameInfo),
-                "mods" => ToolkitModuleCatalog.All.First(m => m.Id == ToolkitModuleId.Mods),
-                "launcher" => ToolkitModuleCatalog.All.First(m => m.Id == ToolkitModuleId.Launcher),
-                _ => ToolkitModuleCatalog.All.First(m => m.Id == ToolkitModuleId.Settings),
+                "saves" => ("Module_Saves_Title", "Module_Saves_Description"),
+                "maps" => ("Module_Maps_Title", "Module_Maps_Description"),
+                "mods" => ("Module_Mods_Title", "Module_Mods_Description"),
+                _ => ("Module_Launcher_Title", "Module_Launcher_Description"),
             };
-
-            PlaceholderTitleText.Text = module.Title;
-            PlaceholderDescriptionText.Text = module.Description;
+            PlaceholderTitleText.Text = _localization.GetString(titleKey);
+            PlaceholderDescriptionText.Text = _localization.GetString(descriptionKey);
         }
     }
 
@@ -228,4 +288,6 @@ public sealed partial class MainWindow : Window
         _processTimer.Stop();
         _trainer.Dispose();
     }
+
+    private sealed record LanguageOption(string Value, string DisplayName);
 }
