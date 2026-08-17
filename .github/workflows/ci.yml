@@ -21,4 +21,4 @@ jobs:
       - name: Build
         run: dotnet build CivVIToolkit.sln -c Release -p:Platform=x64 --no-restore
       - name: Test
-        run: dotnet test tests/CivVIToolkit.Tests/CivVIToolkit.Tests.csproj -c Release -p:Platform=x64 --no-build --logger "trx;LogFileName=test-results.trx"
+        run: dotnet test tests/CivVIToolkit.Tests/CivVIToolkit.Tests.csproj -c Release -p:Platform=x64 --no-restore --logger "trx;LogFileName=test-results.trx"
