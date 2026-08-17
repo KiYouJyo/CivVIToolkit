@@ -21,8 +21,12 @@ namespace CivVIToolkit.App;
 
 public sealed partial class MainWindow : Window
 {
-    private const string AddGoldFeatureId = "player.add-gold";
-    private const long AddGoldAmount = 10_000;
+    private static readonly HashSet<string> ExperimentalAcceptanceFeatures =
+    [
+        "unit.always-upgrade",
+        "combat.one-hit-kill",
+        "ai.block-production",
+    ];
 
     private static readonly JsonSerializerOptions DiagnosticsJsonOptions = new()
     {
@@ -38,12 +42,12 @@ public sealed partial class MainWindow : Window
     private readonly ILocalizationService _localization = LocalizationService.Default;
     private readonly AppSettingsService _settingsService = AppSettingsService.Default;
     private readonly DispatcherQueueTimer _processTimer;
+    private readonly List<IDisposable> _trainerHotkeyRegistrations = [];
 
     private IReadOnlyList<GameInstallation> _installations = [];
     private GameSession? _session;
     private AppSettings _settings;
     private Win32HotkeyRegistrationService? _hotkeys;
-    private IDisposable? _addGoldHotkey;
     private bool _refreshInProgress;
     private bool _languageInitializing;
     private bool _trainerActionInProgress;
@@ -57,8 +61,7 @@ public sealed partial class MainWindow : Window
         _buildProbe = new SteamDx12Build1023995Probe();
         _trainer = new SteamDx12Build1023995TrainerEngine(_buildProbe);
         _settings = _settingsService.Load();
-        TrainerList.ItemsSource = TrainerCatalog.All.Select(feature => LocalizedTrainerFeature.From(feature, _localization)).ToList();
-        AddGoldPreviewTitleText.Text = $"{_localization.GetString("TrainerFeature_player_add_gold")} · PageUp · +{AddGoldAmount:N0}";
+        RefreshTrainerList();
         InitializeLanguageOptions();
         RootNavigation.SelectedItem = RootNavigation.MenuItems[0];
         InitializeHotkeys();
@@ -75,17 +78,34 @@ public sealed partial class MainWindow : Window
 
     private void InitializeHotkeys()
     {
+        var failures = new List<string>();
         try
         {
             var windowHandle = WinRT.Interop.WindowNative.GetWindowHandle(this);
             _hotkeys = new Win32HotkeyRegistrationService(windowHandle);
-            _addGoldHotkey = _hotkeys.Register(
-                ShortcutGesture.Parse("PageUp"),
-                () => DispatcherQueue.TryEnqueue(() => _ = ExecuteAddGoldAsync()));
+            foreach (var feature in TrainerCatalog.All)
+            {
+                var featureId = feature.Id;
+                try
+                {
+                    _trainerHotkeyRegistrations.Add(_hotkeys.Register(
+                        ShortcutGesture.Parse(feature.Shortcut),
+                        () => DispatcherQueue.TryEnqueue(() => _ = ExecuteTrainerFeatureAsync(featureId))));
+                }
+                catch (Exception exception)
+                {
+                    failures.Add($"{feature.Shortcut}: {exception.Message}");
+                }
+            }
         }
         catch (Exception exception)
         {
-            AddGoldPreviewStatusText.Text = $"PageUp: {exception.Message}";
+            failures.Add(exception.Message);
+        }
+
+        if (failures.Count > 0)
+        {
+            TrainerOperationStatusText.Text = string.Join(" · ", failures.Take(3));
         }
     }
 
@@ -153,7 +173,7 @@ public sealed partial class MainWindow : Window
         if (changed)
         {
             DiagnosticsStatusText.Text = string.Empty;
-            AddGoldPreviewStatusText.Text = string.Empty;
+            TrainerOperationStatusText.Text = _localization.GetString("Trainer_OperationHint.Text");
             if (_session is null)
             {
                 await _trainer.DetachAsync();
@@ -184,9 +204,9 @@ public sealed partial class MainWindow : Window
                 displayVersion,
                 _session.ExecutablePath);
 
-            var addGoldState = GetAddGoldState();
-            TrainerStatusText.Text = addGoldState?.Availability == TrainerAvailability.Available
-                ? $"{StoreLabel(_session.Store)} / {BackendLabel(_session.GraphicsBackend)} · {_localization.GetString("TrainerFeature_player_add_gold")} · PageUp ✓"
+            var availableCount = _trainer.Features.Count(state => state.Availability == TrainerAvailability.Available);
+            TrainerStatusText.Text = availableCount == TrainerCatalog.All.Count
+                ? _localization.GetString("Trainer_ProfileVerified")
                 : _localization.GetFormattedString(
                     "Trainer_AttachedFormat",
                     StoreLabel(_session.Store),
@@ -212,18 +232,51 @@ public sealed partial class MainWindow : Window
             ? _localization.GetString("Status_NoMetadata")
             : string.Join("\n", _installations.Select(FormatInstallation));
 
-        UpdateTrainerActionAvailability();
+        RefreshTrainerList();
     }
 
-    private void UpdateTrainerActionAvailability()
+    private void RefreshTrainerList()
     {
-        AddGoldButton.IsEnabled = !_trainerActionInProgress
-            && _session is not null
-            && GetAddGoldState()?.Availability == TrainerAvailability.Available;
+        var states = _trainer.Features.ToDictionary(state => state.Definition.Id, StringComparer.Ordinal);
+        TrainerList.ItemsSource = TrainerCatalog.All.Select(feature =>
+        {
+            states.TryGetValue(feature.Id, out var state);
+            return LocalizedTrainerFeature.From(feature, _localization, state, FormatTrainerState(feature, state));
+        }).ToList();
     }
 
-    private TrainerFeatureState? GetAddGoldState() =>
-        _trainer.Features.FirstOrDefault(state => state.Definition.Id == AddGoldFeatureId);
+    private string FormatTrainerState(TrainerFeatureDefinition feature, TrainerFeatureState? state)
+    {
+        if (state is null)
+        {
+            return _localization.GetString("Trainer_SignaturePending.Text");
+        }
+
+        if (state.Availability == TrainerAvailability.Available)
+        {
+            if (state.IsEnabled)
+            {
+                return _localization.GetString("Trainer_StateEnabled");
+            }
+
+            if (ExperimentalAcceptanceFeatures.Contains(feature.Id))
+            {
+                return _localization.GetString("Trainer_StateExperimental");
+            }
+
+            return feature.Kind == TrainerFeatureKind.ValueAction
+                ? _localization.GetString("Trainer_StateActionReady")
+                : _localization.GetString("Trainer_StateReady");
+        }
+
+        return state.Availability switch
+        {
+            TrainerAvailability.NotAttached => _localization.GetString("Trainer_StateNotAttached"),
+            TrainerAvailability.UnsupportedGameVersion => _localization.GetString("Trainer_StateUnsupported"),
+            TrainerAvailability.Error => _localization.GetString("Trainer_StateError"),
+            _ => _localization.GetString("Trainer_SignaturePending.Text"),
+        };
+    }
 
     private string FormatInstallation(GameInstallation installation)
     {
@@ -252,38 +305,68 @@ public sealed partial class MainWindow : Window
         await RefreshDiscoveryAsync();
     }
 
-    private async void AddGoldButton_Click(object sender, RoutedEventArgs e)
+    private async void TrainerList_ItemClick(object sender, ItemClickEventArgs e)
     {
-        await ExecuteAddGoldAsync();
+        if (e.ClickedItem is LocalizedTrainerFeature feature)
+        {
+            await ExecuteTrainerFeatureAsync(feature.Id);
+        }
     }
 
-    private async Task ExecuteAddGoldAsync()
+    private async Task ExecuteTrainerFeatureAsync(string featureId)
     {
-        if (_trainerActionInProgress
-            || _session is null
-            || GetAddGoldState()?.Availability != TrainerAvailability.Available)
+        if (_trainerActionInProgress || _session is null)
         {
             return;
         }
 
+        var definition = TrainerCatalog.All.FirstOrDefault(feature => feature.Id == featureId);
+        var state = _trainer.Features.FirstOrDefault(candidate => candidate.Definition.Id == featureId);
+        if (definition is null || state?.Availability != TrainerAvailability.Available)
+        {
+            TrainerOperationStatusText.Text = state?.StatusMessage ?? _localization.GetString("Trainer_StateUnavailable");
+            return;
+        }
+
         _trainerActionInProgress = true;
-        UpdateTrainerActionAvailability();
         try
         {
-            var before = await _buildProbe.ProbeAsync(_session);
-            await _trainer.ExecuteAsync(AddGoldFeatureId, AddGoldAmount);
-            var after = await _buildProbe.ProbeAsync(_session);
-            var featureName = _localization.GetString("TrainerFeature_player_add_gold");
-            AddGoldPreviewStatusText.Text = $"{featureName}: {before.Gold:N1} → {after.Gold:N1}";
+            TrainerBuildProbeSnapshot? before = null;
+            if (definition.Kind == TrainerFeatureKind.ValueAction)
+            {
+                before = await _buildProbe.ProbeAsync(_session);
+                await _trainer.ExecuteAsync(featureId, definition.DefaultValue);
+            }
+            else
+            {
+                await _trainer.SetEnabledAsync(featureId, !state.IsEnabled);
+            }
+
+            var localized = LocalizedTrainerFeature.From(definition, _localization).DisplayName;
+            var updatedState = _trainer.Features.First(candidate => candidate.Definition.Id == featureId);
+            if (definition.Kind == TrainerFeatureKind.ValueAction && before is not null)
+            {
+                var after = await _buildProbe.ProbeAsync(_session);
+                TrainerOperationStatusText.Text = featureId switch
+                {
+                    "player.add-gold" => $"{localized}: {before.Gold:N1} → {after.Gold:N1}",
+                    "player.add-influence" => $"{localized}: {before.InfluencePoints:N1} → {after.InfluencePoints:N1}",
+                    _ => $"{localized} · {_localization.GetString("Trainer_StateCompleted")}",
+                };
+            }
+            else
+            {
+                TrainerOperationStatusText.Text = $"{localized} · {_localization.GetString(updatedState.IsEnabled ? "Trainer_StateEnabled" : "Trainer_StateDisabled")}";
+            }
         }
         catch (Exception exception)
         {
-            AddGoldPreviewStatusText.Text = exception.Message;
+            TrainerOperationStatusText.Text = exception.Message;
         }
         finally
         {
             _trainerActionInProgress = false;
-            UpdateTrainerActionAvailability();
+            RefreshTrainerList();
         }
     }
 
@@ -384,7 +467,11 @@ public sealed partial class MainWindow : Window
     private void MainWindow_Closed(object sender, WindowEventArgs args)
     {
         _processTimer.Stop();
-        _addGoldHotkey?.Dispose();
+        foreach (var registration in _trainerHotkeyRegistrations)
+        {
+            registration.Dispose();
+        }
+        _trainerHotkeyRegistrations.Clear();
         _hotkeys?.Dispose();
         _trainer.Dispose();
     }
