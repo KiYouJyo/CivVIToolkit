@@ -15,9 +15,9 @@
 - 监测 Civilization VI 进程，读取 PID、可执行文件路径和版本信息。
 - 提供进程内存读写、AoB 特征码解析与扫描基础。
 - 已建立经典 **22 项单机修改功能**的数据驱动框架与快捷键契约。
-- 已针对 Steam / DX12 / Gathering Storm `1.0.12.68 (1023995)` 建立首个精确 GameCore Profile。
-- v0.1.3 开始开放首个真实写入功能：`PageUp` / 应用内按钮 **增加金钱 +10,000**。
-- 每次写入前都会重新验证 GameCore SHA-256、13 个 AoB anchor、本地玩家与 Treasury 路径；其余 21 项仍保持 `Signature pending`。
+- 已针对 Steam / DX12 / Gathering Storm `1.0.12.68 (1023995)` 建立首个精确 Profile；v0.2.0 Preview 已接入 22 项功能的实机验收实现。
+- `PageUp` 增加金钱 +10,000 已完成真实单机对局验证；其余 v0.2.0 功能仍按组进行验收，不将“已实现”误写为“全部已验证”。
+- 不支持的游戏 Build 保持 fail-closed，不使用猜测地址。
 - 提供只读运行时诊断，便于建立 Steam / Epic、DX11 / DX12 的版本化 Signature Profile。
 - 已预留 Save Manager、Maps & Game Info、Mod Manager、Quick Launch 与 Settings 模块。
 
@@ -32,9 +32,15 @@
 
 ## Trainer 状态
 
-当前低层内存访问、AoB 扫描、快捷键与 22 项功能目录已经建立。已验证 Build 上的单项功能会逐步开放；任何未完成 Profile、AoB、对象链或写入语义验证的功能仍保持不可用，不会使用猜测地址。
+首个完整验收 Profile 锁定：
 
-兼容策略见 [Trainer Signature 文档](docs/TRAINER-SIGNATURES.md)，运行时 Build Fingerprint 见 [诊断文档](docs/RUNTIME-DIAGNOSTICS.md)。
+- Steam / DX12 / Gathering Storm `1.0.12.68 (1023995)`
+- EXE SHA-256 `c2c3d40b86260a541d8a4d38cb70d50d3406ae1de374afc382d1e42bc1342f1e`
+- GameCore SHA-256 `324c51e9ea3531758842e16c69e6cddbefbb226c5b675c3d6e60111646c2e98c`
+
+v0.2.0 Preview 将 22 项目录全部接到可点击行与原快捷键：Num 1–9、Num 0、Num .、PageUp、PageDown、Alt+Num 1–9。所有功能仍要求精确 Profile 校验；版本、特征码、对象链或 Patch 原字节不匹配时拒绝执行。
+
+详细实现、验收状态与分组测试顺序见 [Trainer Signature 文档](docs/TRAINER-SIGNATURES.md)，运行时 Build Fingerprint 见 [诊断文档](docs/RUNTIME-DIAGNOSTICS.md)。
 
 ## Signed Acceptance 验收包
 
@@ -56,6 +62,10 @@
 CivVIToolkit 不要求账户，也不包含遥测。安装发现、游戏进程识别、特征码扫描与当前诊断功能均在本机完成。诊断 JSON 只复制到本机剪贴板，不自动上传。公开提交诊断信息前请删除本机路径等不希望公开的内容。
 
 详见 [PRIVACY.md](PRIVACY.md)。
+
+## 使用范围
+
+Trainer 功能只面向 Civilization VI **本地单机模式**。项目不提供多人联机作弊或反作弊规避能力。
 
 ## 系统要求
 
@@ -81,15 +91,11 @@ dotnet build CivVIToolkit.sln -c Release -p:Platform=x64 --no-restore
 
 - [路线图与版本规划](docs/ROADMAP.md)
 - [架构](docs/ARCHITECTURE.md)
-- [Trainer 特征码策略](docs/TRAINER-SIGNATURES.md)
+- [Trainer Signature 策略](docs/TRAINER-SIGNATURES.md)
 - [运行时诊断](docs/RUNTIME-DIAGNOSTICS.md)
+- [发布指南](docs/RELEASE.md)
 - [本地化](docs/LOCALIZATION.md)
-- [发布流程](docs/RELEASE.md)
-
-## 使用范围
-
-Trainer 功能仅面向 **Civilization VI 本地单机模式**。本项目不面向多人对战作弊，也不会为绕过联机反作弊机制提供支持。
 
 ## License
 
-MIT
+[MIT](LICENSE)
