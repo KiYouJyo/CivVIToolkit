@@ -1,0 +1,39 @@
+# Build
+bin/
+obj/
+artifacts/
+TestResults/
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Rider / VS Code
+.idea/
+.vscode/
+
+# NuGet
+*.nupkg
+*.snupkg
+packages/
+
+# Windows packaging
+AppPackages/
+BundleArtifacts/
+*.appx
+*.appxbundle
+*.msix
+*.msixbundle
+*.msixupload
+
+# Local diagnostics / signatures
+*.log
+local-signatures/
+*.dmp
+
+# OS
+Thumbs.db
+.DS_Store
