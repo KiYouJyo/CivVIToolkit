@@ -13,15 +13,19 @@ public sealed class ProcessMemoryAccessor : IDisposable
     private nint _handle;
 
     public int ProcessId { get; }
+    public bool CanWrite { get; }
 
-    public ProcessMemoryAccessor(int processId)
+    public ProcessMemoryAccessor(int processId, bool allowWrite = true)
     {
         ProcessId = processId;
-        _handle = OpenProcess(
-            ProcessVmOperation | ProcessVmRead | ProcessVmWrite | ProcessQueryInformation,
-            false,
-            processId);
+        CanWrite = allowWrite;
+        var desiredAccess = ProcessVmRead | ProcessQueryInformation;
+        if (allowWrite)
+        {
+            desiredAccess |= ProcessVmOperation | ProcessVmWrite;
+        }
 
+        _handle = OpenProcess(desiredAccess, false, processId);
         if (_handle == 0)
         {
             throw new Win32Exception(Marshal.GetLastWin32Error(), $"Unable to open process {processId}.");
@@ -65,6 +69,11 @@ public sealed class ProcessMemoryAccessor : IDisposable
     public void Write(nint address, ReadOnlySpan<byte> bytes)
     {
         ObjectDisposedException.ThrowIf(_handle == 0, this);
+        if (!CanWrite)
+        {
+            throw new InvalidOperationException("This process memory accessor was opened in read-only mode.");
+        }
+
         if (bytes.IsEmpty)
         {
             return;
