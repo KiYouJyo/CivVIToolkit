@@ -1,5 +1,14 @@
 namespace CivVIToolkit.Core.Game;
 
+public sealed record GameModuleDiagnostics(
+    string Name,
+    string Path,
+    string? FileVersion,
+    string Sha256,
+    string BaseAddress,
+    int ImageSize,
+    string? SymbolMapPath);
+
 public sealed record GameRuntimeDiagnostics(
     DateTimeOffset CapturedAtUtc,
     int ProcessId,
@@ -11,7 +20,8 @@ public sealed record GameRuntimeDiagnostics(
     string ModuleBaseAddress,
     int ModuleImageSize,
     string? InstallDirectory,
-    bool MatchedKnownInstallation);
+    bool MatchedKnownInstallation,
+    GameModuleDiagnostics? GameCoreModule = null);
 
 public interface IGameRuntimeDiagnosticsService
 {
