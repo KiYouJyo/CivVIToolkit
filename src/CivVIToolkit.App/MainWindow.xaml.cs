@@ -1,6 +1,9 @@
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using CivVIToolkit.Core.Game;
 using CivVIToolkit.Core.Modules;
 using CivVIToolkit.Core.Trainer;
+using CivVIToolkit.Platform.Windows.Diagnostics;
 using CivVIToolkit.Platform.Windows.Discovery;
 using CivVIToolkit.Platform.Windows.Processes;
 using CivVIToolkit.Platform.Windows.Trainer;
@@ -8,13 +11,21 @@ using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
+using Windows.ApplicationModel.DataTransfer;
 
 namespace CivVIToolkit.App;
 
 public sealed partial class MainWindow : Window
 {
+    private static readonly JsonSerializerOptions DiagnosticsJsonOptions = new()
+    {
+        WriteIndented = true,
+        Converters = { new JsonStringEnumConverter() },
+    };
+
     private readonly IGameDiscoveryService _discovery = new WindowsGameDiscoveryService();
     private readonly IGameProcessMonitor _processMonitor = new Civ6ProcessMonitor();
+    private readonly IGameRuntimeDiagnosticsService _diagnostics = new GameRuntimeDiagnosticsService();
     private readonly ITrainerEngine _trainer = new PendingSignatureTrainerEngine();
     private readonly DispatcherQueueTimer _processTimer;
 
@@ -81,6 +92,7 @@ public sealed partial class MainWindow : Window
 
         if (changed)
         {
+            DiagnosticsStatusText.Text = string.Empty;
             if (_session is null)
             {
                 await _trainer.DetachAsync();
@@ -96,6 +108,8 @@ public sealed partial class MainWindow : Window
 
     private void RenderDetectionState()
     {
+        DiagnosticsButton.IsEnabled = _session is not null;
+
         if (_session is not null)
         {
             StatusTitleText.Text = "Civilization VI is running";
@@ -151,6 +165,35 @@ public sealed partial class MainWindow : Window
     private async void RefreshButton_Click(object sender, RoutedEventArgs e)
     {
         await RefreshDiscoveryAsync();
+    }
+
+    private async void DiagnosticsButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (_session is null)
+        {
+            return;
+        }
+
+        DiagnosticsButton.IsEnabled = false;
+        DiagnosticsStatusText.Text = "Collecting read-only runtime diagnostics…";
+        try
+        {
+            var snapshot = await _diagnostics.CaptureAsync(_session);
+            var json = JsonSerializer.Serialize(snapshot, DiagnosticsJsonOptions);
+            var package = new DataPackage();
+            package.SetText(json);
+            Clipboard.SetContent(package);
+            Clipboard.Flush();
+            DiagnosticsStatusText.Text = $"Diagnostics copied · SHA-256 {snapshot.ExecutableSha256[..12]}… · image {snapshot.ModuleImageSize:N0} bytes";
+        }
+        catch (Exception exception)
+        {
+            DiagnosticsStatusText.Text = $"Diagnostics failed: {exception.Message}";
+        }
+        finally
+        {
+            DiagnosticsButton.IsEnabled = _session is not null;
+        }
     }
 
     private void RootNavigation_SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
