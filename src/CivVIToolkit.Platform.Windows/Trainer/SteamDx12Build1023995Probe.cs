@@ -117,10 +117,13 @@ public sealed class SteamDx12Build1023995Probe : ITrainerBuildProbe
         var players = ReadPointer(memory, manager + PlayerArrayOffset, "player array");
         var player = ReadPointer(memory, players + (localPlayerId * IntPtr.Size), "local player");
         var components = ReadPointer(memory, player + PlayerComponentsOffset, "local player component block");
+        var religion = components + ReligionComponentOffset;
+        var treasury = components + TreasuryComponentOffset;
+        var influence = components + InfluenceComponentOffset;
 
-        var faithRaw = ReadInt32(memory, components + ReligionComponentOffset + FaithBalanceOffset, "faith balance");
-        var goldRaw = ReadInt32(memory, components + TreasuryComponentOffset + GoldBalanceOffset, "gold balance");
-        var influenceRaw = ReadInt32(memory, components + InfluenceComponentOffset + InfluencePointsOffset, "influence points");
+        var faithRaw = ReadInt32(memory, religion + FaithBalanceOffset, "faith balance");
+        var goldRaw = ReadInt32(memory, treasury + GoldBalanceOffset, "gold balance");
+        var influenceRaw = ReadInt32(memory, influence + InfluencePointsOffset, "influence points");
 
         return new TrainerBuildProbeSnapshot(
             ProfileId,
@@ -129,7 +132,16 @@ public sealed class SteamDx12Build1023995Probe : ITrainerBuildProbe
             goldRaw / FixedPointScale,
             faithRaw / FixedPointScale,
             influenceRaw / FixedPointScale,
-            verified);
+            verified,
+            goldRaw,
+            faithRaw,
+            influenceRaw,
+            FormatAddress(manager),
+            FormatAddress(player),
+            FormatAddress(components),
+            FormatAddress(treasury),
+            FormatAddress(religion),
+            FormatAddress(influence));
     }
 
     private static nint ReadPointer(ProcessMemoryAccessor memory, nint address, string label)
@@ -159,6 +171,8 @@ public sealed class SteamDx12Build1023995Probe : ITrainerBuildProbe
 
         return bytes;
     }
+
+    private static string FormatAddress(nint address) => $"0x{address:X}";
 
     private static async Task<string> ComputeSha256Async(string path, CancellationToken cancellationToken)
     {
