@@ -2,7 +2,7 @@
 
 # CivVIToolkit
 
-**Sid Meier's Civilization VI** 向けのモダンな Windows ツールキットです。WinUI 3 を基盤とし、最初の段階ではローカルのシングルプレイヤー用 Trainer を中心に実装しつつ、セーブ管理、マップ／ゲーム情報、Mod 管理、クイック起動を独立モジュールとして拡張できる構成にしています。
+**Sid Meier's Civilization VI** 向けのモダンな Windows ツールキットです。WinUI 3 を基盤とし、ローカルのシングルプレイヤー用 Trainer を中心に、セーブ管理、マップ／ゲーム情報、Mod 管理、クイック起動を独立モジュールとして拡張できる構成にしています。
 
 [![GitHub Release](https://img.shields.io/github/v/release/KiYouJyo/CivVIToolkit?display_name=tag&sort=semver&color=2F81F7&label=Release)](https://github.com/KiYouJyo/CivVIToolkit/releases) [![CI](https://github.com/KiYouJyo/CivVIToolkit/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/KiYouJyo/CivVIToolkit/actions/workflows/ci.yml) [![Closed PRs](https://img.shields.io/github/issues-pr-closed/KiYouJyo/CivVIToolkit?color=8250DF&label=Closed%20PRs)](https://github.com/KiYouJyo/CivVIToolkit/pulls?q=is%3Apr+is%3Aclosed) [![Last Commit](https://img.shields.io/github/last-commit/KiYouJyo/CivVIToolkit?color=57606A&label=Last%20Commit)](https://github.com/KiYouJyo/CivVIToolkit/commits/main/)
 
@@ -15,7 +15,9 @@
 - Civilization VI の PID、実行ファイルパス、ファイルバージョンを監視。
 - プロセスメモリアクセスと AoB シグネチャスキャンの基盤。
 - クラシックな **22 項目 Trainer** のデータ駆動カタログとショートカット契約。
-- 未検証 Build は `Signature pending` のままにし、推測した固定アドレスを使用しません。
+- Steam / DX12 / Gathering Storm `1.0.12.68 (1023995)` 向けの最初の厳密 Profile を構築し、v0.2.0 Preview では 22 項目すべてを実機受け入れテスト可能な状態に実装。
+- `PageUp` ゴールド +10,000 は実際のシングルプレイヤー対局で検証済み。その他の v0.2.0 項目は実装済みですが、全項目を「実機検証済み」とは扱いません。
+- 未対応 Build は fail-closed とし、推測した固定アドレスを使用しません。
 - Steam/Epic・DX11/DX12 ごとのバージョン化 Signature Profile 作成用の読み取り専用診断。
 - Save Manager、Maps & Game Info、Mod Manager、Quick Launch、Settings の拡張枠。
 
@@ -30,13 +32,19 @@
 
 ## Trainer の状態
 
-メモリアクセス、AoB スキャナ、ショートカット契約、22 項目のカタログは実装済みです。ゲーム状態を変更する機能は、検出した Build に対してシグネチャと Patch の意味が検証された場合のみ有効化します。
+最初の完全受け入れ Profile は以下に固定されています。
 
-詳細は [Trainer Signatures](docs/TRAINER-SIGNATURES.md) と [Runtime Diagnostics](docs/RUNTIME-DIAGNOSTICS.md) を参照してください。
+- Steam / DX12 / Gathering Storm `1.0.12.68 (1023995)`
+- EXE SHA-256 `c2c3d40b86260a541d8a4d38cb70d50d3406ae1de374afc382d1e42bc1342f1e`
+- GameCore SHA-256 `324c51e9ea3531758842e16c69e6cddbefbb226c5b675c3d6e60111646c2e98c`
+
+v0.2.0 Preview では Num 1–9、Num 0、Num .、PageUp、PageDown、Alt+Num 1–9 の全 22 項目をクリック可能な行と元のホットキーに接続しています。Build、シグネチャ、ポインタ経路、Patch 元バイトのいずれかが一致しない場合は実行を拒否します。
+
+実装と受け入れ状況は [Trainer Signatures](docs/TRAINER-SIGNATURES.md)、Build Fingerprint は [Runtime Diagnostics](docs/RUNTIME-DIAGNOSTICS.md) を参照してください。
 
 ## Signed Acceptance ビルド
 
-リポジトリには自動署名 x64 Preview 検収ワークフローがあります。同一リポジトリ内の PR では **Signed Acceptance** が自動実行され、メンテナは Actions から手動実行することもできます。Restore、テスト、Release ビルド、自己完結型 x64 publish、署名と検証、SHA-256 作成、Artifact アップロードまで自動化します。
+リポジトリには自動署名 x64 Preview 検収ワークフローがあります。同一リポジトリ内の PR では **Signed MSIX Acceptance** が自動実行され、メンテナは Actions から手動実行することもできます。Restore、テスト、Release ビルド、MSIX 署名と検証、SHA-256 作成、Artifact アップロードまで自動化します。
 
 検収ビルドは実ゲーム環境での確認用で、正式 Release ではありません。詳細は [docs/RELEASE.md](docs/RELEASE.md) を参照してください。
 
@@ -51,7 +59,7 @@
 
 ## プライバシーとローカル設計
 
-CivVIToolkit はアカウントを必要とせず、テレメトリも含みません。インストール検出、プロセス検出、シグネチャスキャン、現在の診断はローカルで完結します。診断 JSON はローカルのクリップボードにのみコピーされ、自動アップロードされません。公開 Issue に貼る場合は必要に応じてローカルパスを削除してください。
+CivVIToolkit はアカウントを必要とせず、テレメトリも含みません。インストール検出、プロセス検出、シグネチャスキャン、現在の診断はローカルで完結します。診断 JSON はローカルのクリップボードにのみコピーされ、自動アップロードされません。
 
 詳細は [PRIVACY.md](PRIVACY.md) を参照してください。
 
@@ -89,7 +97,7 @@ dotnet build CivVIToolkit.sln -c Release -p:Platform=x64 --no-restore
 
 ## 利用範囲
 
-Trainer はローカルのシングルプレイヤー専用です。マルチプレイでの不正行為、アンチチート回避、オンラインの公平性を損なう機能は対象外です。
+Trainer はローカルのシングルプレイヤー専用です。
 
 ## License と商標
 
