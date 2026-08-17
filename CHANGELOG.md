@@ -17,6 +17,43 @@
 - Signed Acceptance 从“解压后直接运行的 self-contained WinUI 3 目录”迁移为签名 MSIX。
 - Release 结构对齐 UrbanPlanToolbox：版本元数据、签名产物、one-click 包、SHA-256、三语说明和幂等 Release reconciliation。
 
+## [0.2.0] - 2026-08-17
+
+### Added
+- 针对已验证的 Steam / DX12 / Gathering Storm `1.0.12.68 (1023995)` 精确 Profile，将经典 22 项单机修改器全部接入可操作状态。
+- 22 个全局快捷键与可点击修改器功能行；Toggle 功能显示实时启用状态，ValueAction 直接执行。
+- 临时 x64 GameCore 调用桥：按 Windows x64 ABI 在目标进程内调用已验证函数，调用后立即释放，不注入常驻 DLL。
+- 可逆代码 Patch 基础：写入前验证原字节，修改页保护并刷新指令缓存，关闭功能 / Detach / 退出时恢复原字节。
+- 本地玩家资源、研究、市政、单位、城市、生产、资源库存等完整运行时路径。
+- AI 玩家枚举以及 AI 金钱 / 信仰 / 影响力 / 研究 / 市政 / 移动力 / 生产 / 资源控制。
+
+### Trainer
+- Num 1：无限金钱。
+- Num 2：无限信仰。
+- Num 3：一回合完成研究。
+- Num 4：一回合完成市政。
+- Num 5：增加影响力 +1000。
+- Num 6：单位无限移动力。
+- Num 7：单位无限生命。
+- Num 8：一回合建造 / 招募。
+- Num 9：全部奢侈 / 战略资源。
+- Num 0：单位随时可升级。
+- Num .：城市最大人口。
+- PageUp：增加金钱 +10000（v0.1.3 已实机验证）。
+- PageDown：建造者无限使用次数。
+- Alt+Num 1–9：AI 对应限制与一击必杀功能。
+
+### Acceptance
+- v0.2.0 为“全 22 项实机验收构建”，不是宣称 22 项全部已经实机验证完成。
+- `PageUp +10000 Gold` 已完成真实游戏写入验收；Gold / Faith / Influence 读取链与 13 个运行时 AoB anchor 已完成实机验证。
+- `unit.always-upgrade`、`combat.one-hit-kill`、`ai.block-production` 当前在 UI 中标记为“实验性验收”，需要重点验证其游戏语义与边界条件。
+- 所有功能仍严格锁定精确 GameCore SHA-256；任何 Build / signature / 原字节不匹配均 fail closed。
+
+### Safety
+- 仅用于 Civilization VI 本地单机模式。
+- 不实现多人联机作弊、反作弊规避或持久注入。
+- 代码 Patch 在正常关闭、Detach 时尝试恢复原始字节。
+
 ## [0.1.3] - 2026-08-17
 
 ### Added
