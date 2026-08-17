@@ -1,0 +1,38 @@
+name: Feature request
+about: 提议新的工具箱功能或改进
+labels: [enhancement]
+body:
+  - type: textarea
+    id: scenario
+    attributes:
+      label: 使用场景
+      description: 这个功能解决什么实际问题？
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: 建议方案
+      description: 请描述期望的交互、输入输出和模块归属。
+    validations:
+      required: true
+  - type: dropdown
+    id: module
+    attributes:
+      label: 模块
+      options:
+        - Trainer
+        - Save Manager
+        - Maps & Game Info
+        - Mod Manager
+        - Quick Launch
+        - Settings / Localization
+        - Repository / Build / Release
+        - 其他
+    validations:
+      required: true
+  - type: textarea
+    id: boundaries
+    attributes:
+      label: 数据、联网或兼容性边界
+      description: 如涉及游戏 Build、存档、网络、权限或隐私，请说明。

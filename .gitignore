@@ -20,7 +20,7 @@ TestResults/
 *.snupkg
 packages/
 
-# Windows packaging
+# Windows packaging / acceptance artifacts
 AppPackages/
 BundleArtifacts/
 *.appx
@@ -28,6 +28,14 @@ BundleArtifacts/
 *.msix
 *.msixbundle
 *.msixupload
+*.zip
+
+# Signing material — never commit private certificates or keys
+*.pfx
+*.p12
+*.cer
+*.key
+*.pem
 
 # Local diagnostics / signatures
 *.log
