@@ -17,6 +17,20 @@
 - Signed Acceptance 从“解压后直接运行的 self-contained WinUI 3 目录”迁移为签名 MSIX。
 - Release 结构对齐 UrbanPlanToolbox：版本元数据、签名产物、one-click 包、SHA-256、三语说明和幂等 Release reconciliation。
 
+## [0.3.2] - 2026-08-18
+
+### Fixed
+- 修复对局初始化期间 `Player::Manager` 暂时为空后，22 项修改器全部永久显示“运行错误”的连接竞态；GameCore 已加载但 Trainer 未就绪时自动重试精确 Profile。
+- 修复主修改器在高 DPI / 较窄内容宽度下 NumberBox、ToggleSwitch、快捷键和状态文本互相遮挡的问题。
+- 修复紧凑修改器把 `AppWindow.Resize` 的物理像素误当作 XAML 有效像素，导致 150% / 200% 缩放下窗口实际宽度过小的问题。
+- 修复语言切换提示显示 `!Settings_RestartInfo...!` 原始占位符的问题。
+
+### Changed
+- 修改器分类改为顶部横向分类栏，功能列表使用完整内容宽度。
+- 语言切换改为运行时立即更新 MRT Core、Culture、ResourceLoader 与可见界面，无需重启应用。
+- 主窗口和紧凑修改器的静态界面文字均支持运行时重新本地化。
+- 继续保留 Steam / DX12 / Gathering Storm 1023995 精确 SHA、13 AoB 与指针链 fail-closed 写入保护。
+
 ## [0.3.1] - 2026-08-18
 
 ### Added
