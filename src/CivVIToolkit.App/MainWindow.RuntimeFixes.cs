@@ -12,11 +12,6 @@ public sealed partial class MainWindow
     private DispatcherQueueTimer? _trainerRetryTimer;
     private bool _trainerRetryInProgress;
 
-    /// <summary>
-    /// Runs after the generated XAML and the original constructor have finished.
-    /// It keeps the accepted v0.3.1 code path intact while applying the live
-    /// language and transient GameCore readiness fixes found during real testing.
-    /// </summary>
     internal void InitializePostConstructionFixes()
     {
         LanguageComboBox.SelectionChanged -= LanguageComboBox_SelectionChanged;
@@ -58,7 +53,6 @@ public sealed partial class MainWindow
         try
         {
             await _trainer.AttachAsync(_session);
-            _lastTrainerUiSignature = null;
             RenderDetectionState();
         }
         catch
@@ -105,7 +99,6 @@ public sealed partial class MainWindow
         InitializeLanguageOptions();
         ApplyLiveLocalization();
         RenderDetectionState();
-        _lastTrainerUiSignature = null;
         RefreshTrainerList(force: true);
 
         if (RootNavigation.SelectedItem is NavigationViewItem { Tag: string selectedTag })
@@ -134,6 +127,8 @@ public sealed partial class MainWindow
         ApplyLocalizedTree(RootLayout);
         Title = _localization.GetString("AppDisplayName");
         InitializeVersionText();
+        // Refiltering here is user-triggered by a language change. Background
+        // polling never calls this path and therefore never rebinds ItemsSource.
         ApplyTrainerFilter();
     }
 
@@ -194,11 +189,6 @@ public sealed partial class MainWindow
 
     private void ApplyTrainerLayoutFix(double width)
     {
-        // The first v0.3.1 trainer kept a 150-190 DIP category rail even when
-        // the main NavigationView had already collapsed. On high-DPI displays
-        // that left too little room for NumberBox and ToggleSwitch templates.
-        // Categories now live in the horizontal command row, so the body gets
-        // the complete content width at every window size.
         TrainerCategoryColumn.Width = new GridLength(0);
         Grid.SetColumn(TrainerMainCard, 0);
         Grid.SetColumnSpan(TrainerMainCard, 2);
