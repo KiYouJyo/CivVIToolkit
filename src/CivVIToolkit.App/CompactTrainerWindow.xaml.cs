@@ -42,12 +42,13 @@ public sealed partial class CompactTrainerWindow : Window
 
     private void CompactRoot_Loaded(object sender, RoutedEventArgs e)
     {
-        // AppWindow.Resize uses physical pixels while XAML layout uses effective
-        // pixels. The old fixed 560x680 call made the window only ~280 DIPs wide
-        // at 200% scaling, which caused NumberBox and ToggleSwitch overlap.
+        // AppWindow.Resize consumes physical pixels while XAML measures in DIPs.
+        // Reserve a stable logical width, then translate it with RasterizationScale.
+        // The extra width is intentional: shortcut and action controls must never
+        // share the same visual footprint at 150%/200% Windows scaling.
         var scale = CompactRoot.XamlRoot?.RasterizationScale ?? 1.0;
-        const double logicalWidth = 520;
-        const double logicalHeight = 640;
+        const double logicalWidth = 580;
+        const double logicalHeight = 700;
         AppWindow.Resize(new SizeInt32(
             Math.Max(1, (int)Math.Round(logicalWidth * scale)),
             Math.Max(1, (int)Math.Round(logicalHeight * scale))));
