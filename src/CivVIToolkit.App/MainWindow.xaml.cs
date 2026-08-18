@@ -80,7 +80,6 @@ public sealed partial class MainWindow : Window
     private Win32HotkeyRegistrationService? _hotkeys;
     private CompactTrainerWindow? _compactTrainerWindow;
     private string _trainerCategory = "resources";
-    private string? _lastTrainerUiSignature;
     private bool _refreshInProgress;
     private bool _languageInitializing;
     private bool _trainerActionInProgress;
@@ -230,7 +229,6 @@ public sealed partial class MainWindow : Window
             {
                 await _trainer.AttachAsync(_session);
             }
-            _lastTrainerUiSignature = null;
         }
 
         RenderDetectionState();
@@ -301,6 +299,7 @@ public sealed partial class MainWindow : Window
 
     private void RefreshTrainerList(bool force = false)
     {
+        _ = force;
         var states = _trainer.Features.ToDictionary(state => state.Definition.Id, StringComparer.Ordinal);
         var firstBinding = _trainerFeatures.Count == 0;
 
@@ -517,7 +516,6 @@ public sealed partial class MainWindow : Window
         finally
         {
             _trainerActionInProgress = false;
-            _lastTrainerUiSignature = null;
             RefreshTrainerList(force: true);
         }
     }
@@ -549,7 +547,6 @@ public sealed partial class MainWindow : Window
         finally
         {
             _trainerActionInProgress = false;
-            _lastTrainerUiSignature = null;
             RefreshTrainerList(force: true);
         }
     }
