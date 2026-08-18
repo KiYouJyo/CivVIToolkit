@@ -57,6 +57,9 @@ public sealed record LocalizedTrainerFeature(
         var availability = state?.Availability ?? TrainerAvailability.SignaturePending;
         var isValueAction = definition.Kind == TrainerFeatureKind.ValueAction;
         var actionValue = configuredActionValue ?? definition.DefaultValue ?? 1;
+        var resolvedStatus = IsTransientMatchReadinessFailure(state)
+            ? localization.GetString("Trainer_StateWaitingMatch")
+            : status ?? state?.StatusMessage ?? string.Empty;
 
         return new LocalizedTrainerFeature(
             definition.Id,
@@ -70,8 +73,15 @@ public sealed record LocalizedTrainerFeature(
             actionValue,
             isValueAction ? Visibility.Visible : Visibility.Collapsed,
             definition.Notes,
-            status ?? state?.StatusMessage ?? string.Empty,
+            resolvedStatus,
             state?.IsEnabled ?? false,
             availability);
     }
+
+    private static bool IsTransientMatchReadinessFailure(TrainerFeatureState? state) =>
+        state?.Availability == TrainerAvailability.Error
+        && state.StatusMessage is { } message
+        && (message.Contains("player manager pointer is null", StringComparison.OrdinalIgnoreCase)
+            || message.Contains("game context root is unavailable", StringComparison.OrdinalIgnoreCase)
+            || message.Contains("local player", StringComparison.OrdinalIgnoreCase));
 }
