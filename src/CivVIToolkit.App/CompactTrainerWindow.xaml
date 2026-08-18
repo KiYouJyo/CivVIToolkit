@@ -8,19 +8,38 @@
         <MicaBackdrop />
     </Window.SystemBackdrop>
 
-    <Grid>
+    <Grid x:Name="CompactRoot">
+        <Grid.Resources>
+            <Style x:Key="CompactShortcutStyle" TargetType="Border">
+                <Setter Property="Background" Value="{ThemeResource CardBackgroundFillColorSecondaryBrush}" />
+                <Setter Property="CornerRadius" Value="6" />
+                <Setter Property="Height" Value="30" />
+                <Setter Property="VerticalAlignment" Value="Center" />
+            </Style>
+        </Grid.Resources>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <TitleBar x:Name="CompactTitleBar" Title="CivVIToolkit · 修改器" />
+        <TitleBar
+            x:Name="CompactTitleBar"
+            localization:LiveLocalization.Key="Compact_TitleBar"
+            Title="CivVIToolkit · 修改器" />
 
         <InfoBar Grid.Row="1" Margin="10,8,10,8" IsOpen="True" IsClosable="False" Severity="Informational">
             <StackPanel Spacing="2">
-                <TextBlock Text="第一版 22 项修改器" Style="{StaticResource BodyStrongTextBlockStyle}" />
-                <TextBlock x:Name="CompactStatusText" Text="置顶显示 · 与主窗口共享同一 Trainer 状态" FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                <TextBlock
+                    localization:LiveLocalization.Key="Compact_Headline"
+                    Text="第一版 22 项修改器"
+                    Style="{StaticResource BodyStrongTextBlockStyle}" />
+                <TextBlock
+                    x:Name="CompactStatusText"
+                    Text="置顶显示 · 与主窗口共享同一 Trainer 状态"
+                    FontSize="11"
+                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                    TextWrapping="Wrap" />
             </StackPanel>
         </InfoBar>
 
@@ -39,30 +58,62 @@
                     <Setter Property="Padding" Value="0" />
                     <Setter Property="Margin" Value="0,1" />
                     <Setter Property="CornerRadius" Value="6" />
-                    <Setter Property="MinHeight" Value="48" />
+                    <Setter Property="MinHeight" Value="54" />
                 </Style>
             </ListView.ItemContainerStyle>
             <ListView.ItemTemplate>
                 <DataTemplate x:DataType="localization:LocalizedTrainerFeature">
-                    <Grid MinHeight="48" Padding="9,4" ColumnSpacing="8">
+                    <Grid MinHeight="54" Padding="9,5" ColumnSpacing="8">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="104" />
-                            <ColumnDefinition Width="116" />
-                            <ColumnDefinition Width="82" />
+                            <ColumnDefinition Width="88" />
+                            <ColumnDefinition Width="118" />
                         </Grid.ColumnDefinitions>
+
                         <StackPanel Spacing="1" VerticalAlignment="Center">
-                            <TextBlock Text="{x:Bind DisplayName}" FontSize="12" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
-                            <TextBlock Text="{x:Bind Scope}" FontSize="10" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                            <TextBlock
+                                Text="{x:Bind DisplayName}"
+                                FontSize="12"
+                                FontWeight="SemiBold"
+                                TextTrimming="CharacterEllipsis" />
+                            <StackPanel Orientation="Horizontal" Spacing="5">
+                                <TextBlock Text="{x:Bind Scope}" FontSize="10" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                <TextBlock Text="·" FontSize="10" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                <TextBlock Text="{x:Bind Status}" FontSize="10" Foreground="{ThemeResource TextFillColorSecondaryBrush}" TextTrimming="CharacterEllipsis" />
+                            </StackPanel>
                         </StackPanel>
-                        <Border Grid.Column="1" Width="104" Height="30" Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}" CornerRadius="6" VerticalAlignment="Center">
-                            <TextBlock Text="{x:Bind Shortcut}" FontFamily="Cascadia Mono" FontSize="10" HorizontalAlignment="Center" VerticalAlignment="Center" />
+
+                        <Border Grid.Column="1" Width="88" Style="{StaticResource CompactShortcutStyle}">
+                            <TextBlock
+                                Text="{x:Bind Shortcut}"
+                                FontFamily="Cascadia Mono"
+                                FontSize="10"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center" />
                         </Border>
-                        <Grid Grid.Column="2" VerticalAlignment="Center">
-                            <NumberBox Tag="{x:Bind Id}" Value="{x:Bind ActionValue, Mode=OneWay}" Minimum="1" Maximum="8000000" SpinButtonPlacementMode="Compact" Visibility="{x:Bind ActionEditorVisibility}" ValueChanged="CompactValueInput_ValueChanged" Tapped="CompactValueInput_Tapped" />
-                            <ToggleSwitch IsOn="{x:Bind IsEnabled, Mode=OneWay}" IsHitTestVisible="False" OffContent="" OnContent="" HorizontalAlignment="Center" Visibility="{x:Bind ToggleVisibility}" />
+
+                        <Grid Grid.Column="2" Width="118" VerticalAlignment="Center">
+                            <NumberBox
+                                Tag="{x:Bind Id}"
+                                Value="{x:Bind ActionValue, Mode=OneWay}"
+                                Minimum="1"
+                                Maximum="8000000"
+                                SmallChange="100"
+                                Width="112"
+                                MinWidth="0"
+                                HorizontalAlignment="Center"
+                                SpinButtonPlacementMode="Compact"
+                                Visibility="{x:Bind ActionEditorVisibility}"
+                                ValueChanged="CompactValueInput_ValueChanged"
+                                Tapped="CompactValueInput_Tapped" />
+                            <ToggleSwitch
+                                IsOn="{x:Bind IsEnabled, Mode=OneWay}"
+                                IsHitTestVisible="False"
+                                OffContent=""
+                                OnContent=""
+                                HorizontalAlignment="Center"
+                                Visibility="{x:Bind ToggleVisibility}" />
                         </Grid>
-                        <TextBlock Grid.Column="3" Text="{x:Bind Status}" FontSize="10" Foreground="{ThemeResource TextFillColorSecondaryBrush}" HorizontalAlignment="Right" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
                     </Grid>
                 </DataTemplate>
             </ListView.ItemTemplate>
