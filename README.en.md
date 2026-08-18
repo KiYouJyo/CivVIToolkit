@@ -24,6 +24,10 @@ CivVIToolkit is a modular Windows companion for Civilization VI. The current foc
 
 Writes are enabled only for the exact verified build. Unknown GameCore fingerprints or runtime anchor mismatches fail closed.
 
+### v0.2.2 acceptance focus
+
+Live testing showed that Civilization VI can temporarily clear the GameContext root while the match and `Player::Manager` remain active. v0.2.2 keeps the original GameContext route as the preferred path. When that root is temporarily null, the SHA-locked single-player profile may fall back to the previously live-verified player slot 0, but only after confirming the slot is active and the Treasury, Religion and Influence live components all exist. Otherwise writes remain blocked.
+
 ## Modules
 
 - Overview / game detection
