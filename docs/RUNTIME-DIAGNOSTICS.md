@@ -1,27 +1,19 @@
-# Runtime diagnostics
+# Runtime Diagnostics
 
-The first verified trainer signatures must be derived from real Civilization VI builds. CivVIToolkit therefore includes a deliberately read-only runtime diagnostics snapshot before any signature-dependent feature is enabled.
+CivVIToolkit can copy a JSON runtime diagnostic snapshot for exact-build troubleshooting.
 
-When Civilization VI is running, **Copy diagnostics** collects:
+Typical fields include:
 
-- detected storefront (`Steam` / `EpicGames`)
-- renderer (`DirectX11` / `DirectX12`)
-- process ID
-- executable path
-- the raw Civilization VI file-version string plus its normalized version when available
-- SHA-256 of the running executable
-- main-module base address
-- main-module image size
-- matched installation root and whether launcher metadata matched it
-- when a Gathering Storm match has loaded `GameCore_XP2_FinalRelease.dll`: its path, SHA-256, module base address and image size
-- the adjacent `GameCore_XP2_FinalRelease.map` path when the shipped symbol map is present
+- process ID, store and graphics backend
+- executable path/version/SHA-256
+- module base and image size
+- Gathering Storm GameCore path/SHA-256/base/size
+- exact trainer profile ID
+- verified AoB RVA map
+- local player ID and selected live component addresses
+- read-only Gold/Faith/Influence probe values when available
+- an error message when the trainer probe cannot be resolved
 
-The JSON snapshot is copied to the clipboard. It contains no save-game contents, account credentials, launcher tokens or arbitrary memory dump data.
+Starting with v0.2.2, the trainer snapshot `ResourcePath` also records whether local-player resolution used the preferred GameContext route or the verified single-player Player::Manager slot-0 fallback.
 
-## Fingerprint versus signature
-
-A diagnostics JSON is a **build fingerprint**, not an AoB signature. It identifies the exact executable and, once the match core is loaded, the exact Gathering Storm GameCore module that a verified trainer profile must target. Users do not need to copy diagnostics during normal use; it exists for development and troubleshooting.
-
-Civilization VI loads much of Gathering Storm's game logic through `GameCore_XP2_FinalRelease.dll` after entering a match. CivVIToolkit therefore tracks that module independently from `CivilizationVI.exe` / `CivilizationVI_DX12.exe`. A future signature profile may use the executable fingerprint, the GameCore fingerprint and verified AoB patterns together rather than assuming a fixed absolute address.
-
-Actual AoB signatures and patch semantics remain separate from diagnostics and must still be verified before a trainer switch becomes available.
+The diagnostics action does not intentionally include save contents, credentials, authentication tokens or arbitrary memory dumps. The JSON is copied to the local clipboard and is not automatically uploaded.
