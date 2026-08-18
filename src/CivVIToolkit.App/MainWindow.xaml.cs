@@ -255,9 +255,6 @@ public sealed partial class MainWindow : Window
                 feature.Kind == TrainerFeatureKind.ValueAction ? configuredValue : null);
         }).ToList();
 
-        // The process monitor polls independently from the trainer scheduler. Do
-        // not replace the ListView source when nothing visible changed: recreating
-        // item containers made the shortcut badges visibly jump on every poll.
         var signature = string.Join(
             '\u001F',
             items.Select(item => $"{item.Id}|{item.Status}|{item.IsEnabled}|{item.Availability}"));
@@ -351,7 +348,6 @@ public sealed partial class MainWindow : Window
 
     private void TrainerValueInput_Tapped(object sender, TappedRoutedEventArgs e)
     {
-        // Editing a value should never activate the surrounding ListView row.
         e.Handled = true;
     }
 
