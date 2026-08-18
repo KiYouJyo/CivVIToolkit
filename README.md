@@ -24,6 +24,10 @@ CivVIToolkit 是一个面向 Civilization VI 的模块化 Windows 工具箱，�
 
 当前 Profile 仅针对已验证的精确 Build 开放写入。未知 GameCore SHA 或运行时锚点不匹配时会拒绝修改。
 
+### v0.2.2 验收重点
+
+真实对局表明 Civilization VI 有时会在游戏仍正常运行、`Player::Manager` 仍可用时暂时清空 GameContext 根指针。v0.2.2 会优先使用原有 GameContext 路径；若该根指针暂时为空，则仅在精确 SHA 锁定的单机 Profile 上验证并回退到此前已实测的玩家槽位 0。回退还要求 Treasury、Religion、Influence 三个 live component 均存在，否则仍然拒绝写入。
+
 ## 模块
 
 - 概览 / 游戏检测
@@ -36,13 +40,7 @@ CivVIToolkit 是一个面向 Civilization VI 的模块化 Windows 工具箱，�
 
 ## 开发与发布
 
-仓库包含：
-
-- Windows CI：Restore / Build / Test / 三语资源一致性检查
-- 自动签名 Signed MSIX Acceptance 验收包
-- 一键安装包
-- `release/release.json` 中央发布元数据
-- Release Orchestrator 与 GitHub Release 发布工作流
+仓库包含 Windows CI、三语资源一致性检查、自动签名 Signed MSIX Acceptance、一键安装包、`release/release.json` 中央发布元数据，以及 Release Orchestrator / GitHub Release 工作流。
 
 当前仍为 Preview。真实修改器功能必须完成单机实机验收后才会标记为稳定。
 
