@@ -113,20 +113,53 @@
                         <ListView x:Name="TrainerList" SelectionMode="None" IsItemClickEnabled="True" ItemClick="TrainerList_ItemClick">
                             <ListView.ItemTemplate>
                                 <DataTemplate x:DataType="localization:LocalizedTrainerFeature">
-                                    <Grid Padding="4,8" ColumnSpacing="14">
+                                    <Grid Padding="4,8" ColumnSpacing="12">
                                         <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="120" />
+                                            <ColumnDefinition Width="136" />
                                             <ColumnDefinition Width="*" />
-                                            <ColumnDefinition Width="170" />
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="160" />
                                         </Grid.ColumnDefinitions>
-                                        <Border Background="{ThemeResource ControlFillColorDefaultBrush}" CornerRadius="6" Padding="8,4" HorizontalAlignment="Left">
-                                            <TextBlock Text="{x:Bind Shortcut}" FontFamily="Cascadia Mono" />
+                                        <Border
+                                            Width="118"
+                                            Height="36"
+                                            Background="{ThemeResource ControlFillColorDefaultBrush}"
+                                            CornerRadius="6"
+                                            HorizontalAlignment="Left"
+                                            VerticalAlignment="Center">
+                                            <TextBlock
+                                                Text="{x:Bind Shortcut}"
+                                                FontFamily="Cascadia Mono"
+                                                HorizontalAlignment="Center"
+                                                VerticalAlignment="Center" />
                                         </Border>
-                                        <StackPanel Grid.Column="1" Spacing="2">
+                                        <StackPanel Grid.Column="1" Spacing="2" VerticalAlignment="Center">
                                             <TextBlock Text="{x:Bind DisplayName}" FontWeight="SemiBold" />
                                             <TextBlock Text="{x:Bind Group}" Opacity="0.62" FontSize="12" />
                                         </StackPanel>
-                                        <TextBlock Grid.Column="2" Text="{x:Bind Status}" Opacity="0.72" HorizontalAlignment="Right" VerticalAlignment="Center" TextWrapping="Wrap" />
+                                        <NumberBox
+                                            Grid.Column="2"
+                                            Width="132"
+                                            Margin="4,0"
+                                            HorizontalAlignment="Right"
+                                            VerticalAlignment="Center"
+                                            Minimum="1"
+                                            Maximum="8000000"
+                                            SmallChange="100"
+                                            LargeChange="1000"
+                                            SpinButtonPlacementMode="Compact"
+                                            Visibility="{x:Bind ActionEditorVisibility}"
+                                            Value="{x:Bind ActionValue, Mode=OneTime}"
+                                            Tag="{x:Bind Id}"
+                                            ValueChanged="TrainerValueInput_ValueChanged"
+                                            Tapped="TrainerValueInput_Tapped" />
+                                        <TextBlock
+                                            Grid.Column="3"
+                                            Text="{x:Bind Status}"
+                                            Opacity="0.72"
+                                            HorizontalAlignment="Right"
+                                            VerticalAlignment="Center"
+                                            TextWrapping="Wrap" />
                                     </Grid>
                                 </DataTemplate>
                             </ListView.ItemTemplate>
