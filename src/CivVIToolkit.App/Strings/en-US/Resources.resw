@@ -4,9 +4,12 @@
   <resheader name="version"><value>2.0</value></resheader>
   <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
   <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
-  <data name="AppDisplayName" xml:space="preserve"><value>Civ VI Toolkit</value></data>
+
+  <data name="AppDisplayName" xml:space="preserve"><value>CivVIToolkit</value></data>
   <data name="AppDescription" xml:space="preserve"><value>Civilization VI local toolkit</value></data>
-  <data name="Navigation_Root.PaneTitle" xml:space="preserve"><value>Civ VI Toolkit</value></data>
+  <data name="App_TitleBar.Title" xml:space="preserve"><value>CivVIToolkit</value></data>
+
+  <data name="Navigation_Root.PaneTitle" xml:space="preserve"><value>CivVIToolkit</value></data>
   <data name="Navigation_Overview.Content" xml:space="preserve"><value>Overview</value></data>
   <data name="Navigation_Trainer.Content" xml:space="preserve"><value>Trainer</value></data>
   <data name="Navigation_Saves.Content" xml:space="preserve"><value>Save Manager</value></data>
@@ -14,6 +17,14 @@
   <data name="Navigation_Mods.Content" xml:space="preserve"><value>Mod Manager</value></data>
   <data name="Navigation_Launcher.Content" xml:space="preserve"><value>Quick Launch</value></data>
   <data name="Navigation_Settings.Content" xml:space="preserve"><value>Settings</value></data>
+  <data name="Nav_Home.Content" xml:space="preserve"><value>Home</value></data>
+  <data name="Nav_Trainer.Content" xml:space="preserve"><value>Trainer</value></data>
+  <data name="Nav_Saves.Content" xml:space="preserve"><value>Save Manager</value></data>
+  <data name="Nav_Mods.Content" xml:space="preserve"><value>Mod Manager</value></data>
+  <data name="Nav_Encyclopedia.Content" xml:space="preserve"><value>Encyclopedia</value></data>
+  <data name="Nav_Diagnostics.Content" xml:space="preserve"><value>Presets &amp; Diagnostics</value></data>
+  <data name="Nav_Settings.Content" xml:space="preserve"><value>Settings &amp; About</value></data>
+
   <data name="Overview_Title.Text" xml:space="preserve"><value>Civ VI Toolkit</value></data>
   <data name="Overview_Subtitle.Text" xml:space="preserve"><value>A modular Civilization VI toolkit for detection, single-player trainer features, saves, mods and launch workflows.</value></data>
   <data name="Overview_StatusScanning.Text" xml:space="preserve"><value>Scanning for Civilization VI…</value></data>
@@ -26,35 +37,115 @@
   <data name="Overview_RendererAwareDescription.Text" xml:space="preserve"><value>Identifies CivilizationVI.exe as DX11 and CivilizationVI_DX12.exe as DX12 at runtime.</value></data>
   <data name="Overview_ModuleReadyTitle.Text" xml:space="preserve"><value>Module-ready</value></data>
   <data name="Overview_ModuleReadyDescription.Text" xml:space="preserve"><value>Trainer, saves, maps, mods and launcher stay separated so the toolkit can grow without coupling everything to memory editing.</value></data>
+
+  <data name="Home_Title.Text" xml:space="preserve"><value>Home</value></data>
+  <data name="Home_Subtitle.Text" xml:space="preserve"><value>Resume the game and manage trainer features, saves, mods, and the encyclopedia in one place.</value></data>
+  <data name="Home_Search.PlaceholderText" xml:space="preserve"><value>Search encyclopedia, mods, or saves…</value></data>
+  <data name="Home_Rescan.Content" xml:space="preserve"><value>Rescan</value></data>
+  <data name="Home_ContinueTitle.Text" xml:space="preserve"><value>Continue game</value></data>
+  <data name="Home_LaunchDx11.Content" xml:space="preserve"><value>Launch DirectX 11</value></data>
+  <data name="Home_LaunchDx12.Content" xml:space="preserve"><value>Launch DirectX 12</value></data>
+  <data name="Home_RunControlTitle.Text" xml:space="preserve"><value>Runtime controls</value></data>
+  <data name="Home_CurrentSession.Text" xml:space="preserve"><value>Current session</value></data>
+  <data name="Home_TrainerLabel.Text" xml:space="preserve"><value>Trainer</value></data>
+  <data name="Home_OpenTrainer.Content" xml:space="preserve"><value>Open</value></data>
+  <data name="Home_ModLabel.Text" xml:space="preserve"><value>Mod profile</value></data>
+  <data name="Home_Reserved.Text" xml:space="preserve"><value>Entry reserved</value></data>
+  <data name="Home_ManageMod.Content" xml:space="preserve"><value>Manage</value></data>
+  <data name="Home_SafetyLabel.Text" xml:space="preserve"><value>Safety status</value></data>
+  <data name="Home_Diagnostics.Content" xml:space="preserve"><value>Diagnostics</value></data>
+  <data name="Home_SaveKicker.Text" xml:space="preserve"><value>Saves</value></data>
+  <data name="Home_SaveTitle.Text" xml:space="preserve"><value>Save Manager entry</value></data>
+  <data name="Home_SaveDesc.Text" xml:space="preserve"><value>Browse, backup, and restore will be connected in a later milestone.</value></data>
+  <data name="Home_SaveInfo.Message" xml:space="preserve"><value>Entry reserved · no background scan</value></data>
+  <data name="Home_SaveButton.Content" xml:space="preserve"><value>Manage saves</value></data>
+  <data name="Home_ModKicker.Text" xml:space="preserve"><value>Mod</value></data>
+  <data name="Home_ModTitle.Text" xml:space="preserve"><value>Mod Manager entry</value></data>
+  <data name="Home_ModDesc.Text" xml:space="preserve"><value>Enable/disable, configuration, and dependency checks will be connected later.</value></data>
+  <data name="Home_ModInfo.Message" xml:space="preserve"><value>Entry created · management logic not connected yet</value></data>
+  <data name="Home_ModButton.Content" xml:space="preserve"><value>Manage profile</value></data>
+  <data name="Home_EncyclopediaKicker.Text" xml:space="preserve"><value>Encyclopedia</value></data>
+  <data name="Home_EncyclopediaTitle.Text" xml:space="preserve"><value>Civilization VI Encyclopedia</value></data>
+  <data name="Home_EncyclopediaDesc.Text" xml:space="preserve"><value>Rules, civilizations, units, buildings, and cross-references will be added later.</value></data>
+  <data name="Home_EncyclopediaSearch.PlaceholderText" xml:space="preserve"><value>Search maps, rules, civilizations, units…</value></data>
+  <data name="Home_EncyclopediaButton.Content" xml:space="preserve"><value>Open encyclopedia</value></data>
+
   <data name="Trainer_Title.Text" xml:space="preserve"><value>Single-player Trainer</value></data>
   <data name="Trainer_StatusWaiting.Text" xml:space="preserve"><value>Waiting for Civilization VI.</value></data>
   <data name="Trainer_Info.Title" xml:space="preserve"><value>v0.1 Trainer Core</value></data>
-  <data name="Trainer_Info.Message" xml:space="preserve"><value>The process, memory and AoB scanning layers are in place. Individual features stay disabled until signatures are verified against real Steam/Epic and DX11/DX12 game builds.</value></data>
+  <data name="Trainer_Info.Message" xml:space="preserve"><value>The process, memory and AoB scanning layers are in place. Individual features remain disabled until signatures are verified against a real game build.</value></data>
   <data name="Trainer_SignaturePending.Text" xml:space="preserve"><value>Signature pending</value></data>
+  <data name="Trainer_PageTitle.Text" xml:space="preserve"><value>Trainer</value></data>
+  <data name="Trainer_Search.PlaceholderText" xml:space="preserve"><value>Search trainer features…</value></data>
+  <data name="Trainer_Compact.Content" xml:space="preserve"><value>Open compact window</value></data>
+  <data name="Trainer_PresetLabel.Text" xml:space="preserve"><value>Current preset</value></data>
+  <data name="Trainer_SafetyLabel.Text" xml:space="preserve"><value>Safety guard</value></data>
+  <data name="Trainer_RuntimeLabel.Text" xml:space="preserve"><value>Runtime status</value></data>
+  <data name="Trainer_DisableAll.Content" xml:space="preserve"><value>Disable all</value></data>
+  <data name="Trainer_CategoryResources.Content" xml:space="preserve"><value>Resources &amp; Economy  9</value></data>
+  <data name="Trainer_CategoryScience.Content" xml:space="preserve"><value>Science &amp; Culture  4</value></data>
+  <data name="Trainer_CategoryUnits.Content" xml:space="preserve"><value>Units &amp; Combat  5</value></data>
+  <data name="Trainer_CategoryCities.Content" xml:space="preserve"><value>Cities &amp; Production  4</value></data>
+
+  <data name="Diagnostics_Title.Text" xml:space="preserve"><value>Presets &amp; Diagnostics</value></data>
+  <data name="Diagnostics_Subtitle.Text" xml:space="preserve"><value>Inspect the current runtime and copy diagnostics used for build validation.</value></data>
+  <data name="Diagnostics_Copy.Content" xml:space="preserve"><value>Copy diagnostics JSON</value></data>
+  <data name="Diagnostics_Privacy.Text" xml:space="preserve"><value>Diagnostics do not export saves or account credentials and do not read unrelated process memory.</value></data>
+  <data name="Diagnostics_WriteTitle.Text" xml:space="preserve"><value>Write protection</value></data>
+  <data name="Diagnostics_WriteDesc.Text" xml:space="preserve"><value>Trainer writes are enabled only after the target version, module signatures, and pointer chain are validated.</value></data>
+  <data name="Diagnostics_WriteInfo.Message" xml:space="preserve"><value>Mismatched game builds stay read-only and reject writes.</value></data>
+  <data name="Diagnostics_PurposeTitle.Text" xml:space="preserve"><value>Diagnostic purpose</value></data>
+  <data name="Diagnostics_PurposeHeadline.Text" xml:space="preserve"><value>Build adaptation and troubleshooting</value></data>
+  <data name="Diagnostics_PurposeDesc.Text" xml:space="preserve"><value>Copied data can compare Steam / Epic, DX11 / DX12, file versions, GameCore, and Trainer Probe results.</value></data>
+  <data name="Diagnostics_PurposeInfo.Message" xml:space="preserve"><value>Diagnostics run only when requested and are never uploaded in the background.</value></data>
+
   <data name="Placeholder_Info.Title" xml:space="preserve"><value>Planned module</value></data>
   <data name="Placeholder_Info.Message" xml:space="preserve"><value>Navigation and module boundaries are already reserved. The module can be implemented later without restructuring the Trainer Core.</value></data>
+  <data name="Placeholder_Headline.Text" xml:space="preserve"><value>This version keeps only the module entry</value></data>
+  <data name="Placeholder_Desc.Text" xml:space="preserve"><value>Future functionality can be connected without rebuilding the main shell.</value></data>
+
   <data name="Settings_Title.Text" xml:space="preserve"><value>Settings</value></data>
-  <data name="Settings_Description.Text" xml:space="preserve"><value>Configure local CivVIToolkit behavior. The first settings foundation covers interface language.</value></data>
+  <data name="Settings_Description.Text" xml:space="preserve"><value>Configure local CivVIToolkit behavior.</value></data>
   <data name="Settings_LanguageTitle.Text" xml:space="preserve"><value>Language</value></data>
-  <data name="Settings_LanguageDescription.Text" xml:space="preserve"><value>Choose the interface language. The preference is stored locally and fully applies after restarting the app.</value></data>
-  <data name="Settings_RestartInfo.Title" xml:space="preserve"><value>Restart required</value></data>
-  <data name="Settings_RestartInfo.Message" xml:space="preserve"><value>The language preference was saved. Restart CivVIToolkit to fully apply the new language.</value></data>
+  <data name="Settings_LanguageDescription.Text" xml:space="preserve"><value>Choose the interface language. Changes apply immediately without restarting.</value></data>
+  <data name="Settings_RestartInfo.Title" xml:space="preserve"><value>Language changed</value></data>
+  <data name="Settings_RestartInfo.Message" xml:space="preserve"><value>The new interface language has been applied immediately.</value></data>
+  <data name="Settings_PageTitle.Text" xml:space="preserve"><value>Settings &amp; About</value></data>
+  <data name="Settings_PageSubtitle.Text" xml:space="preserve"><value>Adjust local interface behavior and view CivVIToolkit version information.</value></data>
+  <data name="Settings_LanguageTitleLive.Text" xml:space="preserve"><value>Language</value></data>
+  <data name="Settings_LanguageDescLive.Text" xml:space="preserve"><value>Choose the interface language; changes apply immediately with no restart.</value></data>
+  <data name="Settings_SinglePlayerTitle.Text" xml:space="preserve"><value>Single-player safety boundary</value></data>
+  <data name="Settings_SinglePlayerDesc.Text" xml:space="preserve"><value>The trainer is for Civilization VI single-player games; unsupported builds automatically reject memory writes.</value></data>
+  <data name="Settings_SinglePlayerInfo.Message" xml:space="preserve"><value>Single-player only</value></data>
+  <data name="Settings_AboutTitle.Text" xml:space="preserve"><value>About CivVIToolkit</value></data>
+  <data name="Settings_AboutDesc.Text" xml:space="preserve"><value>WinUI 3 / .NET 10 · Civilization VI local toolkit</value></data>
+  <data name="Settings_LanguageApplied.Title" xml:space="preserve"><value>Language changed</value></data>
+  <data name="Settings_LanguageApplied.Message" xml:space="preserve"><value>The new interface language is active immediately; no CivVIToolkit restart is required.</value></data>
+  <data name="Settings_SaveFailedTitle" xml:space="preserve"><value>Save failed</value></data>
+  <data name="Settings_SaveFailedMessage" xml:space="preserve"><value>The new interface language could not be applied or saved. Check write access to the local app-data directory.</value></data>
+
+  <data name="Compact_TitleBar.Title" xml:space="preserve"><value>CivVIToolkit · Trainer</value></data>
+  <data name="Compact_Headline.Text" xml:space="preserve"><value>First 22 trainer features</value></data>
+  <data name="Compact_StatusVerifiedFormat" xml:space="preserve"><value>Always on top · {0} enabled · profile verified</value></data>
+  <data name="Compact_StatusWaitingFormat" xml:space="preserve"><value>Always on top · {0} enabled · waiting for a supported game profile</value></data>
+
   <data name="Language_System" xml:space="preserve"><value>Follow system</value></data>
   <data name="Language_Chinese" xml:space="preserve"><value>简体中文</value></data>
   <data name="Language_Japanese" xml:space="preserve"><value>日本語</value></data>
   <data name="Language_English" xml:space="preserve"><value>English</value></data>
+
   <data name="Status_DetectionFailed" xml:space="preserve"><value>Detection failed</value></data>
   <data name="Status_RunningTitle" xml:space="preserve"><value>Civilization VI is running</value></data>
   <data name="Status_RunningDetailsFormat" xml:space="preserve"><value>PID {0}  ·  Version {1}
 {2}</value></data>
-  <data name="Trainer_AttachedFormat" xml:space="preserve"><value>Attached to {0} / {1}. Core memory access and AoB scanning are ready; feature signatures for this build are still pending verification.</value></data>
+  <data name="Trainer_AttachedFormat" xml:space="preserve"><value>Attached to {0} / {1}.</value></data>
   <data name="Status_InstallationDetectedTitle" xml:space="preserve"><value>Civilization VI installation detected</value></data>
   <data name="Status_InstallationDetectedBadgeFormat" xml:space="preserve"><value>{0} · game is not running</value></data>
   <data name="Status_LaunchHint" xml:space="preserve"><value>Launch the game normally. CivVIToolkit will identify DX11 or DX12 automatically when the process appears.</value></data>
-  <data name="Trainer_InstallationFound" xml:space="preserve"><value>Installation found. Start Civilization VI to attach the Trainer Core.</value></data>
+  <data name="Trainer_InstallationFound" xml:space="preserve"><value>Installation found. Start Civilization VI to attach the trainer.</value></data>
   <data name="Status_NotDetectedTitle" xml:space="preserve"><value>Civilization VI was not detected</value></data>
   <data name="Status_ScanCompleted" xml:space="preserve"><value>Steam / Epic Games scan completed</value></data>
-  <data name="Status_NotDetectedHint" xml:space="preserve"><value>Install the game through Steam or Epic Games Launcher, then press Refresh. No manual path is required for supported installations.</value></data>
+  <data name="Status_NotDetectedHint" xml:space="preserve"><value>Install the game through Steam or Epic Games Launcher, then press Refresh.</value></data>
   <data name="Trainer_WaitingSupported" xml:space="preserve"><value>Waiting for a supported Civilization VI installation and process.</value></data>
   <data name="Status_NoMetadata" xml:space="preserve"><value>No installation metadata found.</value></data>
   <data name="Diagnostics_Collecting" xml:space="preserve"><value>Collecting read-only runtime diagnostics…</value></data>
@@ -72,6 +163,7 @@
   <data name="Module_Mods_Description" xml:space="preserve"><value>Discover local mods and provide a shared entry point for validation, dependency checks and enable/disable workflows.</value></data>
   <data name="Module_Launcher_Title" xml:space="preserve"><value>Quick Launch</value></data>
   <data name="Module_Launcher_Description" xml:space="preserve"><value>Launch the detected Steam / Epic installation with a selected DX11 / DX12 preference.</value></data>
+
   <data name="TrainerGroup_Player" xml:space="preserve"><value>Player</value></data>
   <data name="TrainerGroup_Units" xml:space="preserve"><value>Units</value></data>
   <data name="TrainerGroup_Cities" xml:space="preserve"><value>Cities</value></data>
@@ -99,6 +191,4 @@
   <data name="TrainerFeature_combat_one_hit_kill" xml:space="preserve"><value>One-Hit Kill</value></data>
   <data name="TrainerFeature_ai_block_production" xml:space="preserve"><value>AI Cannot Complete Construction / Recruitment</value></data>
   <data name="TrainerFeature_ai_zero_resources" xml:space="preserve"><value>Clear AI Luxury / Strategic Resources</value></data>
-  <data name="Settings_SaveFailedTitle" xml:space="preserve"><value>Save failed</value></data>
-  <data name="Settings_SaveFailedMessage" xml:space="preserve"><value>CivVIToolkit could not write the local settings file. Check write access to the current user's local app-data directory.</value></data>
 </root>

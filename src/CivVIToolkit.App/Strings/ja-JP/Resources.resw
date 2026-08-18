@@ -4,9 +4,12 @@
   <resheader name="version"><value>2.0</value></resheader>
   <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
   <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
-  <data name="AppDisplayName" xml:space="preserve"><value>Civ VI Toolkit</value></data>
+
+  <data name="AppDisplayName" xml:space="preserve"><value>CivVIToolkit</value></data>
   <data name="AppDescription" xml:space="preserve"><value>Civilization VI ローカルツールキット</value></data>
-  <data name="Navigation_Root.PaneTitle" xml:space="preserve"><value>Civ VI Toolkit</value></data>
+  <data name="App_TitleBar.Title" xml:space="preserve"><value>CivVIToolkit</value></data>
+
+  <data name="Navigation_Root.PaneTitle" xml:space="preserve"><value>CivVIToolkit</value></data>
   <data name="Navigation_Overview.Content" xml:space="preserve"><value>概要</value></data>
   <data name="Navigation_Trainer.Content" xml:space="preserve"><value>Trainer</value></data>
   <data name="Navigation_Saves.Content" xml:space="preserve"><value>セーブ管理</value></data>
@@ -14,6 +17,14 @@
   <data name="Navigation_Mods.Content" xml:space="preserve"><value>Mod 管理</value></data>
   <data name="Navigation_Launcher.Content" xml:space="preserve"><value>クイック起動</value></data>
   <data name="Navigation_Settings.Content" xml:space="preserve"><value>設定</value></data>
+  <data name="Nav_Home.Content" xml:space="preserve"><value>ホーム</value></data>
+  <data name="Nav_Trainer.Content" xml:space="preserve"><value>Trainer</value></data>
+  <data name="Nav_Saves.Content" xml:space="preserve"><value>セーブ管理</value></data>
+  <data name="Nav_Mods.Content" xml:space="preserve"><value>Mod 管理</value></data>
+  <data name="Nav_Encyclopedia.Content" xml:space="preserve"><value>百科事典</value></data>
+  <data name="Nav_Diagnostics.Content" xml:space="preserve"><value>プリセットと診断</value></data>
+  <data name="Nav_Settings.Content" xml:space="preserve"><value>設定と情報</value></data>
+
   <data name="Overview_Title.Text" xml:space="preserve"><value>Civ VI Toolkit</value></data>
   <data name="Overview_Subtitle.Text" xml:space="preserve"><value>ゲーム検出、シングルプレイヤー Trainer、セーブ、Mod、起動フローをまとめるモジュール型 Civilization VI ツールキットです。</value></data>
   <data name="Overview_StatusScanning.Text" xml:space="preserve"><value>Civilization VI を検索しています…</value></data>
@@ -26,35 +37,115 @@
   <data name="Overview_RendererAwareDescription.Text" xml:space="preserve"><value>実行時に CivilizationVI.exe を DX11、CivilizationVI_DX12.exe を DX12 として判別します。</value></data>
   <data name="Overview_ModuleReadyTitle.Text" xml:space="preserve"><value>モジュール拡張</value></data>
   <data name="Overview_ModuleReadyDescription.Text" xml:space="preserve"><value>Trainer、セーブ、マップ、Mod、ランチャーを分離し、すべてをメモリ編集層に結合せず拡張できます。</value></data>
+
+  <data name="Home_Title.Text" xml:space="preserve"><value>ホーム</value></data>
+  <data name="Home_Subtitle.Text" xml:space="preserve"><value>ゲームの再開と Trainer、セーブ、Mod、百科事典をまとめて管理します。</value></data>
+  <data name="Home_Search.PlaceholderText" xml:space="preserve"><value>百科事典、Mod、セーブを検索…</value></data>
+  <data name="Home_Rescan.Content" xml:space="preserve"><value>再スキャン</value></data>
+  <data name="Home_ContinueTitle.Text" xml:space="preserve"><value>ゲームを続ける</value></data>
+  <data name="Home_LaunchDx11.Content" xml:space="preserve"><value>DirectX 11 を起動</value></data>
+  <data name="Home_LaunchDx12.Content" xml:space="preserve"><value>DirectX 12 を起動</value></data>
+  <data name="Home_RunControlTitle.Text" xml:space="preserve"><value>実行コントロール</value></data>
+  <data name="Home_CurrentSession.Text" xml:space="preserve"><value>現在のセッション</value></data>
+  <data name="Home_TrainerLabel.Text" xml:space="preserve"><value>Trainer</value></data>
+  <data name="Home_OpenTrainer.Content" xml:space="preserve"><value>開く</value></data>
+  <data name="Home_ModLabel.Text" xml:space="preserve"><value>Mod プロファイル</value></data>
+  <data name="Home_Reserved.Text" xml:space="preserve"><value>入口を予約済み</value></data>
+  <data name="Home_ManageMod.Content" xml:space="preserve"><value>管理</value></data>
+  <data name="Home_SafetyLabel.Text" xml:space="preserve"><value>安全状態</value></data>
+  <data name="Home_Diagnostics.Content" xml:space="preserve"><value>診断</value></data>
+  <data name="Home_SaveKicker.Text" xml:space="preserve"><value>セーブ</value></data>
+  <data name="Home_SaveTitle.Text" xml:space="preserve"><value>セーブ管理の入口</value></data>
+  <data name="Home_SaveDesc.Text" xml:space="preserve"><value>閲覧、バックアップ、復元は今後のマイルストーンで接続します。</value></data>
+  <data name="Home_SaveInfo.Message" xml:space="preserve"><value>入口を予約済み · バックグラウンドスキャンなし</value></data>
+  <data name="Home_SaveButton.Content" xml:space="preserve"><value>セーブを管理</value></data>
+  <data name="Home_ModKicker.Text" xml:space="preserve"><value>Mod</value></data>
+  <data name="Home_ModTitle.Text" xml:space="preserve"><value>Mod 管理の入口</value></data>
+  <data name="Home_ModDesc.Text" xml:space="preserve"><value>有効化、設定、依存関係チェックは今後接続します。</value></data>
+  <data name="Home_ModInfo.Message" xml:space="preserve"><value>入口を作成済み · 管理ロジックは未接続</value></data>
+  <data name="Home_ModButton.Content" xml:space="preserve"><value>プロファイル管理</value></data>
+  <data name="Home_EncyclopediaKicker.Text" xml:space="preserve"><value>百科事典</value></data>
+  <data name="Home_EncyclopediaTitle.Text" xml:space="preserve"><value>Civilization VI 百科事典</value></data>
+  <data name="Home_EncyclopediaDesc.Text" xml:space="preserve"><value>ルール、文明、ユニット、建造物、相互参照は今後追加します。</value></data>
+  <data name="Home_EncyclopediaSearch.PlaceholderText" xml:space="preserve"><value>マップ、ルール、文明、ユニットを検索…</value></data>
+  <data name="Home_EncyclopediaButton.Content" xml:space="preserve"><value>百科事典を開く</value></data>
+
   <data name="Trainer_Title.Text" xml:space="preserve"><value>シングルプレイヤー Trainer</value></data>
   <data name="Trainer_StatusWaiting.Text" xml:space="preserve"><value>Civilization VI の起動を待っています。</value></data>
   <data name="Trainer_Info.Title" xml:space="preserve"><value>v0.1 Trainer Core</value></data>
-  <data name="Trainer_Info.Message" xml:space="preserve"><value>プロセス、メモリ、AoB スキャン層は構築済みです。各機能は Steam/Epic・DX11/DX12 の実ゲーム Build でシグネチャが検証されるまで無効のままです。</value></data>
+  <data name="Trainer_Info.Message" xml:space="preserve"><value>プロセス、メモリ、AoB スキャン層は構築済みです。各機能は実ゲーム Build でシグネチャが検証されるまで無効です。</value></data>
   <data name="Trainer_SignaturePending.Text" xml:space="preserve"><value>シグネチャ待ち</value></data>
+  <data name="Trainer_PageTitle.Text" xml:space="preserve"><value>Trainer</value></data>
+  <data name="Trainer_Search.PlaceholderText" xml:space="preserve"><value>Trainer 機能を検索…</value></data>
+  <data name="Trainer_Compact.Content" xml:space="preserve"><value>コンパクトウィンドウを開く</value></data>
+  <data name="Trainer_PresetLabel.Text" xml:space="preserve"><value>現在のプリセット</value></data>
+  <data name="Trainer_SafetyLabel.Text" xml:space="preserve"><value>安全保護</value></data>
+  <data name="Trainer_RuntimeLabel.Text" xml:space="preserve"><value>実行状態</value></data>
+  <data name="Trainer_DisableAll.Content" xml:space="preserve"><value>すべて無効</value></data>
+  <data name="Trainer_CategoryResources.Content" xml:space="preserve"><value>資源・経済  9</value></data>
+  <data name="Trainer_CategoryScience.Content" xml:space="preserve"><value>科学・文化  4</value></data>
+  <data name="Trainer_CategoryUnits.Content" xml:space="preserve"><value>ユニット・戦闘  5</value></data>
+  <data name="Trainer_CategoryCities.Content" xml:space="preserve"><value>都市・生産  4</value></data>
+
+  <data name="Diagnostics_Title.Text" xml:space="preserve"><value>プリセットと診断</value></data>
+  <data name="Diagnostics_Subtitle.Text" xml:space="preserve"><value>現在の実行環境を確認し、ビルド検証用の診断情報をコピーします。</value></data>
+  <data name="Diagnostics_Copy.Content" xml:space="preserve"><value>診断 JSON をコピー</value></data>
+  <data name="Diagnostics_Privacy.Text" xml:space="preserve"><value>診断はセーブやアカウント情報を出力せず、無関係なプロセスメモリも読み取りません。</value></data>
+  <data name="Diagnostics_WriteTitle.Text" xml:space="preserve"><value>書き込み保護</value></data>
+  <data name="Diagnostics_WriteDesc.Text" xml:space="preserve"><value>対象バージョン、モジュール署名、ポインタチェーンの検証後にのみ Trainer の書き込みを許可します。</value></data>
+  <data name="Diagnostics_WriteInfo.Message" xml:space="preserve"><value>不一致のゲームビルドは読み取り専用のまま書き込みを拒否します。</value></data>
+  <data name="Diagnostics_PurposeTitle.Text" xml:space="preserve"><value>診断の用途</value></data>
+  <data name="Diagnostics_PurposeHeadline.Text" xml:space="preserve"><value>ビルド対応と問題の特定</value></data>
+  <data name="Diagnostics_PurposeDesc.Text" xml:space="preserve"><value>Steam / Epic、DX11 / DX12、ファイルバージョン、GameCore、Trainer Probe の比較に利用できます。</value></data>
+  <data name="Diagnostics_PurposeInfo.Message" xml:space="preserve"><value>診断はユーザー操作時のみ実行され、バックグラウンドでアップロードしません。</value></data>
+
   <data name="Placeholder_Info.Title" xml:space="preserve"><value>予定モジュール</value></data>
   <data name="Placeholder_Info.Message" xml:space="preserve"><value>ナビゲーションとモジュール境界はすでに予約済みです。Trainer Core を再構築せずに後続バージョンで実装できます。</value></data>
+  <data name="Placeholder_Headline.Text" xml:space="preserve"><value>このバージョンでは機能入口のみを保持しています</value></data>
+  <data name="Placeholder_Desc.Text" xml:space="preserve"><value>今後の機能追加でもメイン画面を再構築する必要はありません。</value></data>
+
   <data name="Settings_Title.Text" xml:space="preserve"><value>設定</value></data>
-  <data name="Settings_Description.Text" xml:space="preserve"><value>CivVIToolkit のローカル動作を設定します。最初の設定基盤として表示言語に対応します。</value></data>
+  <data name="Settings_Description.Text" xml:space="preserve"><value>CivVIToolkit のローカル動作を設定します。</value></data>
   <data name="Settings_LanguageTitle.Text" xml:space="preserve"><value>言語</value></data>
-  <data name="Settings_LanguageDescription.Text" xml:space="preserve"><value>表示言語を選択します。設定はローカルに保存され、アプリ再起動後に完全適用されます。</value></data>
-  <data name="Settings_RestartInfo.Title" xml:space="preserve"><value>再起動が必要です</value></data>
-  <data name="Settings_RestartInfo.Message" xml:space="preserve"><value>言語設定を保存しました。CivVIToolkit を再起動すると新しい言語が完全に適用されます。</value></data>
+  <data name="Settings_LanguageDescription.Text" xml:space="preserve"><value>表示言語を選択します。変更は再起動せずすぐに反映されます。</value></data>
+  <data name="Settings_RestartInfo.Title" xml:space="preserve"><value>言語を変更しました</value></data>
+  <data name="Settings_RestartInfo.Message" xml:space="preserve"><value>新しい表示言語をすぐに適用しました。</value></data>
+  <data name="Settings_PageTitle.Text" xml:space="preserve"><value>設定と情報</value></data>
+  <data name="Settings_PageSubtitle.Text" xml:space="preserve"><value>CivVIToolkit のローカル表示動作とバージョン情報を確認します。</value></data>
+  <data name="Settings_LanguageTitleLive.Text" xml:space="preserve"><value>言語</value></data>
+  <data name="Settings_LanguageDescLive.Text" xml:space="preserve"><value>表示言語を選択します。変更は再起動なしで即時反映されます。</value></data>
+  <data name="Settings_SinglePlayerTitle.Text" xml:space="preserve"><value>シングルプレイ安全境界</value></data>
+  <data name="Settings_SinglePlayerDesc.Text" xml:space="preserve"><value>Trainer は Civilization VI のシングルプレイ向けです。未対応ビルドではメモリ書き込みを自動的に拒否します。</value></data>
+  <data name="Settings_SinglePlayerInfo.Message" xml:space="preserve"><value>シングルプレイのみ</value></data>
+  <data name="Settings_AboutTitle.Text" xml:space="preserve"><value>CivVIToolkit について</value></data>
+  <data name="Settings_AboutDesc.Text" xml:space="preserve"><value>WinUI 3 / .NET 10 · Civilization VI ローカルツールキット</value></data>
+  <data name="Settings_LanguageApplied.Title" xml:space="preserve"><value>言語を変更しました</value></data>
+  <data name="Settings_LanguageApplied.Message" xml:space="preserve"><value>新しい表示言語はすでに反映されています。CivVIToolkit の再起動は不要です。</value></data>
+  <data name="Settings_SaveFailedTitle" xml:space="preserve"><value>保存に失敗しました</value></data>
+  <data name="Settings_SaveFailedMessage" xml:space="preserve"><value>新しい表示言語を適用または保存できませんでした。ローカルアプリデータへの書き込み権限を確認してください。</value></data>
+
+  <data name="Compact_TitleBar.Title" xml:space="preserve"><value>CivVIToolkit · Trainer</value></data>
+  <data name="Compact_Headline.Text" xml:space="preserve"><value>第1版 22 項目の Trainer</value></data>
+  <data name="Compact_StatusVerifiedFormat" xml:space="preserve"><value>常に手前 · {0} 件有効 · プロファイル検証済み</value></data>
+  <data name="Compact_StatusWaitingFormat" xml:space="preserve"><value>常に手前 · {0} 件有効 · 対応ゲームプロファイル待ち</value></data>
+
   <data name="Language_System" xml:space="preserve"><value>システムに従う</value></data>
   <data name="Language_Chinese" xml:space="preserve"><value>简体中文</value></data>
   <data name="Language_Japanese" xml:space="preserve"><value>日本語</value></data>
   <data name="Language_English" xml:space="preserve"><value>English</value></data>
+
   <data name="Status_DetectionFailed" xml:space="preserve"><value>検出に失敗しました</value></data>
   <data name="Status_RunningTitle" xml:space="preserve"><value>Civilization VI は実行中です</value></data>
   <data name="Status_RunningDetailsFormat" xml:space="preserve"><value>PID {0}  ·  バージョン {1}
 {2}</value></data>
-  <data name="Trainer_AttachedFormat" xml:space="preserve"><value>{0} / {1} に接続しました。メモリアクセスと AoB スキャン Core は準備済みですが、この Build の機能シグネチャはまだ検証待ちです。</value></data>
+  <data name="Trainer_AttachedFormat" xml:space="preserve"><value>{0} / {1} に接続しました。</value></data>
   <data name="Status_InstallationDetectedTitle" xml:space="preserve"><value>Civilization VI のインストールを検出しました</value></data>
   <data name="Status_InstallationDetectedBadgeFormat" xml:space="preserve"><value>{0} · ゲームは未起動</value></data>
   <data name="Status_LaunchHint" xml:space="preserve"><value>通常どおりゲームを起動してください。プロセスが現れると CivVIToolkit が DX11 / DX12 を自動判別します。</value></data>
-  <data name="Trainer_InstallationFound" xml:space="preserve"><value>ゲームのインストールを確認しました。Civilization VI を起動すると Trainer Core に接続できます。</value></data>
+  <data name="Trainer_InstallationFound" xml:space="preserve"><value>ゲームのインストールを確認しました。Civilization VI を起動すると Trainer に接続できます。</value></data>
   <data name="Status_NotDetectedTitle" xml:space="preserve"><value>Civilization VI を検出できませんでした</value></data>
   <data name="Status_ScanCompleted" xml:space="preserve"><value>Steam / Epic Games の検索が完了しました</value></data>
-  <data name="Status_NotDetectedHint" xml:space="preserve"><value>Steam または Epic Games Launcher からゲームをインストールし、更新を押してください。対応インストールでは手動パス指定は不要です。</value></data>
+  <data name="Status_NotDetectedHint" xml:space="preserve"><value>Steam または Epic Games Launcher からゲームをインストールし、更新を押してください。</value></data>
   <data name="Trainer_WaitingSupported" xml:space="preserve"><value>対応する Civilization VI のインストールとプロセスを待っています。</value></data>
   <data name="Status_NoMetadata" xml:space="preserve"><value>インストール情報が見つかりません。</value></data>
   <data name="Diagnostics_Collecting" xml:space="preserve"><value>読み取り専用の実行時診断を収集中…</value></data>
@@ -72,6 +163,7 @@
   <data name="Module_Mods_Description" xml:space="preserve"><value>ローカル Mod を検出し、検証、依存関係チェック、オン／オフ管理の共通入口を提供します。</value></data>
   <data name="Module_Launcher_Title" xml:space="preserve"><value>クイック起動</value></data>
   <data name="Module_Launcher_Description" xml:space="preserve"><value>検出した Steam / Epic インストールを DX11 / DX12 の選択に合わせて起動します。</value></data>
+
   <data name="TrainerGroup_Player" xml:space="preserve"><value>プレイヤー</value></data>
   <data name="TrainerGroup_Units" xml:space="preserve"><value>ユニット</value></data>
   <data name="TrainerGroup_Cities" xml:space="preserve"><value>都市</value></data>
@@ -99,6 +191,4 @@
   <data name="TrainerFeature_combat_one_hit_kill" xml:space="preserve"><value>一撃必殺</value></data>
   <data name="TrainerFeature_ai_block_production" xml:space="preserve"><value>AI の建設 / 訓練完了を禁止</value></data>
   <data name="TrainerFeature_ai_zero_resources" xml:space="preserve"><value>AI の高級 / 戦略資源を消去</value></data>
-  <data name="Settings_SaveFailedTitle" xml:space="preserve"><value>保存に失敗しました</value></data>
-  <data name="Settings_SaveFailedMessage" xml:space="preserve"><value>ローカル設定ファイルを書き込めませんでした。現在のユーザーのローカル AppData への書き込み権限を確認してください。</value></data>
 </root>
