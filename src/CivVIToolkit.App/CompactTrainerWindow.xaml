@@ -4,67 +4,65 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:localization="using:CivVIToolkit.App.Localization">
 
-    <Grid RequestedTheme="Dark" Background="#10151B">
-        <Grid.Resources>
-            <SolidColorBrush x:Key="CompactSurfaceBrush" Color="#161D24" />
-            <SolidColorBrush x:Key="CompactStrokeBrush" Color="#29343E" />
-            <SolidColorBrush x:Key="CompactTextBrush" Color="#F3F6F8" />
-            <SolidColorBrush x:Key="CompactSecondaryBrush" Color="#9AA7B2" />
-            <SolidColorBrush x:Key="CompactAccentBrush" Color="#67C6CF" />
-        </Grid.Resources>
+    <Window.SystemBackdrop>
+        <MicaBackdrop />
+    </Window.SystemBackdrop>
+
+    <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="42" />
-            <RowDefinition Height="64" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <Grid x:Name="CompactTitleBar" Padding="12,0,140,0" Background="#0D1217">
-            <StackPanel Orientation="Horizontal" Spacing="9" VerticalAlignment="Center">
-                <Border Width="22" Height="22" CornerRadius="5" Background="#C49A24">
-                    <TextBlock Text="VI" Foreground="White" FontSize="10" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                </Border>
-                <TextBlock Text="修改器 · 紧凑窗口" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource CompactTextBrush}" VerticalAlignment="Center" />
+        <TitleBar x:Name="CompactTitleBar" Title="CivVIToolkit · 修改器" />
+
+        <InfoBar Grid.Row="1" Margin="10,8,10,8" IsOpen="True" IsClosable="False" Severity="Informational">
+            <StackPanel Spacing="2">
+                <TextBlock Text="第一版 22 项修改器" Style="{StaticResource BodyStrongTextBlockStyle}" />
+                <TextBlock x:Name="CompactStatusText" Text="置顶显示 · 与主窗口共享同一 Trainer 状态" FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
             </StackPanel>
-        </Grid>
+        </InfoBar>
 
-        <Border Grid.Row="1" Margin="10,8,10,8" Background="#162129" BorderBrush="{StaticResource CompactStrokeBrush}" BorderThickness="1" CornerRadius="7" Padding="12,8">
-            <Grid>
-                <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
-                <StackPanel Spacing="2">
-                    <TextBlock Text="第一版 22 项修改器" FontSize="13" FontWeight="SemiBold" Foreground="{StaticResource CompactTextBrush}" />
-                    <TextBlock Text="置顶显示 · 写入签名完成验收前全部保持禁用" FontSize="10" Foreground="{StaticResource CompactSecondaryBrush}" />
-                </StackPanel>
-                <Border Grid.Column="1" Background="#3B2C16" CornerRadius="12" Padding="10,4" VerticalAlignment="Center">
-                    <TextBlock Text="只读待验证" FontSize="10" Foreground="#F0B95F" />
-                </Border>
-            </Grid>
-        </Border>
-
-        <ListView x:Name="CompactTrainerList" Grid.Row="2" Margin="8,0,8,8" SelectionMode="None" IsItemClickEnabled="False" Background="Transparent" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+        <ListView
+            x:Name="CompactTrainerList"
+            Grid.Row="2"
+            Margin="8,0,8,8"
+            SelectionMode="None"
+            IsItemClickEnabled="True"
+            ItemClick="CompactTrainerList_ItemClick"
+            Background="Transparent"
+            ScrollViewer.HorizontalScrollBarVisibility="Disabled">
             <ListView.ItemContainerStyle>
                 <Style TargetType="ListViewItem">
                     <Setter Property="HorizontalContentAlignment" Value="Stretch" />
                     <Setter Property="Padding" Value="0" />
-                    <Setter Property="Margin" Value="0,2" />
-                    <Setter Property="CornerRadius" Value="7" />
+                    <Setter Property="Margin" Value="0,1" />
+                    <Setter Property="CornerRadius" Value="6" />
+                    <Setter Property="MinHeight" Value="48" />
                 </Style>
             </ListView.ItemContainerStyle>
             <ListView.ItemTemplate>
                 <DataTemplate x:DataType="localization:LocalizedTrainerFeature">
-                    <Grid MinHeight="46" Padding="10,6" Background="{StaticResource CompactSurfaceBrush}" ColumnSpacing="8">
+                    <Grid MinHeight="48" Padding="9,4" ColumnSpacing="8">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="98" />
-                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="104" />
+                            <ColumnDefinition Width="116" />
+                            <ColumnDefinition Width="82" />
                         </Grid.ColumnDefinitions>
-                        <StackPanel Spacing="2" VerticalAlignment="Center">
-                            <TextBlock Text="{x:Bind DisplayName}" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource CompactTextBrush}" TextTrimming="CharacterEllipsis" />
-                            <TextBlock Text="{x:Bind Scope}" FontSize="9" Foreground="{StaticResource CompactSecondaryBrush}" />
+                        <StackPanel Spacing="1" VerticalAlignment="Center">
+                            <TextBlock Text="{x:Bind DisplayName}" FontSize="12" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
+                            <TextBlock Text="{x:Bind Scope}" FontSize="10" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                         </StackPanel>
-                        <Border Grid.Column="1" Background="#202A33" CornerRadius="10" Padding="7,3" VerticalAlignment="Center">
-                            <TextBlock Text="{x:Bind Shortcut}" FontFamily="Cascadia Mono" FontSize="9" Foreground="{StaticResource CompactAccentBrush}" HorizontalAlignment="Center" />
+                        <Border Grid.Column="1" Width="104" Height="30" Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}" CornerRadius="6" VerticalAlignment="Center">
+                            <TextBlock Text="{x:Bind Shortcut}" FontFamily="Cascadia Mono" FontSize="10" HorizontalAlignment="Center" VerticalAlignment="Center" />
                         </Border>
-                        <ToggleSwitch Grid.Column="2" IsEnabled="False" OffContent="" OnContent="" MinWidth="40" VerticalAlignment="Center" />
+                        <Grid Grid.Column="2" VerticalAlignment="Center">
+                            <NumberBox Tag="{x:Bind Id}" Value="{x:Bind ActionValue, Mode=OneWay}" Minimum="1" Maximum="8000000" SpinButtonPlacementMode="Compact" Visibility="{x:Bind ActionEditorVisibility}" ValueChanged="CompactValueInput_ValueChanged" Tapped="CompactValueInput_Tapped" />
+                            <ToggleSwitch IsOn="{x:Bind IsEnabled, Mode=OneWay}" IsHitTestVisible="False" OffContent="" OnContent="" HorizontalAlignment="Center" Visibility="{x:Bind ToggleVisibility}" />
+                        </Grid>
+                        <TextBlock Grid.Column="3" Text="{x:Bind Status}" FontSize="10" Foreground="{ThemeResource TextFillColorSecondaryBrush}" HorizontalAlignment="Right" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
                     </Grid>
                 </DataTemplate>
             </ListView.ItemTemplate>

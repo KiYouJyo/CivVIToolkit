@@ -17,6 +17,19 @@
 - Signed Acceptance 从“解压后直接运行的 self-contained WinUI 3 目录”迁移为签名 MSIX。
 - Release 结构对齐 UrbanPlanToolbox：版本元数据、签名产物、one-click 包、SHA-256、三语说明和幂等 Release reconciliation。
 
+## [0.3.1] - 2026-08-18
+
+### Added
+- 将已实机验证的 Steam / DX12 / Gathering Storm 1.0.12.68 (1023995) 精确 Trainer Profile 与稳定性调度器接入新版 UI。
+- 恢复全部 22 项修改器、全局快捷键、金钱 / 影响力自定义输入，以及置顶紧凑修改器窗口的真实操作能力。
+- 响应式页面重排：最大化窗口充分利用可用宽度，中窄窗口自动重排首页、诊断和设置内容。
+
+### Changed
+- 主壳层改用与 UrbanPlanToolbox 一致的原生 WinUI 3 `TitleBar`、`NavigationView`、Mica 和系统 ThemeResource，替换固定自绘导航与硬编码浅色表面。
+- 首页、预设与诊断、设置与关于移除页面级固定 `MaxWidth`，卡片随窗口宽度伸展。
+- 紧凑修改器改用原生 WinUI 材质，并与主窗口共享 Trainer 状态和操作。
+- 保持 GameCore SHA + 13 AoB 精确校验和 fail-closed 写入保护；不匹配构建不会执行内存写入。
+
 ## [0.3.0] - 2026-08-18
 
 ### Added
