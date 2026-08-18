@@ -1,0 +1,73 @@
+<Window
+    x:Class="CivVIToolkit.App.CompactTrainerWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:localization="using:CivVIToolkit.App.Localization">
+
+    <Grid RequestedTheme="Dark" Background="#10151B">
+        <Grid.Resources>
+            <SolidColorBrush x:Key="CompactSurfaceBrush" Color="#161D24" />
+            <SolidColorBrush x:Key="CompactStrokeBrush" Color="#29343E" />
+            <SolidColorBrush x:Key="CompactTextBrush" Color="#F3F6F8" />
+            <SolidColorBrush x:Key="CompactSecondaryBrush" Color="#9AA7B2" />
+            <SolidColorBrush x:Key="CompactAccentBrush" Color="#67C6CF" />
+        </Grid.Resources>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="42" />
+            <RowDefinition Height="64" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Grid x:Name="CompactTitleBar" Padding="12,0,140,0" Background="#0D1217">
+            <StackPanel Orientation="Horizontal" Spacing="9" VerticalAlignment="Center">
+                <Border Width="22" Height="22" CornerRadius="5" Background="#C49A24">
+                    <TextBlock Text="VI" Foreground="White" FontSize="10" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                </Border>
+                <TextBlock Text="修改器 · 紧凑窗口" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource CompactTextBrush}" VerticalAlignment="Center" />
+            </StackPanel>
+        </Grid>
+
+        <Border Grid.Row="1" Margin="10,8,10,8" Background="#162129" BorderBrush="{StaticResource CompactStrokeBrush}" BorderThickness="1" CornerRadius="7" Padding="12,8">
+            <Grid>
+                <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                <StackPanel Spacing="2">
+                    <TextBlock Text="第一版 22 项修改器" FontSize="13" FontWeight="SemiBold" Foreground="{StaticResource CompactTextBrush}" />
+                    <TextBlock Text="置顶显示 · 写入签名完成验收前全部保持禁用" FontSize="10" Foreground="{StaticResource CompactSecondaryBrush}" />
+                </StackPanel>
+                <Border Grid.Column="1" Background="#3B2C16" CornerRadius="12" Padding="10,4" VerticalAlignment="Center">
+                    <TextBlock Text="只读待验证" FontSize="10" Foreground="#F0B95F" />
+                </Border>
+            </Grid>
+        </Border>
+
+        <ListView x:Name="CompactTrainerList" Grid.Row="2" Margin="8,0,8,8" SelectionMode="None" IsItemClickEnabled="False" Background="Transparent" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+            <ListView.ItemContainerStyle>
+                <Style TargetType="ListViewItem">
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                    <Setter Property="Padding" Value="0" />
+                    <Setter Property="Margin" Value="0,2" />
+                    <Setter Property="CornerRadius" Value="7" />
+                </Style>
+            </ListView.ItemContainerStyle>
+            <ListView.ItemTemplate>
+                <DataTemplate x:DataType="localization:LocalizedTrainerFeature">
+                    <Grid MinHeight="46" Padding="10,6" Background="{StaticResource CompactSurfaceBrush}" ColumnSpacing="8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="98" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Spacing="2" VerticalAlignment="Center">
+                            <TextBlock Text="{x:Bind DisplayName}" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource CompactTextBrush}" TextTrimming="CharacterEllipsis" />
+                            <TextBlock Text="{x:Bind Scope}" FontSize="9" Foreground="{StaticResource CompactSecondaryBrush}" />
+                        </StackPanel>
+                        <Border Grid.Column="1" Background="#202A33" CornerRadius="10" Padding="7,3" VerticalAlignment="Center">
+                            <TextBlock Text="{x:Bind Shortcut}" FontFamily="Cascadia Mono" FontSize="9" Foreground="{StaticResource CompactAccentBrush}" HorizontalAlignment="Center" />
+                        </Border>
+                        <ToggleSwitch Grid.Column="2" IsEnabled="False" OffContent="" OnContent="" MinWidth="40" VerticalAlignment="Center" />
+                    </Grid>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+    </Grid>
+</Window>
