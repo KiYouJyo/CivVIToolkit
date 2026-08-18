@@ -7,6 +7,24 @@
             <ResourceDictionary.MergedDictionaries>
                 <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls" />
             </ResourceDictionary.MergedDictionaries>
+
+            <!--
+                WinUI's default ToggleSwitch measures a wider content presenter even
+                when OnContent/OffContent are empty. Trainer rows intentionally place
+                the switch beside a shortcut chip; without an explicit footprint the
+                template can overflow its action cell and render underneath that chip
+                at 150%/200% display scaling. Keep the native template, but constrain
+                its layout box so both the main and compact trainer remain collision-free.
+            -->
+            <Style TargetType="ToggleSwitch">
+                <Setter Property="MinWidth" Value="52" />
+                <Setter Property="Width" Value="52" />
+                <Setter Property="OnContent" Value="{x:Null}" />
+                <Setter Property="OffContent" Value="{x:Null}" />
+                <Setter Property="HorizontalAlignment" Value="Center" />
+                <Setter Property="VerticalAlignment" Value="Center" />
+                <Setter Property="Padding" Value="0" />
+            </Style>
         </ResourceDictionary>
     </Application.Resources>
 </Application>
