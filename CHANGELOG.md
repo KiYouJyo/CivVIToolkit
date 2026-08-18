@@ -17,6 +17,25 @@
 - Signed Acceptance 从“解压后直接运行的 self-contained WinUI 3 目录”迁移为签名 MSIX。
 - Release 结构对齐 UrbanPlanToolbox：版本元数据、签名产物、one-click 包、SHA-256、三语说明和幂等 Release reconciliation。
 
+## [0.3.5] - 2026-08-18
+
+### Added
+- “增加影响力”和“增加金钱”在主修改器与紧凑修改器中新增明确的“应用”按钮；输入值与全局快捷键继续共享同一配置。
+
+### Fixed
+- 修改器 22 个条目改为稳定 Observable ViewModel，只创建一次；后台轮询只原位更新属性，不再周期性重新设置 `ItemsSource`。
+- 主修改器与紧凑修改器共享同一批 ViewModel，紧凑窗口刷新状态时不再重建列表。
+
+### Changed
+- Trainer 行使用 `INotifyPropertyChanged` 更新名称、状态、开关、可用性和输入值；分类或搜索由用户主动变化时才重新筛选列表。
+- 保留 v0.3.4 的进程 / GameCore 轮询去抖作为会话层稳定保护。
+
+## [0.3.4] - 2026-08-18
+
+### Fixed
+- 修复游戏运行时 2 秒轮询偶发模块枚举失败造成 Trainer 重复 Attach / Detach、修改器列表周期性跳动的问题。
+- 同一 PID 已确认的 Gathering Storm GameCore 对短暂探测失败进行有限去抖；真实退出或持续缺失仍正常断开。
+
 ## [0.3.3] - 2026-08-18
 
 ### Fixed
