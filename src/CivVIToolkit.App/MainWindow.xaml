@@ -25,10 +25,9 @@
                 <Setter Property="TextWrapping" Value="Wrap" />
             </Style>
             <Style x:Key="CategoryButtonStyle" TargetType="Button">
-                <Setter Property="Height" Value="40" />
-                <Setter Property="HorizontalAlignment" Value="Stretch" />
-                <Setter Property="HorizontalContentAlignment" Value="Left" />
-                <Setter Property="Background" Value="Transparent" />
+                <Setter Property="Height" Value="36" />
+                <Setter Property="Padding" Value="12,6" />
+                <Setter Property="Background" Value="{ThemeResource SubtleFillColorTransparentBrush}" />
                 <Setter Property="BorderThickness" Value="0" />
                 <Setter Property="CornerRadius" Value="6" />
             </Style>
@@ -39,7 +38,7 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <TitleBar x:Name="AppTitleBar" Title="CivVIToolkit">
+        <TitleBar x:Name="AppTitleBar" localization:LiveLocalization.Key="App_TitleBar" Title="CivVIToolkit">
             <TitleBar.IconSource>
                 <ImageIconSource ImageSource="ms-appx:///Assets/StoreLogo.png" />
             </TitleBar.IconSource>
@@ -61,28 +60,28 @@
             SelectionChanged="RootNavigation_SelectionChanged">
 
             <NavigationView.MenuItems>
-                <NavigationViewItem x:Name="HomeNavItem" Content="首页" Tag="overview">
+                <NavigationViewItem x:Name="HomeNavItem" localization:LiveLocalization.Key="Nav_Home" Content="首页" Tag="overview">
                     <NavigationViewItem.Icon><FontIcon Glyph="&#xE80F;" /></NavigationViewItem.Icon>
                 </NavigationViewItem>
-                <NavigationViewItem x:Name="TrainerNavItem" Content="修改器" Tag="trainer">
+                <NavigationViewItem x:Name="TrainerNavItem" localization:LiveLocalization.Key="Nav_Trainer" Content="修改器" Tag="trainer">
                     <NavigationViewItem.Icon><FontIcon Glyph="&#xE768;" /></NavigationViewItem.Icon>
                 </NavigationViewItem>
-                <NavigationViewItem Content="存档管理" Tag="saves">
+                <NavigationViewItem localization:LiveLocalization.Key="Nav_Saves" Content="存档管理" Tag="saves">
                     <NavigationViewItem.Icon><FontIcon Glyph="&#xE74E;" /></NavigationViewItem.Icon>
                 </NavigationViewItem>
-                <NavigationViewItem Content="Mod 管理" Tag="mods">
+                <NavigationViewItem localization:LiveLocalization.Key="Nav_Mods" Content="Mod 管理" Tag="mods">
                     <NavigationViewItem.Icon><FontIcon Glyph="&#xE71B;" /></NavigationViewItem.Icon>
                 </NavigationViewItem>
-                <NavigationViewItem Content="百科" Tag="encyclopedia">
+                <NavigationViewItem localization:LiveLocalization.Key="Nav_Encyclopedia" Content="百科" Tag="encyclopedia">
                     <NavigationViewItem.Icon><FontIcon Glyph="&#xE82D;" /></NavigationViewItem.Icon>
                 </NavigationViewItem>
             </NavigationView.MenuItems>
 
             <NavigationView.FooterMenuItems>
-                <NavigationViewItem Content="预设与诊断" Tag="diagnostics">
+                <NavigationViewItem localization:LiveLocalization.Key="Nav_Diagnostics" Content="预设与诊断" Tag="diagnostics">
                     <NavigationViewItem.Icon><FontIcon Glyph="&#xE9D9;" /></NavigationViewItem.Icon>
                 </NavigationViewItem>
-                <NavigationViewItem Content="设置与关于" Tag="settings">
+                <NavigationViewItem localization:LiveLocalization.Key="Nav_Settings" Content="设置与关于" Tag="settings">
                     <NavigationViewItem.Icon><FontIcon Glyph="&#xE713;" /></NavigationViewItem.Icon>
                 </NavigationViewItem>
             </NavigationView.FooterMenuItems>
@@ -97,12 +96,12 @@
                         <Grid x:Name="HomeHeaderGrid" ColumnSpacing="12">
                             <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
                             <StackPanel Spacing="2">
-                                <TextBlock Text="首页" Style="{StaticResource PageHeaderTitleStyle}" />
-                                <TextBlock Text="继续游戏并集中管理修改、存档、Mod 与百科。" Style="{StaticResource MutedTextStyle}" />
+                                <TextBlock localization:LiveLocalization.Key="Home_Title" Text="首页" Style="{StaticResource PageHeaderTitleStyle}" />
+                                <TextBlock localization:LiveLocalization.Key="Home_Subtitle" Text="继续游戏并集中管理修改、存档、Mod 与百科。" Style="{StaticResource MutedTextStyle}" />
                             </StackPanel>
                             <StackPanel x:Name="HomeHeaderActions" Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
-                                <TextBox x:Name="HomeSearchBox" Width="260" PlaceholderText="搜索百科、Mod 或存档…" IsReadOnly="True" />
-                                <Button x:Name="RefreshButton" Content="重新扫描" Click="RefreshButton_Click" />
+                                <TextBox x:Name="HomeSearchBox" localization:LiveLocalization.Key="Home_Search" Width="260" PlaceholderText="搜索百科、Mod 或存档…" IsReadOnly="True" />
+                                <Button x:Name="RefreshButton" localization:LiveLocalization.Key="Home_Rescan" Content="重新扫描" Click="RefreshButton_Click" />
                             </StackPanel>
                         </Grid>
 
@@ -139,7 +138,7 @@
                                     <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="220" /></Grid.ColumnDefinitions>
                                     <Grid.RowDefinitions><RowDefinition Height="*" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
                                     <StackPanel Spacing="7">
-                                        <TextBlock Text="继续游戏" Style="{StaticResource SubtitleTextBlockStyle}" />
+                                        <TextBlock localization:LiveLocalization.Key="Home_ContinueTitle" Text="继续游戏" Style="{StaticResource SubtitleTextBlockStyle}" />
                                         <TextBlock x:Name="LaunchStoreText" Text="尚未检测到游戏安装" FontSize="20" FontWeight="SemiBold" TextWrapping="Wrap" />
                                         <TextBlock x:Name="LaunchPathText" Text="刷新后将显示安装目录" Style="{StaticResource MutedTextStyle}" FontSize="11" />
                                         <TextBlock x:Name="InstallationsText" Style="{StaticResource MutedTextStyle}" FontSize="11" MaxLines="2" TextTrimming="CharacterEllipsis" />
@@ -154,21 +153,21 @@
                                         </StackPanel>
                                     </Border>
                                     <StackPanel Grid.Row="1" Grid.ColumnSpan="2" Orientation="Horizontal" Spacing="8">
-                                        <Button x:Name="LaunchDx11Button" Content="启动 DirectX 11" IsEnabled="False" Click="LaunchDx11Button_Click" />
-                                        <Button x:Name="LaunchDx12Button" Content="启动 DirectX 12" Style="{StaticResource AccentButtonStyle}" IsEnabled="False" Click="LaunchDx12Button_Click" />
+                                        <Button x:Name="LaunchDx11Button" localization:LiveLocalization.Key="Home_LaunchDx11" Content="启动 DirectX 11" IsEnabled="False" Click="LaunchDx11Button_Click" />
+                                        <Button x:Name="LaunchDx12Button" localization:LiveLocalization.Key="Home_LaunchDx12" Content="启动 DirectX 12" Style="{StaticResource AccentButtonStyle}" IsEnabled="False" Click="LaunchDx12Button_Click" />
                                     </StackPanel>
                                 </Grid>
                             </Border>
 
                             <Border x:Name="RunControlCard" Grid.Column="1" Style="{StaticResource PageCardStyle}" MinHeight="220">
                                 <StackPanel Spacing="8">
-                                    <TextBlock Text="运行控制" Style="{StaticResource SubtitleTextBlockStyle}" />
-                                    <TextBlock Text="当前会话" Style="{StaticResource MutedTextStyle}" FontSize="11" />
-                                    <Grid Height="42"><Grid.ColumnDefinitions><ColumnDefinition Width="100" /><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions><TextBlock Text="修改器" FontWeight="SemiBold" VerticalAlignment="Center" /><TextBlock x:Name="HomeTrainerCountText" Grid.Column="1" Text="0 项启用" Style="{StaticResource MutedTextStyle}" FontSize="11" VerticalAlignment="Center" /><Button Grid.Column="2" Tag="trainer" Content="打开" Click="HomeNavigationButton_Click" /></Grid>
+                                    <TextBlock localization:LiveLocalization.Key="Home_RunControlTitle" Text="运行控制" Style="{StaticResource SubtitleTextBlockStyle}" />
+                                    <TextBlock localization:LiveLocalization.Key="Home_CurrentSession" Text="当前会话" Style="{StaticResource MutedTextStyle}" FontSize="11" />
+                                    <Grid Height="42"><Grid.ColumnDefinitions><ColumnDefinition Width="100" /><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions><TextBlock localization:LiveLocalization.Key="Home_TrainerLabel" Text="修改器" FontWeight="SemiBold" VerticalAlignment="Center" /><TextBlock x:Name="HomeTrainerCountText" Grid.Column="1" Text="0 项启用" Style="{StaticResource MutedTextStyle}" FontSize="11" VerticalAlignment="Center" /><Button Grid.Column="2" localization:LiveLocalization.Key="Home_OpenTrainer" Tag="trainer" Content="打开" Click="HomeNavigationButton_Click" /></Grid>
                                     <Rectangle Height="1" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
-                                    <Grid Height="42"><Grid.ColumnDefinitions><ColumnDefinition Width="100" /><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions><TextBlock Text="Mod 配置" FontWeight="SemiBold" VerticalAlignment="Center" /><TextBlock Grid.Column="1" Text="入口已保留" Style="{StaticResource MutedTextStyle}" FontSize="11" VerticalAlignment="Center" /><Button Grid.Column="2" Tag="mods" Content="管理" Click="HomeNavigationButton_Click" /></Grid>
+                                    <Grid Height="42"><Grid.ColumnDefinitions><ColumnDefinition Width="100" /><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions><TextBlock localization:LiveLocalization.Key="Home_ModLabel" Text="Mod 配置" FontWeight="SemiBold" VerticalAlignment="Center" /><TextBlock Grid.Column="1" localization:LiveLocalization.Key="Home_Reserved" Text="入口已保留" Style="{StaticResource MutedTextStyle}" FontSize="11" VerticalAlignment="Center" /><Button Grid.Column="2" localization:LiveLocalization.Key="Home_ManageMod" Tag="mods" Content="管理" Click="HomeNavigationButton_Click" /></Grid>
                                     <Rectangle Height="1" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
-                                    <Grid Height="42"><Grid.ColumnDefinitions><ColumnDefinition Width="100" /><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions><TextBlock Text="安全状态" FontWeight="SemiBold" VerticalAlignment="Center" /><TextBlock x:Name="HomeTrainerSafetyText" Grid.Column="1" Text="等待游戏" Style="{StaticResource MutedTextStyle}" FontSize="11" VerticalAlignment="Center" /><Button x:Name="DiagnosticsButton" Grid.Column="2" Content="诊断" Click="DiagnosticsButton_Click" IsEnabled="False" /></Grid>
+                                    <Grid Height="42"><Grid.ColumnDefinitions><ColumnDefinition Width="100" /><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions><TextBlock localization:LiveLocalization.Key="Home_SafetyLabel" Text="安全状态" FontWeight="SemiBold" VerticalAlignment="Center" /><TextBlock x:Name="HomeTrainerSafetyText" Grid.Column="1" Text="等待游戏" Style="{StaticResource MutedTextStyle}" FontSize="11" VerticalAlignment="Center" /><Button x:Name="DiagnosticsButton" Grid.Column="2" localization:LiveLocalization.Key="Home_Diagnostics" Content="诊断" Click="DiagnosticsButton_Click" IsEnabled="False" /></Grid>
                                 </StackPanel>
                             </Border>
                         </Grid>
@@ -181,13 +180,13 @@
                             </Grid.ColumnDefinitions>
                             <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
                             <Border x:Name="SaveModuleCard" Style="{StaticResource PageCardStyle}" MinHeight="210">
-                                <StackPanel Spacing="9"><TextBlock Text="存档" Style="{StaticResource SubtitleTextBlockStyle}" /><TextBlock Text="存档管理入口" FontSize="18" FontWeight="SemiBold" /><TextBlock Text="浏览、备份与恢复功能将在后续里程碑接入。" Style="{StaticResource MutedTextStyle}" FontSize="11" /><InfoBar IsOpen="True" IsClosable="False" Severity="Success" Message="入口已预留 · 不执行后台扫描" /><Button Tag="saves" Content="管理存档" HorizontalAlignment="Left" Click="HomeNavigationButton_Click" /></StackPanel>
+                                <StackPanel Spacing="9"><TextBlock localization:LiveLocalization.Key="Home_SaveKicker" Text="存档" Style="{StaticResource SubtitleTextBlockStyle}" /><TextBlock localization:LiveLocalization.Key="Home_SaveTitle" Text="存档管理入口" FontSize="18" FontWeight="SemiBold" /><TextBlock localization:LiveLocalization.Key="Home_SaveDesc" Text="浏览、备份与恢复功能将在后续里程碑接入。" Style="{StaticResource MutedTextStyle}" FontSize="11" /><InfoBar localization:LiveLocalization.Key="Home_SaveInfo" IsOpen="True" IsClosable="False" Severity="Success" Message="入口已预留 · 不执行后台扫描" /><Button localization:LiveLocalization.Key="Home_SaveButton" Tag="saves" Content="管理存档" HorizontalAlignment="Left" Click="HomeNavigationButton_Click" /></StackPanel>
                             </Border>
                             <Border x:Name="ModModuleCard" Grid.Column="1" Style="{StaticResource PageCardStyle}" MinHeight="210">
-                                <StackPanel Spacing="9"><TextBlock Text="Mod" Style="{StaticResource SubtitleTextBlockStyle}" /><TextBlock Text="Mod 管理入口" FontSize="18" FontWeight="SemiBold" /><TextBlock Text="启停、配置与依赖检查将在后续里程碑接入。" Style="{StaticResource MutedTextStyle}" FontSize="11" /><InfoBar IsOpen="True" IsClosable="False" Severity="Warning" Message="功能入口已建立 · 管理逻辑尚未接入" /><Button Tag="mods" Content="管理配置" HorizontalAlignment="Left" Click="HomeNavigationButton_Click" /></StackPanel>
+                                <StackPanel Spacing="9"><TextBlock localization:LiveLocalization.Key="Home_ModKicker" Text="Mod" Style="{StaticResource SubtitleTextBlockStyle}" /><TextBlock localization:LiveLocalization.Key="Home_ModTitle" Text="Mod 管理入口" FontSize="18" FontWeight="SemiBold" /><TextBlock localization:LiveLocalization.Key="Home_ModDesc" Text="启停、配置与依赖检查将在后续里程碑接入。" Style="{StaticResource MutedTextStyle}" FontSize="11" /><InfoBar localization:LiveLocalization.Key="Home_ModInfo" IsOpen="True" IsClosable="False" Severity="Warning" Message="功能入口已建立 · 管理逻辑尚未接入" /><Button localization:LiveLocalization.Key="Home_ModButton" Tag="mods" Content="管理配置" HorizontalAlignment="Left" Click="HomeNavigationButton_Click" /></StackPanel>
                             </Border>
                             <Border x:Name="EncyclopediaModuleCard" Grid.Column="2" Style="{StaticResource PageCardStyle}" MinHeight="210">
-                                <StackPanel Spacing="9"><TextBlock Text="百科" Style="{StaticResource SubtitleTextBlockStyle}" /><TextBlock Text="Civilization VI 百科" FontSize="18" FontWeight="SemiBold" /><TextBlock Text="规则、文明、单位、建筑与交叉索引将在后续补全。" Style="{StaticResource MutedTextStyle}" FontSize="11" /><TextBox PlaceholderText="搜索地图、规则、文明、单位…" IsReadOnly="True" /><Button Tag="encyclopedia" Content="打开百科" Style="{StaticResource AccentButtonStyle}" HorizontalAlignment="Left" Click="HomeNavigationButton_Click" /></StackPanel>
+                                <StackPanel Spacing="9"><TextBlock localization:LiveLocalization.Key="Home_EncyclopediaKicker" Text="百科" Style="{StaticResource SubtitleTextBlockStyle}" /><TextBlock localization:LiveLocalization.Key="Home_EncyclopediaTitle" Text="Civilization VI 百科" FontSize="18" FontWeight="SemiBold" /><TextBlock localization:LiveLocalization.Key="Home_EncyclopediaDesc" Text="规则、文明、单位、建筑与交叉索引将在后续补全。" Style="{StaticResource MutedTextStyle}" FontSize="11" /><TextBox localization:LiveLocalization.Key="Home_EncyclopediaSearch" PlaceholderText="搜索地图、规则、文明、单位…" IsReadOnly="True" /><Button localization:LiveLocalization.Key="Home_EncyclopediaButton" Tag="encyclopedia" Content="打开百科" Style="{StaticResource AccentButtonStyle}" HorizontalAlignment="Left" Click="HomeNavigationButton_Click" /></StackPanel>
                             </Border>
                         </Grid>
                     </StackPanel>
@@ -196,81 +195,88 @@
                 <!-- TRAINER -->
                 <Grid x:Name="TrainerPanel" Visibility="Collapsed" Padding="24">
                     <Grid.Transitions><TransitionCollection><EntranceThemeTransition FromVerticalOffset="10" IsStaggeringEnabled="False" /></TransitionCollection></Grid.Transitions>
-                    <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="16" /><RowDefinition Height="Auto" /><RowDefinition Height="16" /><RowDefinition Height="*" /></Grid.RowDefinitions>
+                    <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="12" /><RowDefinition Height="Auto" /><RowDefinition Height="12" /><RowDefinition Height="*" /></Grid.RowDefinitions>
+
                     <Grid ColumnSpacing="12">
                         <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
                         <StackPanel Spacing="2">
-                            <TextBlock Text="修改器" Style="{StaticResource PageHeaderTitleStyle}" />
+                            <TextBlock localization:LiveLocalization.Key="Trainer_PageTitle" Text="修改器" Style="{StaticResource PageHeaderTitleStyle}" />
                             <TextBlock x:Name="TrainerStatusText" Text="等待 Civilization VI。" Style="{StaticResource MutedTextStyle}" />
                         </StackPanel>
                         <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
-                            <TextBox x:Name="TrainerSearchBox" Width="230" PlaceholderText="搜索修改项…" TextChanged="TrainerSearchBox_TextChanged" />
-                            <Button x:Name="CompactTrainerButton" Content="打开紧凑窗口" Click="CompactTrainerButton_Click" />
+                            <TextBox x:Name="TrainerSearchBox" localization:LiveLocalization.Key="Trainer_Search" Width="260" PlaceholderText="搜索修改项…" TextChanged="TrainerSearchBox_TextChanged" />
+                            <Button x:Name="CompactTrainerButton" localization:LiveLocalization.Key="Trainer_Compact" Content="打开紧凑窗口" Click="CompactTrainerButton_Click" />
                         </StackPanel>
                     </Grid>
 
-                    <Border Grid.Row="2" Style="{StaticResource PageCardStyle}" Padding="16">
-                        <Grid ColumnSpacing="20">
-                            <Grid.ColumnDefinitions><ColumnDefinition Width="220" /><ColumnDefinition Width="260" /><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
-                            <StackPanel Spacing="3"><TextBlock Text="当前预设" Style="{StaticResource MutedTextStyle}" FontSize="11" /><TextBlock x:Name="TrainerEnabledCountText" Text="默认 · 0 / 22 已启用" FontWeight="SemiBold" /></StackPanel>
-                            <StackPanel Grid.Column="1" Spacing="3"><TextBlock Text="安全保护" Style="{StaticResource MutedTextStyle}" FontSize="11" /><TextBlock x:Name="TrainerSafetyText" Text="单机模式 · 等待验证" FontWeight="SemiBold" /></StackPanel>
-                            <StackPanel Grid.Column="2" Spacing="3"><TextBlock Text="运行状态" Style="{StaticResource MutedTextStyle}" FontSize="11" /><TextBlock x:Name="TrainerOperationStatusText" Text="连接支持的单机对局后可使用已验证功能。" Style="{StaticResource MutedTextStyle}" /></StackPanel>
-                            <Button x:Name="TrainerDisableAllButton" Grid.Column="3" Content="全部关闭" Click="TrainerDisableAllButton_Click" IsEnabled="False" />
+                    <Border Grid.Row="2" Style="{StaticResource PageCardStyle}" Padding="14,10">
+                        <Grid ColumnSpacing="18">
+                            <Grid.ColumnDefinitions><ColumnDefinition Width="Auto" /><ColumnDefinition Width="Auto" /><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                            <StackPanel><TextBlock localization:LiveLocalization.Key="Trainer_PresetLabel" Text="当前预设" Style="{StaticResource MutedTextStyle}" FontSize="11" /><TextBlock x:Name="TrainerEnabledCountText" Text="默认 · 0 / 22 已启用" FontWeight="SemiBold" /></StackPanel>
+                            <StackPanel Grid.Column="1"><TextBlock localization:LiveLocalization.Key="Trainer_SafetyLabel" Text="安全保护" Style="{StaticResource MutedTextStyle}" FontSize="11" /><TextBlock x:Name="TrainerSafetyText" Text="单机模式 · 不匹配时拒绝写入" FontWeight="SemiBold" /></StackPanel>
+                            <StackPanel Grid.Column="2"><TextBlock localization:LiveLocalization.Key="Trainer_RuntimeLabel" Text="运行状态" Style="{StaticResource MutedTextStyle}" FontSize="11" /><TextBlock x:Name="TrainerOperationStatusText" Text="等待对局初始化" TextTrimming="CharacterEllipsis" /></StackPanel>
+                            <Button x:Name="TrainerDisableAllButton" Grid.Column="3" localization:LiveLocalization.Key="Trainer_DisableAll" Content="全部关闭" Click="TrainerDisableAllButton_Click" IsEnabled="False" />
                         </Grid>
                     </Border>
 
-                    <Grid x:Name="TrainerBodyGrid" Grid.Row="4" ColumnSpacing="16">
-                        <Grid.ColumnDefinitions><ColumnDefinition x:Name="TrainerCategoryColumn" Width="190" /><ColumnDefinition Width="*" /></Grid.ColumnDefinitions>
-                        <Border x:Name="TrainerCategoryPane" Background="{ThemeResource LayerFillColorDefaultBrush}" CornerRadius="8" Padding="8">
-                            <StackPanel Spacing="4">
-                                <TextBlock Text="分类" Style="{StaticResource MutedTextStyle}" FontSize="11" Margin="8,4,0,6" />
-                                <Button x:Name="ResourcesCategoryButton" Tag="resources" Style="{StaticResource CategoryButtonStyle}" Click="TrainerCategoryButton_Click" Content="资源与经济   9" />
-                                <Button x:Name="ScienceCategoryButton" Tag="science" Style="{StaticResource CategoryButtonStyle}" Click="TrainerCategoryButton_Click" Content="科技与文化   4" />
-                                <Button x:Name="UnitsCategoryButton" Tag="units" Style="{StaticResource CategoryButtonStyle}" Click="TrainerCategoryButton_Click" Content="单位与战斗   5" />
-                                <Button x:Name="CitiesCategoryButton" Tag="cities" Style="{StaticResource CategoryButtonStyle}" Click="TrainerCategoryButton_Click" Content="城市与建造   4" />
-                            </StackPanel>
-                        </Border>
+                    <ScrollViewer Grid.Row="4" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                        <StackPanel Spacing="10">
+                            <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+                                <StackPanel Orientation="Horizontal" Spacing="6">
+                                    <Button x:Name="ResourcesCategoryButton" localization:LiveLocalization.Key="Trainer_CategoryResources" Tag="resources" Style="{StaticResource CategoryButtonStyle}" Click="TrainerCategoryButton_Click" Content="资源与经济  9" />
+                                    <Button x:Name="ScienceCategoryButton" localization:LiveLocalization.Key="Trainer_CategoryScience" Tag="science" Style="{StaticResource CategoryButtonStyle}" Click="TrainerCategoryButton_Click" Content="科技与文化  4" />
+                                    <Button x:Name="UnitsCategoryButton" localization:LiveLocalization.Key="Trainer_CategoryUnits" Tag="units" Style="{StaticResource CategoryButtonStyle}" Click="TrainerCategoryButton_Click" Content="单位与战斗  5" />
+                                    <Button x:Name="CitiesCategoryButton" localization:LiveLocalization.Key="Trainer_CategoryCities" Tag="cities" Style="{StaticResource CategoryButtonStyle}" Click="TrainerCategoryButton_Click" Content="城市与建造  4" />
+                                </StackPanel>
+                            </ScrollViewer>
 
-                        <Border Grid.Column="1" Style="{StaticResource PageCardStyle}" Padding="14">
-                            <Grid>
-                                <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="10" /><RowDefinition Height="*" /></Grid.RowDefinitions>
-                                <Grid>
-                                    <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
-                                    <StackPanel Spacing="2"><TextBlock x:Name="TrainerCategoryTitleText" Text="资源与经济" Style="{StaticResource SubtitleTextBlockStyle}" /><TextBlock x:Name="TrainerCategoryDescriptionText" Text="玩家资源、即时增量，以及对应的 AI 资源控制。" Style="{StaticResource MutedTextStyle}" FontSize="11" /></StackPanel>
-                                    <TextBlock x:Name="TrainerCategoryCountText" Grid.Column="1" Text="9 项" Style="{StaticResource MutedTextStyle}" VerticalAlignment="Center" />
-                                </Grid>
-                                <ListView x:Name="TrainerList" Grid.Row="2" SelectionMode="None" IsItemClickEnabled="True" ItemClick="TrainerList_ItemClick" Background="Transparent" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
-                                    <ListView.ItemContainerStyle>
-                                        <Style TargetType="ListViewItem"><Setter Property="HorizontalContentAlignment" Value="Stretch" /><Setter Property="Padding" Value="0" /><Setter Property="Margin" Value="0,1" /><Setter Property="CornerRadius" Value="6" /><Setter Property="MinHeight" Value="52" /></Style>
-                                    </ListView.ItemContainerStyle>
-                                    <ListView.ItemTemplate>
-                                        <DataTemplate x:DataType="localization:LocalizedTrainerFeature">
-                                            <Grid MinHeight="52" Padding="10,5" ColumnSpacing="10">
-                                                <Grid.ColumnDefinitions><ColumnDefinition Width="2*" /><ColumnDefinition Width="118" /><ColumnDefinition Width="72" /><ColumnDefinition Width="140" /><ColumnDefinition Width="120" /></Grid.ColumnDefinitions>
-                                                <StackPanel VerticalAlignment="Center" Spacing="1"><TextBlock Text="{x:Bind DisplayName}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" /><TextBlock Text="{x:Bind Group}" Style="{StaticResource MutedTextStyle}" FontSize="11" /></StackPanel>
-                                                <Border Grid.Column="1" Width="118" Height="32" Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}" CornerRadius="6" VerticalAlignment="Center"><TextBlock Text="{x:Bind Shortcut}" FontFamily="Cascadia Mono" FontSize="11" HorizontalAlignment="Center" VerticalAlignment="Center" /></Border>
-                                                <TextBlock Grid.Column="2" Text="{x:Bind Scope}" Style="{StaticResource MutedTextStyle}" FontSize="11" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                                                <Grid Grid.Column="3" VerticalAlignment="Center">
-                                                    <NumberBox Tag="{x:Bind Id}" Value="{x:Bind ActionValue, Mode=OneWay}" Minimum="1" Maximum="8000000" SmallChange="100" SpinButtonPlacementMode="Compact" Visibility="{x:Bind ActionEditorVisibility}" ValueChanged="TrainerValueInput_ValueChanged" Tapped="TrainerValueInput_Tapped" />
-                                                    <ToggleSwitch IsOn="{x:Bind IsEnabled, Mode=OneWay}" IsHitTestVisible="False" OffContent="" OnContent="" HorizontalAlignment="Center" Visibility="{x:Bind ToggleVisibility}" />
-                                                </Grid>
-                                                <TextBlock Grid.Column="4" Text="{x:Bind Status}" Style="{StaticResource MutedTextStyle}" FontSize="11" HorizontalAlignment="Right" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
-                                            </Grid>
-                                        </DataTemplate>
-                                    </ListView.ItemTemplate>
-                                </ListView>
+                            <Grid x:Name="TrainerBodyGrid" ColumnSpacing="0">
+                                <Grid.ColumnDefinitions><ColumnDefinition x:Name="TrainerCategoryColumn" Width="0" /><ColumnDefinition Width="*" /></Grid.ColumnDefinitions>
+                                <Border x:Name="TrainerMainCard" Grid.Column="1" Style="{StaticResource PageCardStyle}" Padding="14">
+                                    <Grid MinHeight="430">
+                                        <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="10" /><RowDefinition Height="*" /></Grid.RowDefinitions>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                                            <StackPanel Spacing="2"><TextBlock x:Name="TrainerCategoryTitleText" Text="资源与经济" Style="{StaticResource SubtitleTextBlockStyle}" /><TextBlock x:Name="TrainerCategoryDescriptionText" Text="玩家资源、即时增量，以及对应的 AI 资源控制。" Style="{StaticResource MutedTextStyle}" FontSize="11" /></StackPanel>
+                                            <TextBlock x:Name="TrainerCategoryCountText" Grid.Column="1" Text="9 项" Style="{StaticResource MutedTextStyle}" VerticalAlignment="Center" />
+                                        </Grid>
+
+                                        <ListView x:Name="TrainerList" Grid.Row="2" SelectionMode="None" IsItemClickEnabled="True" ItemClick="TrainerList_ItemClick" Background="Transparent" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                                            <ListView.ItemContainerStyle>
+                                                <Style TargetType="ListViewItem"><Setter Property="HorizontalContentAlignment" Value="Stretch" /><Setter Property="Padding" Value="0" /><Setter Property="Margin" Value="0,1" /><Setter Property="CornerRadius" Value="6" /><Setter Property="MinHeight" Value="56" /></Style>
+                                            </ListView.ItemContainerStyle>
+                                            <ListView.ItemTemplate>
+                                                <DataTemplate x:DataType="localization:LocalizedTrainerFeature">
+                                                    <Grid MinHeight="56" Padding="8,5" ColumnSpacing="8">
+                                                        <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="88" /><ColumnDefinition Width="128" /><ColumnDefinition Width="96" /></Grid.ColumnDefinitions>
+                                                        <StackPanel VerticalAlignment="Center" Spacing="1">
+                                                            <TextBlock Text="{x:Bind DisplayName}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
+                                                            <TextBlock Text="{x:Bind Scope}" Style="{StaticResource MutedTextStyle}" FontSize="11" />
+                                                        </StackPanel>
+                                                        <Border Grid.Column="1" Width="88" Height="32" Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}" CornerRadius="6" VerticalAlignment="Center"><TextBlock Text="{x:Bind Shortcut}" FontFamily="Cascadia Mono" FontSize="10" HorizontalAlignment="Center" VerticalAlignment="Center" /></Border>
+                                                        <Grid Grid.Column="2" Width="128" VerticalAlignment="Center">
+                                                            <NumberBox Tag="{x:Bind Id}" Value="{x:Bind ActionValue, Mode=OneWay}" Minimum="1" Maximum="8000000" SmallChange="100" Width="120" MinWidth="0" HorizontalAlignment="Center" SpinButtonPlacementMode="Compact" Visibility="{x:Bind ActionEditorVisibility}" ValueChanged="TrainerValueInput_ValueChanged" Tapped="TrainerValueInput_Tapped" />
+                                                            <ToggleSwitch IsOn="{x:Bind IsEnabled, Mode=OneWay}" IsHitTestVisible="False" OffContent="" OnContent="" HorizontalAlignment="Center" Visibility="{x:Bind ToggleVisibility}" />
+                                                        </Grid>
+                                                        <TextBlock Grid.Column="3" Text="{x:Bind Status}" Style="{StaticResource MutedTextStyle}" FontSize="10" HorizontalAlignment="Right" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+                                                    </Grid>
+                                                </DataTemplate>
+                                            </ListView.ItemTemplate>
+                                        </ListView>
+                                    </Grid>
+                                </Border>
                             </Grid>
-                        </Border>
-                    </Grid>
+                        </StackPanel>
+                    </ScrollViewer>
                 </Grid>
 
                 <!-- DIAGNOSTICS -->
                 <ScrollViewer x:Name="DiagnosticsPanel" Visibility="Collapsed" HorizontalScrollBarVisibility="Disabled">
                     <ScrollViewer.Transitions><TransitionCollection><EntranceThemeTransition FromVerticalOffset="10" IsStaggeringEnabled="False" /></TransitionCollection></ScrollViewer.Transitions>
                     <StackPanel Spacing="16" Padding="24" HorizontalAlignment="Stretch">
-                        <Grid ColumnSpacing="12"><Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions><StackPanel Spacing="2"><TextBlock Text="预设与诊断" Style="{StaticResource PageHeaderTitleStyle}" /><TextBlock Text="检查当前运行环境并复制用于版本验证的诊断信息。" Style="{StaticResource MutedTextStyle}" /></StackPanel><Button x:Name="DiagnosticsPageCopyButton" Grid.Column="1" Content="复制诊断 JSON" Style="{StaticResource AccentButtonStyle}" IsEnabled="False" Click="DiagnosticsPageCopyButton_Click" VerticalAlignment="Center" /></Grid>
-                        <Border Style="{StaticResource PageCardStyle}" MinHeight="170"><StackPanel Spacing="9"><StackPanel Orientation="Horizontal" Spacing="8"><Ellipse Width="8" Height="8" Fill="{ThemeResource SystemFillColorSuccessBrush}" VerticalAlignment="Center" /><TextBlock x:Name="DiagnosticsPageStateText" Text="当前没有运行中的 Civilization VI" Style="{StaticResource SubtitleTextBlockStyle}" /></StackPanel><TextBlock Text="诊断不会导出存档、账号凭据，也不会主动读取任意无关进程内存。" Style="{StaticResource MutedTextStyle}" /><Rectangle Height="1" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" /><TextBlock x:Name="DiagnosticsPageDetailsText" FontFamily="Cascadia Mono" FontSize="11" Style="{StaticResource MutedTextStyle}" /><TextBlock x:Name="DiagnosticsPageResultText" Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}" TextWrapping="Wrap" /></StackPanel></Border>
-                        <Grid x:Name="DiagnosticsCardsGrid" ColumnSpacing="16" RowSpacing="16"><Grid.ColumnDefinitions><ColumnDefinition x:Name="DiagnosticsColumn1" Width="*" /><ColumnDefinition x:Name="DiagnosticsColumn2" Width="*" /></Grid.ColumnDefinitions><Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /></Grid.RowDefinitions><Border x:Name="WriteProtectionCard" Style="{StaticResource PageCardStyle}" MinHeight="160"><StackPanel Spacing="8"><TextBlock Text="写入保护" Style="{StaticResource SubtitleTextBlockStyle}" /><TextBlock x:Name="DiagnosticsWriteStateText" Text="等待支持的游戏构建" FontSize="18" FontWeight="SemiBold" /><TextBlock Text="只有目标版本、模块签名和指针链通过校验后才允许修改器写入。" Style="{StaticResource MutedTextStyle}" /><InfoBar IsOpen="True" IsClosable="False" Severity="Warning" Message="不匹配的游戏版本会保持只读并拒绝写入。" /></StackPanel></Border><Border x:Name="DiagnosticsPurposeCard" Grid.Column="1" Style="{StaticResource PageCardStyle}" MinHeight="160"><StackPanel Spacing="8"><TextBlock Text="诊断用途" Style="{StaticResource SubtitleTextBlockStyle}" /><TextBlock Text="版本适配与问题定位" FontSize="18" FontWeight="SemiBold" /><TextBlock Text="复制结果可以用于比对 Steam / Epic、DX11 / DX12、文件版本、GameCore 与 Trainer Probe。" Style="{StaticResource MutedTextStyle}" /><InfoBar IsOpen="True" IsClosable="False" Severity="Informational" Message="诊断仅由用户主动触发，不在后台自动上传。" /></StackPanel></Border></Grid>
+                        <Grid ColumnSpacing="12"><Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions><StackPanel Spacing="2"><TextBlock localization:LiveLocalization.Key="Diagnostics_Title" Text="预设与诊断" Style="{StaticResource PageHeaderTitleStyle}" /><TextBlock localization:LiveLocalization.Key="Diagnostics_Subtitle" Text="检查当前运行环境并复制用于版本验证的诊断信息。" Style="{StaticResource MutedTextStyle}" /></StackPanel><Button x:Name="DiagnosticsPageCopyButton" Grid.Column="1" localization:LiveLocalization.Key="Diagnostics_Copy" Content="复制诊断 JSON" Style="{StaticResource AccentButtonStyle}" IsEnabled="False" Click="DiagnosticsPageCopyButton_Click" VerticalAlignment="Center" /></Grid>
+                        <Border Style="{StaticResource PageCardStyle}" MinHeight="170"><StackPanel Spacing="9"><StackPanel Orientation="Horizontal" Spacing="8"><Ellipse Width="8" Height="8" Fill="{ThemeResource SystemFillColorSuccessBrush}" VerticalAlignment="Center" /><TextBlock x:Name="DiagnosticsPageStateText" Text="当前没有运行中的 Civilization VI" Style="{StaticResource SubtitleTextBlockStyle}" /></StackPanel><TextBlock localization:LiveLocalization.Key="Diagnostics_Privacy" Text="诊断不会导出存档、账号凭据，也不会主动读取任意无关进程内存。" Style="{StaticResource MutedTextStyle}" /><Rectangle Height="1" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" /><TextBlock x:Name="DiagnosticsPageDetailsText" FontFamily="Cascadia Mono" FontSize="11" Style="{StaticResource MutedTextStyle}" /><TextBlock x:Name="DiagnosticsPageResultText" Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}" TextWrapping="Wrap" /></StackPanel></Border>
+                        <Grid x:Name="DiagnosticsCardsGrid" ColumnSpacing="16" RowSpacing="16"><Grid.ColumnDefinitions><ColumnDefinition x:Name="DiagnosticsColumn1" Width="*" /><ColumnDefinition x:Name="DiagnosticsColumn2" Width="*" /></Grid.ColumnDefinitions><Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /></Grid.RowDefinitions><Border x:Name="WriteProtectionCard" Style="{StaticResource PageCardStyle}" MinHeight="160"><StackPanel Spacing="8"><TextBlock localization:LiveLocalization.Key="Diagnostics_WriteTitle" Text="写入保护" Style="{StaticResource SubtitleTextBlockStyle}" /><TextBlock x:Name="DiagnosticsWriteStateText" Text="等待支持的游戏构建" FontSize="18" FontWeight="SemiBold" /><TextBlock localization:LiveLocalization.Key="Diagnostics_WriteDesc" Text="只有目标版本、模块签名和指针链通过校验后才允许修改器写入。" Style="{StaticResource MutedTextStyle}" /><InfoBar localization:LiveLocalization.Key="Diagnostics_WriteInfo" IsOpen="True" IsClosable="False" Severity="Warning" Message="不匹配的游戏版本会保持只读并拒绝写入。" /></StackPanel></Border><Border x:Name="DiagnosticsPurposeCard" Grid.Column="1" Style="{StaticResource PageCardStyle}" MinHeight="160"><StackPanel Spacing="8"><TextBlock localization:LiveLocalization.Key="Diagnostics_PurposeTitle" Text="诊断用途" Style="{StaticResource SubtitleTextBlockStyle}" /><TextBlock localization:LiveLocalization.Key="Diagnostics_PurposeHeadline" Text="版本适配与问题定位" FontSize="18" FontWeight="SemiBold" /><TextBlock localization:LiveLocalization.Key="Diagnostics_PurposeDesc" Text="复制结果可以用于比对 Steam / Epic、DX11 / DX12、文件版本、GameCore 与 Trainer Probe。" Style="{StaticResource MutedTextStyle}" /><InfoBar localization:LiveLocalization.Key="Diagnostics_PurposeInfo" IsOpen="True" IsClosable="False" Severity="Informational" Message="诊断仅由用户主动触发，不在后台自动上传。" /></StackPanel></Border></Grid>
                     </StackPanel>
                 </ScrollViewer>
 
@@ -278,11 +284,11 @@
                 <ScrollViewer x:Name="SettingsPanel" Visibility="Collapsed" HorizontalScrollBarVisibility="Disabled">
                     <ScrollViewer.Transitions><TransitionCollection><EntranceThemeTransition FromVerticalOffset="10" IsStaggeringEnabled="False" /></TransitionCollection></ScrollViewer.Transitions>
                     <StackPanel Spacing="16" Padding="24" HorizontalAlignment="Stretch">
-                        <StackPanel Spacing="2"><TextBlock Text="设置与关于" Style="{StaticResource PageHeaderTitleStyle}" /><TextBlock Text="调整 CivVIToolkit 的本地界面行为并查看版本信息。" Style="{StaticResource MutedTextStyle}" /></StackPanel>
-                        <Border Style="{StaticResource PageCardStyle}"><Grid x:Name="SettingsLanguageGrid" ColumnSpacing="24" RowSpacing="12"><Grid.ColumnDefinitions><ColumnDefinition x:Name="SettingsLanguageTextColumn" Width="*" /><ColumnDefinition x:Name="SettingsLanguageControlColumn" Width="300" /></Grid.ColumnDefinitions><Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /></Grid.RowDefinitions><StackPanel Spacing="4"><TextBlock Text="语言" Style="{StaticResource BodyStrongTextBlockStyle}" /><TextBlock Text="选择界面语言。完整切换将在重新启动应用后生效。" Style="{StaticResource MutedTextStyle}" /></StackPanel><ComboBox x:Name="LanguageComboBox" Grid.Column="1" DisplayMemberPath="DisplayName" SelectionChanged="LanguageComboBox_SelectionChanged" HorizontalAlignment="Stretch" VerticalAlignment="Center" /></Grid></Border>
-                        <Border Style="{StaticResource PageCardStyle}"><Grid><Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions><StackPanel Spacing="4"><TextBlock Text="单机安全边界" Style="{StaticResource BodyStrongTextBlockStyle}" /><TextBlock Text="修改器面向 Civilization VI 单人游戏；不支持的构建会自动拒绝内存写入。" Style="{StaticResource MutedTextStyle}" /></StackPanel><InfoBar Grid.Column="1" IsOpen="True" IsClosable="False" Severity="Success" Message="Single-player only" VerticalAlignment="Center" /></Grid></Border>
-                        <Border Style="{StaticResource PageCardStyle}"><Grid><Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions><StackPanel Spacing="4"><TextBlock Text="关于 CivVIToolkit" Style="{StaticResource BodyStrongTextBlockStyle}" /><TextBlock Text="WinUI 3 / .NET 10 · Civilization VI 本地工具箱" Style="{StaticResource MutedTextStyle}" /></StackPanel><TextBlock x:Name="AppVersionText" Grid.Column="1" Text="v0.3.1" Style="{StaticResource MutedTextStyle}" VerticalAlignment="Center" /></Grid></Border>
-                        <InfoBar x:Name="LanguageRestartInfoBar" IsOpen="False" IsClosable="True" Severity="Informational" Title="需要重启" Message="重启 CivVIToolkit 以完整应用新的语言。" />
+                        <StackPanel Spacing="2"><TextBlock localization:LiveLocalization.Key="Settings_PageTitle" Text="设置与关于" Style="{StaticResource PageHeaderTitleStyle}" /><TextBlock localization:LiveLocalization.Key="Settings_PageSubtitle" Text="调整 CivVIToolkit 的本地界面行为并查看版本信息。" Style="{StaticResource MutedTextStyle}" /></StackPanel>
+                        <Border Style="{StaticResource PageCardStyle}"><Grid x:Name="SettingsLanguageGrid" ColumnSpacing="24" RowSpacing="12"><Grid.ColumnDefinitions><ColumnDefinition x:Name="SettingsLanguageTextColumn" Width="*" /><ColumnDefinition x:Name="SettingsLanguageControlColumn" Width="300" /></Grid.ColumnDefinitions><Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /></Grid.RowDefinitions><StackPanel Spacing="4"><TextBlock localization:LiveLocalization.Key="Settings_LanguageTitleLive" Text="语言" Style="{StaticResource BodyStrongTextBlockStyle}" /><TextBlock localization:LiveLocalization.Key="Settings_LanguageDescLive" Text="选择界面语言；切换会立即应用，无需重启。" Style="{StaticResource MutedTextStyle}" /></StackPanel><ComboBox x:Name="LanguageComboBox" Grid.Column="1" DisplayMemberPath="DisplayName" SelectionChanged="LanguageComboBox_SelectionChanged" HorizontalAlignment="Stretch" VerticalAlignment="Center" /></Grid></Border>
+                        <Border Style="{StaticResource PageCardStyle}"><Grid><Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions><StackPanel Spacing="4"><TextBlock localization:LiveLocalization.Key="Settings_SinglePlayerTitle" Text="单机安全边界" Style="{StaticResource BodyStrongTextBlockStyle}" /><TextBlock localization:LiveLocalization.Key="Settings_SinglePlayerDesc" Text="修改器面向 Civilization VI 单人游戏；不支持的构建会自动拒绝内存写入。" Style="{StaticResource MutedTextStyle}" /></StackPanel><InfoBar Grid.Column="1" localization:LiveLocalization.Key="Settings_SinglePlayerInfo" IsOpen="True" IsClosable="False" Severity="Success" Message="仅单人游戏" VerticalAlignment="Center" /></Grid></Border>
+                        <Border Style="{StaticResource PageCardStyle}"><Grid><Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions><StackPanel Spacing="4"><TextBlock localization:LiveLocalization.Key="Settings_AboutTitle" Text="关于 CivVIToolkit" Style="{StaticResource BodyStrongTextBlockStyle}" /><TextBlock localization:LiveLocalization.Key="Settings_AboutDesc" Text="WinUI 3 / .NET 10 · Civilization VI 本地工具箱" Style="{StaticResource MutedTextStyle}" /></StackPanel><TextBlock x:Name="AppVersionText" Grid.Column="1" Text="v0.3.2" Style="{StaticResource MutedTextStyle}" VerticalAlignment="Center" /></Grid></Border>
+                        <InfoBar x:Name="LanguageRestartInfoBar" IsOpen="False" IsClosable="True" Severity="Success" />
                     </StackPanel>
                 </ScrollViewer>
 
@@ -291,7 +297,7 @@
                     <ScrollViewer.Transitions><TransitionCollection><EntranceThemeTransition FromVerticalOffset="10" IsStaggeringEnabled="False" /></TransitionCollection></ScrollViewer.Transitions>
                     <StackPanel Spacing="16" Padding="24" HorizontalAlignment="Stretch">
                         <StackPanel Spacing="2"><TextBlock x:Name="PlaceholderTitleText" Text="模块" Style="{StaticResource PageHeaderTitleStyle}" /><TextBlock x:Name="PlaceholderDescriptionText" Text="入口已保留。" Style="{StaticResource MutedTextStyle}" /></StackPanel>
-                        <Border Style="{StaticResource PageCardStyle}" MinHeight="320"><StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="10"><FontIcon Glyph="&#xE946;" FontSize="28" Opacity="0.55" /><TextBlock Text="当前版本仅保留功能入口" Style="{StaticResource SubtitleTextBlockStyle}" HorizontalAlignment="Center" /><TextBlock Text="后续接入功能时无需再次重构主界面。" Style="{StaticResource MutedTextStyle}" TextAlignment="Center" /></StackPanel></Border>
+                        <Border Style="{StaticResource PageCardStyle}" MinHeight="320"><StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="10"><FontIcon Glyph="&#xE946;" FontSize="28" Opacity="0.55" /><TextBlock localization:LiveLocalization.Key="Placeholder_Headline" Text="当前版本仅保留功能入口" Style="{StaticResource SubtitleTextBlockStyle}" HorizontalAlignment="Center" /><TextBlock localization:LiveLocalization.Key="Placeholder_Desc" Text="后续接入功能时无需再次重构主界面。" Style="{StaticResource MutedTextStyle}" TextAlignment="Center" /></StackPanel></Border>
                     </StackPanel>
                 </ScrollViewer>
             </Grid>
