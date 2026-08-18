@@ -1,3 +1,5 @@
+using CivVIToolkit.Core.Trainer;
+
 namespace CivVIToolkit.Core.Game;
 
 public sealed record GameModuleDiagnostics(
@@ -21,7 +23,9 @@ public sealed record GameRuntimeDiagnostics(
     int ModuleImageSize,
     string? InstallDirectory,
     bool MatchedKnownInstallation,
-    GameModuleDiagnostics? GameCoreModule = null);
+    GameModuleDiagnostics? GameCoreModule = null,
+    TrainerBuildProbeSnapshot? TrainerProbe = null,
+    string? TrainerProbeError = null);
 
 public interface IGameRuntimeDiagnosticsService
 {

@@ -1,40 +1,28 @@
-# CivVIToolkit architecture
+# Architecture
 
-CivVIToolkit starts as a Civilization VI single-player trainer, but the repository is intentionally shaped as a toolkit rather than a one-off memory editor.
+CivVIToolkit is split into a small domain core, Windows platform services and a WinUI 3 application shell.
 
-## Project boundaries
+## Projects
 
-- `CivVIToolkit.Core` contains store-independent models, module contracts, trainer definitions and shortcut contracts. It must not depend on WinUI or Win32.
-- `CivVIToolkit.Platform.Windows` owns Windows-specific discovery, process inspection, process memory access and AoB scanning.
-- `CivVIToolkit.App` is the WinUI 3 shell. Navigation exposes the long-term module boundaries from day one.
-- `CivVIToolkit.Tests` protects catalog, shortcut and memory-pattern contracts.
+- `CivVIToolkit.Core` — game/session models, toolkit module contracts, trainer catalog and interfaces.
+- `CivVIToolkit.Platform.Windows` — Steam/Epic discovery, process monitoring, memory access, AoB scanning, diagnostics, hotkeys and exact-build trainer implementations.
+- `CivVIToolkit.App` — WinUI 3 navigation, localization, settings and user interaction.
+- `CivVIToolkit.Tests` — architecture and contract tests.
 
-## Detection pipeline
+## Trainer boundary
 
-1. Steam discovery reads Valve registry roots, then `steamapps/libraryfolders.vdf`, then Civilization VI app manifest `289070`.
-2. Epic discovery reads Epic Games Launcher `.item` manifests under ProgramData.
-3. Both discovery paths resolve real Civilization VI executables below the install root instead of assuming a single hard-coded folder.
-4. Runtime process monitoring watches both `CivilizationVI.exe` and `CivilizationVI_DX12.exe`.
-5. Store is taken from a matched installation when possible and falls back to executable-path inference when the game is already running.
-6. Renderer is inferred from the actual running executable, so the user does not need a DX11/DX12 setting.
+Trainer implementations are build-specific and live under the Windows platform layer. The UI does not own memory addresses or signatures.
 
-## Module roadmap
+An exact trainer profile must:
 
-### Trainer
-Versioned signature profiles, hotkeys, patch lifecycle, safe detach and per-build compatibility diagnostics.
+1. fingerprint the target GameCore;
+2. verify required AoB/RVA anchors;
+3. resolve live runtime objects;
+4. refuse writes when validation fails;
+5. keep reversible patches restorable on disable/detach.
 
-### Save Manager
-Local save discovery, backups, metadata, tags, restore points and future cloud-oriented workflows without coupling save operations to trainer memory code.
+Runtime object pointers are treated as volatile. A UI transition may invalidate or temporarily clear one discovery route while other game systems remain live. v0.2.2 therefore allows the exact SHA-locked Steam/DX12 profile to fall back from GameContext to a separately validated Player::Manager local-player route instead of treating one transient null root as proof that the whole match is unavailable.
 
-### Maps & Game Info
-Read-only game/session metadata, map and ruleset inspection, and later save-derived map information.
+## Future modules
 
-### Mod Manager
-Discover official/user mod folders, validate manifests, show dependencies and conflicts, and manage enable/disable state.
-
-### Quick Launch
-Use the detected Steam/Epic installation plus the user's renderer preference to launch Civilization VI without maintaining a second manual game-path setting.
-
-## Design rule
-
-Store detection, renderer detection and install-path discovery are shared platform services. New modules consume those services instead of implementing their own Steam/Epic probing.
+Save management, maps/game information, Mod management and quick launch remain independent from the trainer layer. They should not depend on GameCore memory editing unless a narrowly defined feature explicitly requires it.

@@ -28,8 +28,20 @@
   <data name="Overview_ModuleReadyDescription.Text" xml:space="preserve"><value>Trainer、セーブ、マップ、Mod、ランチャーを分離し、すべてをメモリ編集層に結合せず拡張できます。</value></data>
   <data name="Trainer_Title.Text" xml:space="preserve"><value>シングルプレイヤー Trainer</value></data>
   <data name="Trainer_StatusWaiting.Text" xml:space="preserve"><value>Civilization VI の起動を待っています。</value></data>
-  <data name="Trainer_Info.Title" xml:space="preserve"><value>v0.1 Trainer Core</value></data>
-  <data name="Trainer_Info.Message" xml:space="preserve"><value>プロセス、メモリ、AoB スキャン層は構築済みです。各機能は Steam/Epic・DX11/DX12 の実ゲーム Build でシグネチャが検証されるまで無効のままです。</value></data>
+  <data name="Trainer_Info.Title" xml:space="preserve"><value>v0.2 Trainer Core</value></data>
+  <data name="Trainer_Info.Message" xml:space="preserve"><value>検証済みの Steam / DX12 1023995 厳密 Profile では、22 項目すべてのシングルプレイヤー機能を利用できます。行をクリックするかグローバルホットキーを使用してください。Build が一致しない場合は書き込みを拒否します。</value></data>
+  <data name="Trainer_OperationHint.Text" xml:space="preserve"><value>機能の行をクリックするか、対応するグローバルホットキーを使用します。</value></data>
+  <data name="Trainer_ProfileVerified" xml:space="preserve"><value>Steam / DX12 / Gathering Storm 1.0.12.68 (1023995) Profile 検証済み · 22 項目利用可能</value></data>
+  <data name="Trainer_StateReady" xml:space="preserve"><value>有効化可能</value></data>
+  <data name="Trainer_StateActionReady" xml:space="preserve"><value>実行可能</value></data>
+  <data name="Trainer_StateEnabled" xml:space="preserve"><value>有効</value></data>
+  <data name="Trainer_StateDisabled" xml:space="preserve"><value>無効</value></data>
+  <data name="Trainer_StateCompleted" xml:space="preserve"><value>完了</value></data>
+  <data name="Trainer_StateExperimental" xml:space="preserve"><value>実験的検証</value></data>
+  <data name="Trainer_StateNotAttached" xml:space="preserve"><value>ゲーム未接続</value></data>
+  <data name="Trainer_StateUnsupported" xml:space="preserve"><value>未対応 Build</value></data>
+  <data name="Trainer_StateError" xml:space="preserve"><value>実行エラー</value></data>
+  <data name="Trainer_StateUnavailable" xml:space="preserve"><value>現在利用不可</value></data>
   <data name="Trainer_SignaturePending.Text" xml:space="preserve"><value>シグネチャ待ち</value></data>
   <data name="Placeholder_Info.Title" xml:space="preserve"><value>予定モジュール</value></data>
   <data name="Placeholder_Info.Message" xml:space="preserve"><value>ナビゲーションとモジュール境界はすでに予約済みです。Trainer Core を再構築せずに後続バージョンで実装できます。</value></data>
@@ -81,7 +93,7 @@
   <data name="TrainerFeature_player_unlimited_faith" xml:space="preserve"><value>信仰力無限</value></data>
   <data name="TrainerFeature_player_instant_research" xml:space="preserve"><value>研究を1ターンで完了</value></data>
   <data name="TrainerFeature_player_instant_civic" xml:space="preserve"><value>社会制度を1ターンで完了</value></data>
-  <data name="TrainerFeature_player_add_influence" xml:space="preserve"><value>外交的支持を追加</value></data>
+  <data name="TrainerFeature_player_add_influence" xml:space="preserve"><value>影響力を追加</value></data>
   <data name="TrainerFeature_unit_unlimited_movement" xml:space="preserve"><value>ユニット移動力無限</value></data>
   <data name="TrainerFeature_unit_unlimited_health" xml:space="preserve"><value>ユニット体力無限</value></data>
   <data name="TrainerFeature_city_instant_production" xml:space="preserve"><value>建設 / 訓練を1ターンで完了</value></data>
@@ -94,7 +106,7 @@
   <data name="TrainerFeature_ai_zero_faith" xml:space="preserve"><value>AI の信仰力を0にする</value></data>
   <data name="TrainerFeature_ai_block_research" xml:space="preserve"><value>AI の研究完了を禁止</value></data>
   <data name="TrainerFeature_ai_block_civic" xml:space="preserve"><value>AI の社会制度完了を禁止</value></data>
-  <data name="TrainerFeature_ai_zero_influence" xml:space="preserve"><value>AI の外交的支持を0にする</value></data>
+  <data name="TrainerFeature_ai_zero_influence" xml:space="preserve"><value>AI の影響力を0にする</value></data>
   <data name="TrainerFeature_ai_block_movement" xml:space="preserve"><value>AI ユニットを移動不能にする</value></data>
   <data name="TrainerFeature_combat_one_hit_kill" xml:space="preserve"><value>一撃必殺</value></data>
   <data name="TrainerFeature_ai_block_production" xml:space="preserve"><value>AI の建設 / 訓練完了を禁止</value></data>

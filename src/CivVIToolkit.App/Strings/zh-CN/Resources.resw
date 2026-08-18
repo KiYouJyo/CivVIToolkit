@@ -1,17 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <root>
-  <resheader name="resmimetype">
-    <value>text/microsoft-resx</value>
-  </resheader>
-  <resheader name="version">
-    <value>2.0</value>
-  </resheader>
-  <resheader name="reader">
-    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </resheader>
-  <resheader name="writer">
-    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </resheader>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
   <data name="AppDisplayName" xml:space="preserve"><value>Civ VI Toolkit</value></data>
   <data name="AppDescription" xml:space="preserve"><value>Civilization VI local toolkit</value></data>
   <data name="Navigation_Root.PaneTitle" xml:space="preserve"><value>Civ VI Toolkit</value></data>
@@ -36,8 +28,20 @@
   <data name="Overview_ModuleReadyDescription.Text" xml:space="preserve"><value>修改器、存档、地图信息、Mod 与启动器彼此分离，后续扩展不需要把所有能力耦合到内存修改层。</value></data>
   <data name="Trainer_Title.Text" xml:space="preserve"><value>单机修改器</value></data>
   <data name="Trainer_StatusWaiting.Text" xml:space="preserve"><value>正在等待 Civilization VI。</value></data>
-  <data name="Trainer_Info.Title" xml:space="preserve"><value>v0.1 Trainer Core</value></data>
-  <data name="Trainer_Info.Message" xml:space="preserve"><value>进程、内存与 AoB 扫描层已经建立。单项功能只有在 Steam/Epic、DX11/DX12 的真实游戏 Build 上完成特征码验证后才会启用。</value></data>
+  <data name="Trainer_Info.Title" xml:space="preserve"><value>v0.2 Trainer Core</value></data>
+  <data name="Trainer_Info.Message" xml:space="preserve"><value>已验证的 Steam / DX12 1023995 精确 Profile 现已开放全部 22 项单机功能。点击功能行或使用全局快捷键；版本不匹配时会拒绝写入。</value></data>
+  <data name="Trainer_OperationHint.Text" xml:space="preserve"><value>点击功能行或使用对应全局快捷键。</value></data>
+  <data name="Trainer_ProfileVerified" xml:space="preserve"><value>Steam / DX12 / Gathering Storm 1.0.12.68 (1023995) Profile 已验证 · 22 项功能可用</value></data>
+  <data name="Trainer_StateReady" xml:space="preserve"><value>可启用</value></data>
+  <data name="Trainer_StateActionReady" xml:space="preserve"><value>可执行</value></data>
+  <data name="Trainer_StateEnabled" xml:space="preserve"><value>已启用</value></data>
+  <data name="Trainer_StateDisabled" xml:space="preserve"><value>已关闭</value></data>
+  <data name="Trainer_StateCompleted" xml:space="preserve"><value>已完成</value></data>
+  <data name="Trainer_StateExperimental" xml:space="preserve"><value>实验性验收</value></data>
+  <data name="Trainer_StateNotAttached" xml:space="preserve"><value>游戏未连接</value></data>
+  <data name="Trainer_StateUnsupported" xml:space="preserve"><value>版本不支持</value></data>
+  <data name="Trainer_StateError" xml:space="preserve"><value>运行错误</value></data>
+  <data name="Trainer_StateUnavailable" xml:space="preserve"><value>当前不可用</value></data>
   <data name="Trainer_SignaturePending.Text" xml:space="preserve"><value>等待特征码</value></data>
   <data name="Placeholder_Info.Title" xml:space="preserve"><value>计划模块</value></data>
   <data name="Placeholder_Info.Message" xml:space="preserve"><value>导航与模块边界已经预留。后续版本可以实现该模块，而无需重构 Trainer Core。</value></data>

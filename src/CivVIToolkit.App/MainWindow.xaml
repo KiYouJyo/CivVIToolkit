@@ -104,25 +104,62 @@
                             <TextBlock x:Name="TrainerStatusText" x:Uid="Trainer_StatusWaiting" Text="Waiting for Civilization VI." Opacity="0.72" TextWrapping="Wrap" />
                         </StackPanel>
 
-                        <InfoBar x:Uid="Trainer_Info" IsOpen="True" IsClosable="False" Severity="Informational" Title="v0.1 Trainer Core" Message="The process, memory and AoB scanning layers are in place. Individual game signatures stay disabled until they are verified against real Steam/Epic DX11/DX12 builds." />
+                        <InfoBar x:Uid="Trainer_Info" IsOpen="True" IsClosable="False" Severity="Informational" Title="v0.2 Trainer Core" Message="The exact Steam/DX12 1023995 profile exposes all 22 single-player trainer actions. Click a row or use its global hotkey; unsupported builds fail closed." />
 
-                        <ListView x:Name="TrainerList" SelectionMode="None" IsItemClickEnabled="False">
+                        <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="10" Padding="12">
+                            <TextBlock x:Name="TrainerOperationStatusText" x:Uid="Trainer_OperationHint" Text="Click a trainer row or use its global hotkey." Opacity="0.72" TextWrapping="Wrap" />
+                        </Border>
+
+                        <ListView x:Name="TrainerList" SelectionMode="None" IsItemClickEnabled="True" ItemClick="TrainerList_ItemClick">
                             <ListView.ItemTemplate>
                                 <DataTemplate x:DataType="localization:LocalizedTrainerFeature">
-                                    <Grid Padding="4,8" ColumnSpacing="14">
+                                    <Grid Padding="4,8" ColumnSpacing="12">
                                         <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="120" />
+                                            <ColumnDefinition Width="136" />
                                             <ColumnDefinition Width="*" />
-                                            <ColumnDefinition Width="150" />
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="160" />
                                         </Grid.ColumnDefinitions>
-                                        <Border Background="{ThemeResource ControlFillColorDefaultBrush}" CornerRadius="6" Padding="8,4" HorizontalAlignment="Left">
-                                            <TextBlock Text="{x:Bind Shortcut}" FontFamily="Cascadia Mono" />
+                                        <Border
+                                            Width="118"
+                                            Height="36"
+                                            Background="{ThemeResource ControlFillColorDefaultBrush}"
+                                            CornerRadius="6"
+                                            HorizontalAlignment="Left"
+                                            VerticalAlignment="Center">
+                                            <TextBlock
+                                                Text="{x:Bind Shortcut}"
+                                                FontFamily="Cascadia Mono"
+                                                HorizontalAlignment="Center"
+                                                VerticalAlignment="Center" />
                                         </Border>
-                                        <StackPanel Grid.Column="1" Spacing="2">
+                                        <StackPanel Grid.Column="1" Spacing="2" VerticalAlignment="Center">
                                             <TextBlock Text="{x:Bind DisplayName}" FontWeight="SemiBold" />
                                             <TextBlock Text="{x:Bind Group}" Opacity="0.62" FontSize="12" />
                                         </StackPanel>
-                                        <TextBlock x:Uid="Trainer_SignaturePending" Grid.Column="2" Text="Signature pending" Opacity="0.62" HorizontalAlignment="Right" VerticalAlignment="Center" />
+                                        <NumberBox
+                                            Grid.Column="2"
+                                            Width="132"
+                                            Margin="4,0"
+                                            HorizontalAlignment="Right"
+                                            VerticalAlignment="Center"
+                                            Minimum="1"
+                                            Maximum="8000000"
+                                            SmallChange="100"
+                                            LargeChange="1000"
+                                            SpinButtonPlacementMode="Compact"
+                                            Visibility="{x:Bind ActionEditorVisibility}"
+                                            Value="{x:Bind ActionValue, Mode=OneTime}"
+                                            Tag="{x:Bind Id}"
+                                            ValueChanged="TrainerValueInput_ValueChanged"
+                                            Tapped="TrainerValueInput_Tapped" />
+                                        <TextBlock
+                                            Grid.Column="3"
+                                            Text="{x:Bind Status}"
+                                            Opacity="0.72"
+                                            HorizontalAlignment="Right"
+                                            VerticalAlignment="Center"
+                                            TextWrapping="Wrap" />
                                     </Grid>
                                 </DataTemplate>
                             </ListView.ItemTemplate>
