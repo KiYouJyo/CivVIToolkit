@@ -17,6 +17,18 @@
 - Signed Acceptance 从“解压后直接运行的 self-contained WinUI 3 目录”迁移为签名 MSIX。
 - Release 结构对齐 UrbanPlanToolbox：版本元数据、签名产物、one-click 包、SHA-256、三语说明和幂等 Release reconciliation。
 
+## [0.3.3] - 2026-08-18
+
+### Fixed
+- 继续修复主修改器与紧凑修改器中原生 `ToggleSwitch` 默认模板横向溢出、压到快捷键区域的问题。
+- 紧凑修改器改为两层行布局，将功能名/状态与快捷键/操作控件分离，避免高 DPI 下横向竞争。
+- 紧凑窗口逻辑宽度提升到 580 DIP，并继续根据 `RasterizationScale` 换算物理像素。
+- 金钱与影响力 NumberBox 使用独立操作区域，不再与开关或快捷键共享占位。
+
+### Changed
+- 为 Trainer 使用的原生 ToggleSwitch 设置明确的 52 DIP 布局占位，同时保留 WinUI 视觉模板和交互状态。
+- 保持 v0.3.2 的 Trainer 自动重试、实时语言切换、精确 Profile 和 fail-closed 写入保护。
+
 ## [0.3.2] - 2026-08-18
 
 ### Fixed
