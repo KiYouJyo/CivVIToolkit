@@ -19,6 +19,8 @@ public sealed record LocalizedTrainerFeature(
     bool IsEnabled,
     TrainerAvailability Availability)
 {
+    public Visibility ToggleVisibility => Kind == TrainerFeatureKind.Toggle ? Visibility.Visible : Visibility.Collapsed;
+
     public static LocalizedTrainerFeature From(
         TrainerFeatureDefinition definition,
         ILocalizationService localization,
