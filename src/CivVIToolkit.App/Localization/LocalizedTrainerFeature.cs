@@ -1,4 +1,5 @@
 using CivVIToolkit.Core.Trainer;
+using Microsoft.UI.Xaml;
 
 namespace CivVIToolkit.App.Localization;
 
@@ -11,9 +12,19 @@ public sealed record LocalizedTrainerFeature(
     string DefaultValueText,
     TrainerFeatureKind Kind,
     long? DefaultValue,
-    string? Notes)
+    double ActionValue,
+    Visibility ActionEditorVisibility,
+    string? Notes,
+    string Status,
+    bool IsEnabled,
+    TrainerAvailability Availability)
 {
-    public static LocalizedTrainerFeature From(TrainerFeatureDefinition definition, ILocalizationService localization)
+    public static LocalizedTrainerFeature From(
+        TrainerFeatureDefinition definition,
+        ILocalizationService localization,
+        TrainerFeatureState? state = null,
+        string? status = null,
+        long? configuredActionValue = null)
     {
         ArgumentNullException.ThrowIfNull(definition);
         ArgumentNullException.ThrowIfNull(localization);
@@ -31,7 +42,9 @@ public sealed record LocalizedTrainerFeature(
         var group = string.IsNullOrEmpty(groupKey) ? definition.Group : localization.GetString(groupKey);
         var scope = definition.Id.StartsWith("ai.", StringComparison.Ordinal)
             ? localization.GetString("TrainerGroup_AI")
-            : localization.GetString("TrainerGroup_Player");
+            : definition.Id.StartsWith("combat.", StringComparison.Ordinal)
+                ? localization.GetString("TrainerGroup_Combat")
+                : localization.GetString("TrainerGroup_Player");
         var featureKey = "TrainerFeature_" + definition.Id.Replace('.', '_').Replace('-', '_');
         var displayName = localization.GetString(featureKey);
         if (displayName.StartsWith('!') && displayName.EndsWith('!'))
@@ -39,15 +52,24 @@ public sealed record LocalizedTrainerFeature(
             displayName = definition.DisplayName;
         }
 
+        var availability = state?.Availability ?? TrainerAvailability.SignaturePending;
+        var isValueAction = definition.Kind == TrainerFeatureKind.ValueAction;
+        var actionValue = configuredActionValue ?? definition.DefaultValue ?? 1;
+
         return new LocalizedTrainerFeature(
             definition.Id,
             group,
             scope,
             displayName,
             definition.Shortcut,
-            definition.DefaultValue?.ToString() ?? string.Empty,
+            isValueAction ? actionValue.ToString() : string.Empty,
             definition.Kind,
             definition.DefaultValue,
-            definition.Notes);
+            actionValue,
+            isValueAction ? Visibility.Visible : Visibility.Collapsed,
+            definition.Notes,
+            status ?? state?.StatusMessage ?? string.Empty,
+            state?.IsEnabled ?? false,
+            availability);
     }
 }
