@@ -22,6 +22,7 @@ public sealed partial class CompactTrainerWindow : Window
         Action<string, long> setActionValue)
     {
         InitializeComponent();
+        CompactTrainerList.ItemTemplate = TrainerTemplateFactory.CreateCompactTemplate();
         Title = "CivVIToolkit · Trainer";
         ExtendsContentIntoTitleBar = true;
         SetTitleBar(CompactTitleBar);
@@ -29,7 +30,8 @@ public sealed partial class CompactTrainerWindow : Window
         _setActionValue = setActionValue ?? throw new ArgumentNullException(nameof(setActionValue));
 
         CompactRoot.Loaded += CompactRoot_Loaded;
-        UpdateFeatures(features);
+        _features = features ?? throw new ArgumentNullException(nameof(features));
+        CompactTrainerList.ItemsSource = _features;
         ApplyLocalization(_localization);
 
         if (AppWindow.Presenter is OverlappedPresenter presenter)
@@ -42,24 +44,15 @@ public sealed partial class CompactTrainerWindow : Window
 
     private void CompactRoot_Loaded(object sender, RoutedEventArgs e)
     {
-        // AppWindow.Resize consumes physical pixels while XAML measures in DIPs.
-        // Reserve a stable logical width, then translate it with RasterizationScale.
-        // The extra width is intentional: shortcut and action controls must never
-        // share the same visual footprint at 150%/200% Windows scaling.
         var scale = CompactRoot.XamlRoot?.RasterizationScale ?? 1.0;
-        const double logicalWidth = 580;
-        const double logicalHeight = 700;
+        const double logicalWidth = 620;
+        const double logicalHeight = 720;
         AppWindow.Resize(new SizeInt32(
             Math.Max(1, (int)Math.Round(logicalWidth * scale)),
             Math.Max(1, (int)Math.Round(logicalHeight * scale))));
     }
 
-    public void UpdateFeatures(IReadOnlyList<LocalizedTrainerFeature> features)
-    {
-        _features = features.ToList();
-        CompactTrainerList.ItemsSource = _features;
-        UpdateStatusText();
-    }
+    public void RefreshStatus() => UpdateStatusText();
 
     public void ApplyLocalization(LocalizationService localization)
     {
