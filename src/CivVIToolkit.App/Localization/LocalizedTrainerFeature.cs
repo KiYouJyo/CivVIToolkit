@@ -58,7 +58,7 @@ public sealed record LocalizedTrainerFeature(
         var isValueAction = definition.Kind == TrainerFeatureKind.ValueAction;
         var actionValue = configuredActionValue ?? definition.DefaultValue ?? 1;
         var resolvedStatus = IsTransientMatchReadinessFailure(state)
-            ? localization.GetString("Trainer_StateWaitingMatch")
+            ? localization.GetString("Trainer_StatusWaiting.Text")
             : status ?? state?.StatusMessage ?? string.Empty;
 
         return new LocalizedTrainerFeature(
