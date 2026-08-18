@@ -17,6 +17,21 @@
 - Signed Acceptance 从“解压后直接运行的 self-contained WinUI 3 目录”迁移为签名 MSIX。
 - Release 结构对齐 UrbanPlanToolbox：版本元数据、签名产物、one-click 包、SHA-256、三语说明和幂等 Release reconciliation。
 
+## [0.3.0] - 2026-08-18
+
+### Added
+- 按 Figma v2 设计重建的浅色 WinUI 3 主界面、48 px 自定义标题栏与 220 px 可折叠侧栏。
+- 首页中的 Steam / Epic、DX11 / DX12、PID、版本、路径、重新扫描与快捷启动接线。
+- 第一版 22 项修改器的四类自动分组、分类切换与搜索。
+- 仅包含 22 项修改器入口的置顶紧凑窗口。
+- 独立的“预设与诊断”和“设置与关于”页面。
+
+### Changed
+- 导航按最新 Figma 收束为：首页、修改器、存档管理、Mod 管理、百科，以及底部固定的预设与诊断、设置与关于。
+- 存档管理、Mod 管理、百科保持为空入口，不展示尚未实现的模拟数据。
+- Trainer 未通过运行时签名验收前继续保持只读 / 禁用写入。
+- 应用、MSIX 与 Release Contract 统一为 0.3.0 / 0.3.0.0。
+
 ## [0.1.0] - 2026-08-17
 
 ### Added
