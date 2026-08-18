@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using CivVIToolkit.Core.Trainer;
@@ -113,7 +114,7 @@ public sealed class LocalizedTrainerFeature : INotifyPropertyChanged
         Shortcut = definition.Shortcut;
         Notes = definition.Notes;
         var apply = localization.GetString("Trainer_ApplyButton.Content");
-        ApplyLabel = apply.StartsWith('!') && apply.EndsWith('!') ? "Apply" : apply;
+        ApplyLabel = apply.StartsWith('!') && apply.EndsWith('!') ? ResolveFallbackApplyLabel() : apply;
 
         Availability = state?.Availability ?? TrainerAvailability.SignaturePending;
         IsEnabled = state?.IsEnabled ?? false;
@@ -143,6 +144,14 @@ public sealed class LocalizedTrainerFeature : INotifyPropertyChanged
         var item = new LocalizedTrainerFeature(definition);
         item.UpdateFrom(definition, localization, state, status, configuredActionValue);
         return item;
+    }
+
+    private static string ResolveFallbackApplyLabel()
+    {
+        var language = CultureInfo.CurrentUICulture.Name;
+        if (language.StartsWith("ja", StringComparison.OrdinalIgnoreCase)) return "適用";
+        if (language.StartsWith("zh", StringComparison.OrdinalIgnoreCase)) return "应用";
+        return "Apply";
     }
 
     private static bool IsTransientMatchReadinessFailure(TrainerFeatureState? state) =>
