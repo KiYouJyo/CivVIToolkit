@@ -4,161 +4,391 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:localization="using:CivVIToolkit.App.Localization">
 
-    <NavigationView
-        x:Name="RootNavigation"
-        x:Uid="Navigation_Root"
-        PaneTitle="Civ VI Toolkit"
-        IsBackButtonVisible="Collapsed"
-        IsSettingsVisible="False"
-        SelectionChanged="RootNavigation_SelectionChanged">
+    <Grid x:Name="RootShell" RequestedTheme="Dark" Background="#0A0F14">
+        <Grid.Resources>
+            <SolidColorBrush x:Key="ShellSurfaceBrush" Color="#0D141B" />
+            <SolidColorBrush x:Key="ShellCardBrush" Color="#111A22" />
+            <SolidColorBrush x:Key="ShellCardHoverBrush" Color="#16222C" />
+            <SolidColorBrush x:Key="ShellStrokeBrush" Color="#20303C" />
+            <SolidColorBrush x:Key="ShellTextBrush" Color="#EDF4F7" />
+            <SolidColorBrush x:Key="ShellSecondaryTextBrush" Color="#91A0AD" />
+            <SolidColorBrush x:Key="ShellAccentBrush" Color="#67C6CF" />
+            <SolidColorBrush x:Key="ShellAccentSubtleBrush" Color="#18343B" />
 
-        <NavigationView.MenuItems>
-            <NavigationViewItem x:Uid="Navigation_Overview" Content="Overview" Tag="overview">
-                <NavigationViewItem.Icon><SymbolIcon Symbol="Home" /></NavigationViewItem.Icon>
-            </NavigationViewItem>
-            <NavigationViewItem x:Uid="Navigation_Trainer" Content="Trainer" Tag="trainer">
-                <NavigationViewItem.Icon><SymbolIcon Symbol="Play" /></NavigationViewItem.Icon>
-            </NavigationViewItem>
-            <NavigationViewItemSeparator />
-            <NavigationViewItem x:Uid="Navigation_Saves" Content="Save Manager" Tag="saves" />
-            <NavigationViewItem x:Uid="Navigation_Maps" Content="Maps &amp; Game Info" Tag="maps" />
-            <NavigationViewItem x:Uid="Navigation_Mods" Content="Mod Manager" Tag="mods" />
-            <NavigationViewItem x:Uid="Navigation_Launcher" Content="Quick Launch" Tag="launcher" />
-        </NavigationView.MenuItems>
+            <Style x:Key="NavButtonStyle" TargetType="Button">
+                <Setter Property="Height" Value="44" />
+                <Setter Property="HorizontalAlignment" Value="Stretch" />
+                <Setter Property="HorizontalContentAlignment" Value="Left" />
+                <Setter Property="Background" Value="Transparent" />
+                <Setter Property="Foreground" Value="{StaticResource ShellTextBrush}" />
+                <Setter Property="BorderThickness" Value="0" />
+                <Setter Property="CornerRadius" Value="8" />
+                <Setter Property="Padding" Value="12,0" />
+            </Style>
 
-        <NavigationView.FooterMenuItems>
-            <NavigationViewItem x:Uid="Navigation_Settings" Content="Settings" Tag="settings">
-                <NavigationViewItem.Icon><SymbolIcon Symbol="Setting" /></NavigationViewItem.Icon>
-            </NavigationViewItem>
-        </NavigationView.FooterMenuItems>
+            <Style x:Key="CardStyle" TargetType="Border">
+                <Setter Property="Background" Value="{StaticResource ShellCardBrush}" />
+                <Setter Property="BorderBrush" Value="{StaticResource ShellStrokeBrush}" />
+                <Setter Property="BorderThickness" Value="1" />
+                <Setter Property="CornerRadius" Value="12" />
+                <Setter Property="Padding" Value="18" />
+            </Style>
 
-        <NavigationView.Content>
-            <Grid Padding="28">
-                <ScrollViewer x:Name="OverviewPanel">
-                    <StackPanel Spacing="18" MaxWidth="980" HorizontalAlignment="Left">
-                        <StackPanel Spacing="4">
-                            <TextBlock x:Uid="Overview_Title" Text="Civ VI Toolkit" Style="{StaticResource TitleTextBlockStyle}" />
-                            <TextBlock x:Uid="Overview_Subtitle" Text="A modular Civilization VI companion for detection, single-player trainer features, saves, mods and launch workflows." Opacity="0.72" TextWrapping="Wrap" />
+            <Style x:Key="SectionTitleStyle" TargetType="TextBlock">
+                <Setter Property="FontSize" Value="28" />
+                <Setter Property="FontWeight" Value="SemiBold" />
+                <Setter Property="Foreground" Value="{StaticResource ShellTextBrush}" />
+            </Style>
+
+            <Style x:Key="SecondaryTextStyle" TargetType="TextBlock">
+                <Setter Property="Foreground" Value="{StaticResource ShellSecondaryTextBrush}" />
+                <Setter Property="TextWrapping" Value="Wrap" />
+            </Style>
+        </Grid.Resources>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition x:Name="SidebarColumn" Width="236" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="48" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Border Grid.RowSpan="2" Grid.Column="0" Background="{StaticResource ShellSurfaceBrush}" BorderBrush="{StaticResource ShellStrokeBrush}" BorderThickness="0,0,1,0" />
+
+        <!-- Sidebar header / hamburger -->
+        <Grid Grid.Row="0" Grid.Column="0" Padding="8,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="44" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Button x:Name="SidebarToggleButton" Width="40" Height="40" Background="Transparent" BorderThickness="0" CornerRadius="8" Click="SidebarToggleButton_Click" ToolTipService.ToolTip="折叠导航">
+                <FontIcon Glyph="&#xE700;" FontSize="16" />
+            </Button>
+            <StackPanel x:Name="SidebarBrandPanel" Grid.Column="1" VerticalAlignment="Center" Margin="8,0,0,0">
+                <TextBlock Text="Civ VI Toolkit" FontSize="15" FontWeight="SemiBold" Foreground="{StaticResource ShellTextBrush}" />
+            </StackPanel>
+        </Grid>
+
+        <!-- Drag region / window title -->
+        <Grid x:Name="TitleBarDragRegion" Grid.Row="0" Grid.Column="1" Background="Transparent" Padding="18,0,150,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <TextBlock x:Name="CurrentPageTitleText" Text="首页" VerticalAlignment="Center" FontSize="13" Foreground="{StaticResource ShellSecondaryTextBrush}" />
+            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                <Ellipse x:Name="TitleStatusDot" Width="7" Height="7" Fill="{StaticResource ShellAccentBrush}" Opacity="0.35" />
+                <TextBlock x:Name="TitleStatusText" Text="未连接游戏" FontSize="12" Foreground="{StaticResource ShellSecondaryTextBrush}" />
+            </StackPanel>
+        </Grid>
+
+        <!-- Sidebar navigation -->
+        <Grid Grid.Row="1" Grid.Column="0" Padding="8,10,8,12">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <StackPanel Spacing="4">
+                <Button x:Name="HomeNavButton" Tag="overview" Style="{StaticResource NavButtonStyle}" Click="NavigationButton_Click" Opacity="1">
+                    <StackPanel Orientation="Horizontal" Spacing="12">
+                        <FontIcon Glyph="&#xE80F;" FontSize="16" />
+                        <TextBlock x:Name="HomeNavLabel" Text="首页" VerticalAlignment="Center" />
+                    </StackPanel>
+                </Button>
+                <Button x:Name="TrainerNavButton" Tag="trainer" Style="{StaticResource NavButtonStyle}" Click="NavigationButton_Click" Opacity="0.68">
+                    <StackPanel Orientation="Horizontal" Spacing="12">
+                        <FontIcon Glyph="&#xE768;" FontSize="16" />
+                        <TextBlock x:Name="TrainerNavLabel" Text="修改器" VerticalAlignment="Center" />
+                    </StackPanel>
+                </Button>
+                <Button x:Name="LauncherNavButton" Tag="launcher" Style="{StaticResource NavButtonStyle}" Click="NavigationButton_Click" Opacity="0.68">
+                    <StackPanel Orientation="Horizontal" Spacing="12">
+                        <FontIcon Glyph="&#xE7E8;" FontSize="16" />
+                        <TextBlock x:Name="LauncherNavLabel" Text="快捷启动" VerticalAlignment="Center" />
+                    </StackPanel>
+                </Button>
+                <Button x:Name="SavesNavButton" Tag="saves" Style="{StaticResource NavButtonStyle}" Click="NavigationButton_Click" Opacity="0.68">
+                    <StackPanel Orientation="Horizontal" Spacing="12">
+                        <FontIcon Glyph="&#xE74E;" FontSize="16" />
+                        <TextBlock x:Name="SavesNavLabel" Text="存档管理" VerticalAlignment="Center" />
+                    </StackPanel>
+                </Button>
+                <Button x:Name="ModsNavButton" Tag="mods" Style="{StaticResource NavButtonStyle}" Click="NavigationButton_Click" Opacity="0.68">
+                    <StackPanel Orientation="Horizontal" Spacing="12">
+                        <FontIcon Glyph="&#xE71B;" FontSize="16" />
+                        <TextBlock x:Name="ModsNavLabel" Text="Mod 管理" VerticalAlignment="Center" />
+                    </StackPanel>
+                </Button>
+                <Button x:Name="EncyclopediaNavButton" Tag="encyclopedia" Style="{StaticResource NavButtonStyle}" Click="NavigationButton_Click" Opacity="0.68">
+                    <StackPanel Orientation="Horizontal" Spacing="12">
+                        <FontIcon Glyph="&#xE82D;" FontSize="16" />
+                        <TextBlock x:Name="EncyclopediaNavLabel" Text="百科" VerticalAlignment="Center" />
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+
+            <StackPanel Grid.Row="2" Spacing="4">
+                <Button x:Name="DiagnosticsNavButton" Tag="diagnostics" Style="{StaticResource NavButtonStyle}" Click="NavigationButton_Click" Opacity="0.68">
+                    <StackPanel Orientation="Horizontal" Spacing="12">
+                        <FontIcon Glyph="&#xE9D9;" FontSize="16" />
+                        <TextBlock x:Name="DiagnosticsNavLabel" Text="诊断" VerticalAlignment="Center" />
+                    </StackPanel>
+                </Button>
+                <Button x:Name="SettingsNavButton" Tag="settings" Style="{StaticResource NavButtonStyle}" Click="NavigationButton_Click" Opacity="0.68">
+                    <StackPanel Orientation="Horizontal" Spacing="12">
+                        <FontIcon Glyph="&#xE713;" FontSize="16" />
+                        <TextBlock x:Name="SettingsNavLabel" Text="设置" VerticalAlignment="Center" />
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+        </Grid>
+
+        <!-- Main content -->
+        <Grid Grid.Row="1" Grid.Column="1" Padding="28,22,28,28">
+            <!-- HOME -->
+            <ScrollViewer x:Name="OverviewPanel">
+                <StackPanel Spacing="18" MaxWidth="1180" HorizontalAlignment="Stretch">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Spacing="5">
+                            <TextBlock Text="首页" Style="{StaticResource SectionTitleStyle}" />
+                            <TextBlock Text="游戏状态、平台与运行环境一览" Style="{StaticResource SecondaryTextStyle}" />
                         </StackPanel>
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                            <Button x:Name="DiagnosticsButton" Content="复制诊断" Click="DiagnosticsButton_Click" IsEnabled="False" />
+                            <Button x:Name="RefreshButton" Content="刷新" Click="RefreshButton_Click" />
+                        </StackPanel>
+                    </Grid>
 
-                        <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="12" Padding="18">
-                            <Grid>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto" />
-                                    <RowDefinition Height="Auto" />
-                                    <RowDefinition Height="Auto" />
-                                    <RowDefinition Height="Auto" />
-                                </Grid.RowDefinitions>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
-
-                                <StackPanel Spacing="4">
-                                    <TextBlock x:Name="StatusTitleText" x:Uid="Overview_StatusScanning" Text="Scanning for Civilization VI…" Style="{StaticResource SubtitleTextBlockStyle}" />
-                                    <TextBlock x:Name="StatusBadgeText" x:Uid="Overview_StatusDetecting" Text="Detecting Steam / Epic Games and DX11 / DX12" Opacity="0.72" />
-                                </StackPanel>
-                                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Top">
-                                    <Button x:Name="DiagnosticsButton" x:Uid="Overview_CopyDiagnostics" Content="Copy diagnostics" Click="DiagnosticsButton_Click" IsEnabled="False" />
-                                    <Button x:Name="RefreshButton" x:Uid="Common_Refresh" Content="Refresh" Click="RefreshButton_Click" />
-                                </StackPanel>
-
-                                <TextBlock x:Name="DetectionDetailsText" Grid.Row="1" Grid.ColumnSpan="2" Margin="0,14,0,0" TextWrapping="Wrap" />
-                                <TextBlock x:Name="InstallationsText" Grid.Row="2" Grid.ColumnSpan="2" Margin="0,10,0,0" Opacity="0.66" TextWrapping="Wrap" />
-                                <TextBlock x:Name="DiagnosticsStatusText" Grid.Row="3" Grid.ColumnSpan="2" Margin="0,8,0,0" Opacity="0.66" TextWrapping="Wrap" />
-                            </Grid>
-                        </Border>
-
-                        <Grid ColumnSpacing="14">
+                    <Border Style="{StaticResource CardStyle}" Padding="22">
+                        <Grid ColumnSpacing="18">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
-                            <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="12" Padding="16">
-                                <StackPanel Spacing="5">
-                                    <TextBlock x:Uid="Overview_StoreAwareTitle" Text="Store-aware" FontWeight="SemiBold" />
-                                    <TextBlock x:Uid="Overview_StoreAwareDescription" Text="Reads Steam library metadata and Epic launcher manifests instead of relying on a fixed install path." Opacity="0.7" TextWrapping="Wrap" />
+                            <StackPanel Spacing="8">
+                                <StackPanel Orientation="Horizontal" Spacing="9">
+                                    <Ellipse x:Name="OverviewStatusDot" Width="9" Height="9" Fill="{StaticResource ShellAccentBrush}" Opacity="0.35" VerticalAlignment="Center" />
+                                    <TextBlock x:Name="StatusTitleText" Text="正在检测 Civilization VI…" FontSize="19" FontWeight="SemiBold" Foreground="{StaticResource ShellTextBrush}" />
                                 </StackPanel>
-                            </Border>
-                            <Border Grid.Column="1" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="12" Padding="16">
-                                <StackPanel Spacing="5">
-                                    <TextBlock x:Uid="Overview_RendererAwareTitle" Text="Renderer-aware" FontWeight="SemiBold" />
-                                    <TextBlock x:Uid="Overview_RendererAwareDescription" Text="Identifies CivilizationVI.exe as DX11 and CivilizationVI_DX12.exe as DX12 at runtime." Opacity="0.7" TextWrapping="Wrap" />
-                                </StackPanel>
-                            </Border>
-                            <Border Grid.Column="2" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="12" Padding="16">
-                                <StackPanel Spacing="5">
-                                    <TextBlock x:Uid="Overview_ModuleReadyTitle" Text="Module-ready" FontWeight="SemiBold" />
-                                    <TextBlock x:Uid="Overview_ModuleReadyDescription" Text="Trainer, saves, maps, mods and launcher are separated so the toolkit can grow without coupling everything to memory editing." Opacity="0.7" TextWrapping="Wrap" />
-                                </StackPanel>
+                                <TextBlock x:Name="StatusBadgeText" Text="Steam / Epic · DX11 / DX12" Foreground="{StaticResource ShellAccentBrush}" />
+                                <TextBlock x:Name="DetectionDetailsText" Style="{StaticResource SecondaryTextStyle}" />
+                            </StackPanel>
+                            <Border Grid.Column="1" Background="{StaticResource ShellAccentSubtleBrush}" CornerRadius="9" Padding="14,9" VerticalAlignment="Top">
+                                <TextBlock Text="自动识别" Foreground="{StaticResource ShellAccentBrush}" FontWeight="SemiBold" />
                             </Border>
                         </Grid>
-                    </StackPanel>
-                </ScrollViewer>
+                    </Border>
 
-                <ScrollViewer x:Name="TrainerPanel" Visibility="Collapsed">
-                    <StackPanel Spacing="16" MaxWidth="980" HorizontalAlignment="Left">
-                        <StackPanel Spacing="4">
-                            <TextBlock x:Uid="Trainer_Title" Text="Single-player Trainer" Style="{StaticResource TitleTextBlockStyle}" />
-                            <TextBlock x:Name="TrainerStatusText" x:Uid="Trainer_StatusWaiting" Text="Waiting for Civilization VI." Opacity="0.72" TextWrapping="Wrap" />
+                    <Grid ColumnSpacing="12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Border Style="{StaticResource CardStyle}" Padding="16">
+                            <StackPanel Spacing="7">
+                                <TextBlock Text="平台" Style="{StaticResource SecondaryTextStyle}" FontSize="12" />
+                                <TextBlock x:Name="OverviewStoreText" Text="—" FontSize="19" FontWeight="SemiBold" Foreground="{StaticResource ShellTextBrush}" />
+                            </StackPanel>
+                        </Border>
+                        <Border Grid.Column="1" Style="{StaticResource CardStyle}" Padding="16">
+                            <StackPanel Spacing="7">
+                                <TextBlock Text="渲染器" Style="{StaticResource SecondaryTextStyle}" FontSize="12" />
+                                <TextBlock x:Name="OverviewRendererText" Text="—" FontSize="19" FontWeight="SemiBold" Foreground="{StaticResource ShellTextBrush}" />
+                            </StackPanel>
+                        </Border>
+                        <Border Grid.Column="2" Style="{StaticResource CardStyle}" Padding="16">
+                            <StackPanel Spacing="7">
+                                <TextBlock Text="版本" Style="{StaticResource SecondaryTextStyle}" FontSize="12" />
+                                <TextBlock x:Name="OverviewVersionText" Text="—" FontSize="19" FontWeight="SemiBold" Foreground="{StaticResource ShellTextBrush}" TextTrimming="CharacterEllipsis" />
+                            </StackPanel>
+                        </Border>
+                        <Border Grid.Column="3" Style="{StaticResource CardStyle}" Padding="16">
+                            <StackPanel Spacing="7">
+                                <TextBlock Text="进程" Style="{StaticResource SecondaryTextStyle}" FontSize="12" />
+                                <TextBlock x:Name="OverviewProcessText" Text="—" FontSize="19" FontWeight="SemiBold" Foreground="{StaticResource ShellTextBrush}" />
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+
+                    <Border Style="{StaticResource CardStyle}">
+                        <StackPanel Spacing="10">
+                            <TextBlock Text="检测到的游戏安装" FontSize="16" FontWeight="SemiBold" Foreground="{StaticResource ShellTextBrush}" />
+                            <TextBlock x:Name="InstallationsText" Style="{StaticResource SecondaryTextStyle}" />
+                            <TextBlock x:Name="DiagnosticsStatusText" Foreground="{StaticResource ShellAccentBrush}" TextWrapping="Wrap" />
                         </StackPanel>
+                    </Border>
+                </StackPanel>
+            </ScrollViewer>
 
-                        <InfoBar x:Uid="Trainer_Info" IsOpen="True" IsClosable="False" Severity="Informational" Title="v0.1 Trainer Core" Message="The process, memory and AoB scanning layers are in place. Individual game signatures stay disabled until they are verified against real Steam/Epic DX11/DX12 builds." />
+            <!-- TRAINER -->
+            <ScrollViewer x:Name="TrainerPanel" Visibility="Collapsed">
+                <StackPanel Spacing="16" MaxWidth="1180" HorizontalAlignment="Stretch">
+                    <StackPanel Spacing="5">
+                        <TextBlock Text="修改器" Style="{StaticResource SectionTitleStyle}" />
+                        <TextBlock x:Name="TrainerStatusText" Text="等待 Civilization VI。" Style="{StaticResource SecondaryTextStyle}" />
+                    </StackPanel>
 
-                        <ListView x:Name="TrainerList" SelectionMode="None" IsItemClickEnabled="False">
+                    <InfoBar IsOpen="True" IsClosable="False" Severity="Informational" Title="22 项修改器框架已接入" Message="当前游戏版本尚未完成内存签名验证，因此功能保持禁用。界面、快捷键定义和运行时识别已接线，不会使用猜测地址写入游戏进程。" />
+
+                    <Border Style="{StaticResource CardStyle}" Padding="8">
+                        <ListView x:Name="TrainerList" SelectionMode="None" IsItemClickEnabled="False" Background="Transparent">
+                            <ListView.ItemContainerStyle>
+                                <Style TargetType="ListViewItem">
+                                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                                    <Setter Property="Padding" Value="0" />
+                                    <Setter Property="Margin" Value="0,2" />
+                                    <Setter Property="CornerRadius" Value="8" />
+                                </Style>
+                            </ListView.ItemContainerStyle>
                             <ListView.ItemTemplate>
                                 <DataTemplate x:DataType="localization:LocalizedTrainerFeature">
-                                    <Grid Padding="4,8" ColumnSpacing="14">
+                                    <Grid Padding="12,10" ColumnSpacing="14">
                                         <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="120" />
+                                            <ColumnDefinition Width="108" />
                                             <ColumnDefinition Width="*" />
                                             <ColumnDefinition Width="150" />
+                                            <ColumnDefinition Width="Auto" />
                                         </Grid.ColumnDefinitions>
-                                        <Border Background="{ThemeResource ControlFillColorDefaultBrush}" CornerRadius="6" Padding="8,4" HorizontalAlignment="Left">
-                                            <TextBlock Text="{x:Bind Shortcut}" FontFamily="Cascadia Mono" />
+                                        <Border Background="#17212A" BorderBrush="{StaticResource ShellStrokeBrush}" BorderThickness="1" CornerRadius="7" Padding="8,5" HorizontalAlignment="Left" VerticalAlignment="Center">
+                                            <TextBlock Text="{x:Bind Shortcut}" FontFamily="Cascadia Mono" FontSize="12" Foreground="{StaticResource ShellAccentBrush}" />
                                         </Border>
-                                        <StackPanel Grid.Column="1" Spacing="2">
-                                            <TextBlock Text="{x:Bind DisplayName}" FontWeight="SemiBold" />
-                                            <TextBlock Text="{x:Bind Group}" Opacity="0.62" FontSize="12" />
+                                        <StackPanel Grid.Column="1" Spacing="2" VerticalAlignment="Center">
+                                            <TextBlock Text="{x:Bind DisplayName}" FontWeight="SemiBold" Foreground="{StaticResource ShellTextBrush}" />
+                                            <TextBlock Text="{x:Bind Group}" Foreground="{StaticResource ShellSecondaryTextBrush}" FontSize="12" />
                                         </StackPanel>
-                                        <TextBlock x:Uid="Trainer_SignaturePending" Grid.Column="2" Text="Signature pending" Opacity="0.62" HorizontalAlignment="Right" VerticalAlignment="Center" />
+                                        <TextBlock Grid.Column="2" Text="等待签名" Foreground="{StaticResource ShellSecondaryTextBrush}" HorizontalAlignment="Right" VerticalAlignment="Center" />
+                                        <ToggleSwitch Grid.Column="3" IsEnabled="False" OffContent="" OnContent="" VerticalAlignment="Center" />
                                     </Grid>
                                 </DataTemplate>
                             </ListView.ItemTemplate>
                         </ListView>
-                    </StackPanel>
-                </ScrollViewer>
+                    </Border>
+                </StackPanel>
+            </ScrollViewer>
 
-                <ScrollViewer x:Name="SettingsPanel" Visibility="Collapsed">
-                    <StackPanel Spacing="18" MaxWidth="760" HorizontalAlignment="Left">
-                        <StackPanel Spacing="4">
-                            <TextBlock x:Uid="Settings_Title" Text="Settings" Style="{StaticResource TitleTextBlockStyle}" />
-                            <TextBlock x:Uid="Settings_Description" Text="Configure local CivVIToolkit behavior." Opacity="0.72" TextWrapping="Wrap" />
-                        </StackPanel>
-                        <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="12" Padding="18">
-                            <Grid ColumnSpacing="18">
+            <!-- QUICK LAUNCH -->
+            <ScrollViewer x:Name="LauncherPanel" Visibility="Collapsed">
+                <StackPanel Spacing="18" MaxWidth="980" HorizontalAlignment="Stretch">
+                    <StackPanel Spacing="5">
+                        <TextBlock Text="快捷启动" Style="{StaticResource SectionTitleStyle}" />
+                        <TextBlock Text="使用自动检测到的安装直接启动指定渲染器" Style="{StaticResource SecondaryTextStyle}" />
+                    </StackPanel>
+
+                    <Border Style="{StaticResource CardStyle}" Padding="22">
+                        <StackPanel Spacing="14">
+                            <StackPanel Spacing="5">
+                                <TextBlock x:Name="LaunchStoreText" Text="尚未检测到游戏安装" FontSize="18" FontWeight="SemiBold" Foreground="{StaticResource ShellTextBrush}" />
+                                <TextBlock x:Name="LaunchPathText" Text="刷新后将显示安装目录" Style="{StaticResource SecondaryTextStyle}" />
+                            </StackPanel>
+                            <Grid ColumnSpacing="10">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="260" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <Button x:Name="LaunchDx11Button" Content="启动 DirectX 11" Height="52" IsEnabled="False" Click="LaunchDx11Button_Click" />
+                                <Button x:Name="LaunchDx12Button" Grid.Column="1" Content="启动 DirectX 12" Height="52" IsEnabled="False" Click="LaunchDx12Button_Click" />
+                            </Grid>
+                            <TextBlock x:Name="LaunchStatusText" Foreground="{StaticResource ShellAccentBrush}" TextWrapping="Wrap" />
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </ScrollViewer>
+
+            <!-- DIAGNOSTICS -->
+            <ScrollViewer x:Name="DiagnosticsPanel" Visibility="Collapsed">
+                <StackPanel Spacing="18" MaxWidth="980" HorizontalAlignment="Stretch">
+                    <StackPanel Spacing="5">
+                        <TextBlock Text="诊断" Style="{StaticResource SectionTitleStyle}" />
+                        <TextBlock Text="检查当前运行版本，并复制用于签名验证的只读诊断信息" Style="{StaticResource SecondaryTextStyle}" />
+                    </StackPanel>
+                    <Border Style="{StaticResource CardStyle}" Padding="22">
+                        <Grid RowSpacing="12">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+                            <Grid ColumnSpacing="16">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
                                 <StackPanel Spacing="4">
-                                    <TextBlock x:Uid="Settings_LanguageTitle" Text="Language" FontWeight="SemiBold" />
-                                    <TextBlock x:Uid="Settings_LanguageDescription" Text="Choose the interface language." Opacity="0.7" TextWrapping="Wrap" />
+                                    <TextBlock x:Name="DiagnosticsPageStateText" Text="当前没有运行中的 Civilization VI" FontSize="17" FontWeight="SemiBold" Foreground="{StaticResource ShellTextBrush}" />
+                                    <TextBlock Text="诊断不会导出存档、账号凭据或任意进程内存。" Style="{StaticResource SecondaryTextStyle}" />
                                 </StackPanel>
-                                <ComboBox x:Name="LanguageComboBox" Grid.Column="1" DisplayMemberPath="DisplayName" SelectionChanged="LanguageComboBox_SelectionChanged" HorizontalAlignment="Stretch" />
+                                <Button x:Name="DiagnosticsPageCopyButton" Grid.Column="1" Content="复制诊断 JSON" IsEnabled="False" Click="DiagnosticsPageCopyButton_Click" />
                             </Grid>
-                        </Border>
-                        <InfoBar x:Name="LanguageRestartInfoBar" x:Uid="Settings_RestartInfo" IsOpen="False" IsClosable="True" Severity="Informational" Title="Restart required" Message="Restart CivVIToolkit to fully apply the new language." />
-                    </StackPanel>
-                </ScrollViewer>
-
-                <StackPanel x:Name="PlaceholderPanel" Visibility="Collapsed" Spacing="8" MaxWidth="760" HorizontalAlignment="Left" VerticalAlignment="Top">
-                    <TextBlock x:Name="PlaceholderTitleText" Style="{StaticResource TitleTextBlockStyle}" />
-                    <TextBlock x:Name="PlaceholderDescriptionText" Opacity="0.72" TextWrapping="Wrap" />
-                    <InfoBar x:Uid="Placeholder_Info" IsOpen="True" IsClosable="False" Severity="Informational" Title="Planned module" Message="The navigation contract already reserves this module. Implementation will arrive in a later milestone without restructuring the Trainer Core." />
+                            <TextBlock x:Name="DiagnosticsPageDetailsText" Grid.Row="1" FontFamily="Cascadia Mono" FontSize="12" Foreground="{StaticResource ShellSecondaryTextBrush}" TextWrapping="Wrap" />
+                            <TextBlock x:Name="DiagnosticsPageResultText" Grid.Row="2" Foreground="{StaticResource ShellAccentBrush}" TextWrapping="Wrap" />
+                        </Grid>
+                    </Border>
                 </StackPanel>
-            </Grid>
-        </NavigationView.Content>
-    </NavigationView>
+            </ScrollViewer>
+
+            <!-- SETTINGS -->
+            <ScrollViewer x:Name="SettingsPanel" Visibility="Collapsed">
+                <StackPanel Spacing="18" MaxWidth="900" HorizontalAlignment="Stretch">
+                    <StackPanel Spacing="5">
+                        <TextBlock Text="设置" Style="{StaticResource SectionTitleStyle}" />
+                        <TextBlock Text="调整 Civ VI Toolkit 的本地行为" Style="{StaticResource SecondaryTextStyle}" />
+                    </StackPanel>
+                    <Border Style="{StaticResource CardStyle}" Padding="20">
+                        <Grid ColumnSpacing="18">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="280" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Spacing="4">
+                                <TextBlock Text="语言" FontWeight="SemiBold" Foreground="{StaticResource ShellTextBrush}" />
+                                <TextBlock Text="选择界面语言。完整切换将在重启后应用。" Style="{StaticResource SecondaryTextStyle}" />
+                            </StackPanel>
+                            <ComboBox x:Name="LanguageComboBox" Grid.Column="1" DisplayMemberPath="DisplayName" SelectionChanged="LanguageComboBox_SelectionChanged" HorizontalAlignment="Stretch" />
+                        </Grid>
+                    </Border>
+                    <Border Style="{StaticResource CardStyle}" Padding="20">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Spacing="4">
+                                <TextBlock Text="关于" FontWeight="SemiBold" Foreground="{StaticResource ShellTextBrush}" />
+                                <TextBlock Text="Civ VI Toolkit · WinUI 3 / .NET 10" Style="{StaticResource SecondaryTextStyle}" />
+                            </StackPanel>
+                            <TextBlock x:Name="AppVersionText" Grid.Column="1" Text="v0.3.0" Foreground="{StaticResource ShellSecondaryTextBrush}" VerticalAlignment="Center" />
+                        </Grid>
+                    </Border>
+                    <InfoBar x:Name="LanguageRestartInfoBar" IsOpen="False" IsClosable="True" Severity="Informational" Title="需要重启" Message="重启 Civ VI Toolkit 以完整应用新的语言。" />
+                </StackPanel>
+            </ScrollViewer>
+
+            <!-- Intentionally empty future-module entrance -->
+            <ScrollViewer x:Name="PlaceholderPanel" Visibility="Collapsed">
+                <StackPanel Spacing="18" MaxWidth="900" HorizontalAlignment="Stretch">
+                    <StackPanel Spacing="5">
+                        <TextBlock x:Name="PlaceholderTitleText" Text="模块" Style="{StaticResource SectionTitleStyle}" />
+                        <TextBlock x:Name="PlaceholderDescriptionText" Text="入口已保留。" Style="{StaticResource SecondaryTextStyle}" />
+                    </StackPanel>
+                    <Border Style="{StaticResource CardStyle}" Padding="28" MinHeight="220">
+                        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="8">
+                            <FontIcon Glyph="&#xE946;" FontSize="28" Foreground="{StaticResource ShellSecondaryTextBrush}" />
+                            <TextBlock Text="此模块暂不在当前版本实现" FontSize="16" Foreground="{StaticResource ShellTextBrush}" HorizontalAlignment="Center" />
+                            <TextBlock Text="导航与页面结构已经保留，后续可以直接接入功能而无需重做主界面。" Style="{StaticResource SecondaryTextStyle}" TextAlignment="Center" MaxWidth="520" />
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </ScrollViewer>
+        </Grid>
+    </Grid>
 </Window>
