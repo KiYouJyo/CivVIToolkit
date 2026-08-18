@@ -14,6 +14,7 @@ using CivVIToolkit.Platform.Windows.Trainer;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Windows.ApplicationModel.DataTransfer;
 
@@ -43,11 +44,15 @@ public sealed partial class MainWindow : Window
     private readonly AppSettingsService _settingsService = AppSettingsService.Default;
     private readonly DispatcherQueueTimer _processTimer;
     private readonly List<IDisposable> _trainerHotkeyRegistrations = [];
+    private readonly Dictionary<string, long> _trainerActionValues = TrainerCatalog.All
+        .Where(feature => feature.Kind == TrainerFeatureKind.ValueAction)
+        .ToDictionary(feature => feature.Id, feature => feature.DefaultValue ?? 1L, StringComparer.Ordinal);
 
     private IReadOnlyList<GameInstallation> _installations = [];
     private GameSession? _session;
     private AppSettings _settings;
     private Win32HotkeyRegistrationService? _hotkeys;
+    private string? _lastTrainerUiSignature;
     private bool _refreshInProgress;
     private bool _languageInitializing;
     private bool _trainerActionInProgress;
@@ -59,7 +64,7 @@ public sealed partial class MainWindow : Window
         SystemBackdrop = new MicaBackdrop();
 
         _buildProbe = new SteamDx12Build1023995Probe();
-        _trainer = new SteamDx12Build1023995TrainerEngine(_buildProbe);
+        _trainer = new SteamDx12Build1023995StableTrainerEngine(_buildProbe);
         _settings = _settingsService.Load();
         RefreshTrainerList();
         InitializeLanguageOptions();
@@ -238,11 +243,31 @@ public sealed partial class MainWindow : Window
     private void RefreshTrainerList()
     {
         var states = _trainer.Features.ToDictionary(state => state.Definition.Id, StringComparer.Ordinal);
-        TrainerList.ItemsSource = TrainerCatalog.All.Select(feature =>
+        var items = TrainerCatalog.All.Select(feature =>
         {
             states.TryGetValue(feature.Id, out var state);
-            return LocalizedTrainerFeature.From(feature, _localization, state, FormatTrainerState(feature, state));
+            _trainerActionValues.TryGetValue(feature.Id, out var configuredValue);
+            return LocalizedTrainerFeature.From(
+                feature,
+                _localization,
+                state,
+                FormatTrainerState(feature, state),
+                feature.Kind == TrainerFeatureKind.ValueAction ? configuredValue : null);
         }).ToList();
+
+        // The process monitor polls independently from the trainer scheduler. Do
+        // not replace the ListView source when nothing visible changed: recreating
+        // item containers made the shortcut badges visibly jump on every poll.
+        var signature = string.Join(
+            '\u001F',
+            items.Select(item => $"{item.Id}|{item.Status}|{item.IsEnabled}|{item.Availability}"));
+        if (string.Equals(signature, _lastTrainerUiSignature, StringComparison.Ordinal))
+        {
+            return;
+        }
+
+        _lastTrainerUiSignature = signature;
+        TrainerList.ItemsSource = items;
     }
 
     private string FormatTrainerState(TrainerFeatureDefinition feature, TrainerFeatureState? state)
@@ -313,6 +338,23 @@ public sealed partial class MainWindow : Window
         }
     }
 
+    private void TrainerValueInput_ValueChanged(object sender, NumberBoxValueChangedEventArgs e)
+    {
+        if (sender is not NumberBox numberBox || numberBox.Tag is not string featureId || double.IsNaN(numberBox.Value))
+        {
+            return;
+        }
+
+        var normalized = (long)Math.Clamp(Math.Round(numberBox.Value), 1d, 8_000_000d);
+        _trainerActionValues[featureId] = normalized;
+    }
+
+    private void TrainerValueInput_Tapped(object sender, TappedRoutedEventArgs e)
+    {
+        // Editing a value should never activate the surrounding ListView row.
+        e.Handled = true;
+    }
+
     private async Task ExecuteTrainerFeatureAsync(string featureId)
     {
         if (_trainerActionInProgress || _session is null)
@@ -335,7 +377,10 @@ public sealed partial class MainWindow : Window
             if (definition.Kind == TrainerFeatureKind.ValueAction)
             {
                 before = await _buildProbe.ProbeAsync(_session);
-                await _trainer.ExecuteAsync(featureId, definition.DefaultValue);
+                var amount = _trainerActionValues.TryGetValue(featureId, out var configuredValue)
+                    ? configuredValue
+                    : definition.DefaultValue;
+                await _trainer.ExecuteAsync(featureId, amount);
             }
             else
             {
