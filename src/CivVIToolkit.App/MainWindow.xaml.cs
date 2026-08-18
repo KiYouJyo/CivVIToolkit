@@ -26,6 +26,45 @@ public sealed partial class MainWindow : Window
         Converters = { new JsonStringEnumConverter() },
     };
 
+    private static readonly IReadOnlyDictionary<string, string[]> TrainerCategoryIds =
+        new Dictionary<string, string[]>(StringComparer.Ordinal)
+        {
+            ["resources"] =
+            [
+                "player.unlimited-gold",
+                "player.unlimited-faith",
+                "player.add-influence",
+                "player.unlimited-resources",
+                "player.add-gold",
+                "ai.zero-gold",
+                "ai.zero-faith",
+                "ai.zero-influence",
+                "ai.zero-resources",
+            ],
+            ["science"] =
+            [
+                "player.instant-research",
+                "player.instant-civic",
+                "ai.block-research",
+                "ai.block-civic",
+            ],
+            ["units"] =
+            [
+                "unit.unlimited-movement",
+                "unit.unlimited-health",
+                "unit.always-upgrade",
+                "ai.block-movement",
+                "combat.one-hit-kill",
+            ],
+            ["cities"] =
+            [
+                "city.instant-production",
+                "city.max-population",
+                "unit.unlimited-builder-charges",
+                "ai.block-production",
+            ],
+        };
+
     private readonly IGameDiscoveryService _discovery = new WindowsGameDiscoveryService();
     private readonly IGameProcessMonitor _processMonitor = new Civ6ProcessMonitor();
     private readonly IGameRuntimeDiagnosticsService _diagnostics = new GameRuntimeDiagnosticsService();
@@ -35,12 +74,15 @@ public sealed partial class MainWindow : Window
     private readonly DispatcherQueueTimer _processTimer;
 
     private IReadOnlyList<GameInstallation> _installations = [];
+    private IReadOnlyList<LocalizedTrainerFeature> _trainerFeatures = [];
     private GameSession? _session;
     private AppSettings _settings;
+    private CompactTrainerWindow? _compactTrainerWindow;
     private bool _refreshInProgress;
     private bool _languageInitializing;
     private bool _sidebarCollapsed;
     private string _activePage = "overview";
+    private string _trainerCategory = "resources";
 
     public MainWindow()
     {
@@ -51,9 +93,12 @@ public sealed partial class MainWindow : Window
         SetTitleBar(TitleBarDragRegion);
 
         _settings = _settingsService.Load();
-        TrainerList.ItemsSource = TrainerCatalog.All.Select(feature => LocalizedTrainerFeature.From(feature, _localization)).ToList();
+        _trainerFeatures = TrainerCatalog.All
+            .Select(feature => LocalizedTrainerFeature.From(feature, _localization))
+            .ToList();
         InitializeLanguageOptions();
         InitializeVersionText();
+        ApplyTrainerFilter();
         ShowPage("overview");
 
         _processTimer = DispatcherQueue.CreateTimer();
@@ -168,22 +213,15 @@ public sealed partial class MainWindow : Window
                 ?? _localization.GetString("Common_UnknownVersion");
 
             StatusTitleText.Text = _localization.GetString("Status_RunningTitle");
-            StatusBadgeText.Text = $"{StoreLabel(_session.Store)} · {BackendLabel(_session.GraphicsBackend)}";
-            DetectionDetailsText.Text = _localization.GetFormattedString(
-                "Status_RunningDetailsFormat",
-                _session.ProcessId,
-                displayVersion,
-                _session.ExecutablePath);
-            TrainerStatusText.Text = _localization.GetFormattedString(
-                "Trainer_AttachedFormat",
-                StoreLabel(_session.Store),
-                BackendLabel(_session.GraphicsBackend));
+            StatusBadgeText.Text = $"{Path.GetFileName(_session.ExecutablePath)} · PID {_session.ProcessId} · {StoreLabel(_session.Store)}";
+            DetectionDetailsText.Text = _session.ExecutablePath;
+            TrainerStatusText.Text = "按功能分组管理第一版 22 项修改。当前进程已连接，但写入签名仍需完成运行时验收。";
 
             OverviewStoreText.Text = StoreLabel(_session.Store);
             OverviewRendererText.Text = BackendLabel(_session.GraphicsBackend);
             OverviewVersionText.Text = displayVersion;
-            OverviewProcessText.Text = _session.ProcessId.ToString();
-            TitleStatusText.Text = $"{StoreLabel(_session.Store)} · {BackendLabel(_session.GraphicsBackend)}";
+            OverviewProcessText.Text = $"PID {_session.ProcessId}";
+            TitleStatusText.Text = "已连接";
             DiagnosticsPageStateText.Text = "已连接 Civilization VI";
             DiagnosticsPageDetailsText.Text = BuildDiagnosticsSummary(_session, displayVersion);
         }
@@ -198,7 +236,7 @@ public sealed partial class MainWindow : Window
             StatusTitleText.Text = _localization.GetString("Status_InstallationDetectedTitle");
             StatusBadgeText.Text = _localization.GetFormattedString("Status_InstallationDetectedBadgeFormat", stores);
             DetectionDetailsText.Text = _localization.GetString("Status_LaunchHint");
-            TrainerStatusText.Text = _localization.GetString("Trainer_InstallationFound");
+            TrainerStatusText.Text = "按功能分组管理第一版 22 项修改。启动 Civilization VI 后会自动连接只读 Trainer Core。";
 
             OverviewStoreText.Text = stores;
             OverviewRendererText.Text = string.IsNullOrWhiteSpace(renderers) ? "—" : renderers;
@@ -213,13 +251,13 @@ public sealed partial class MainWindow : Window
             StatusTitleText.Text = _localization.GetString("Status_NotDetectedTitle");
             StatusBadgeText.Text = _localization.GetString("Status_ScanCompleted");
             DetectionDetailsText.Text = _localization.GetString("Status_NotDetectedHint");
-            TrainerStatusText.Text = _localization.GetString("Trainer_WaitingSupported");
+            TrainerStatusText.Text = "按功能分组管理第一版 22 项修改。当前正在等待受支持的 Civilization VI 安装与进程。";
 
             OverviewStoreText.Text = "—";
             OverviewRendererText.Text = "—";
             OverviewVersionText.Text = "—";
             OverviewProcessText.Text = "—";
-            TitleStatusText.Text = "未连接游戏";
+            TitleStatusText.Text = "未连接";
             DiagnosticsPageStateText.Text = "当前没有运行中的 Civilization VI";
             DiagnosticsPageDetailsText.Text = "尚未检测到 Steam 或 Epic Games 安装。";
         }
@@ -245,9 +283,10 @@ public sealed partial class MainWindow : Window
         if (firstInstallation is null)
         {
             LaunchStoreText.Text = "尚未检测到游戏安装";
-            LaunchPathText.Text = "点击首页的“刷新”重新扫描 Steam / Epic Games。";
+            LaunchPathText.Text = "点击右上角“重新扫描”以检测 Steam / Epic Games。";
             LaunchDx11Button.IsEnabled = false;
             LaunchDx12Button.IsEnabled = false;
+            LaunchStatusText.Text = "未检测到可启动目标";
             return;
         }
 
@@ -258,15 +297,15 @@ public sealed partial class MainWindow : Window
 
         if (_session is not null)
         {
-            LaunchStatusText.Text = "游戏已在运行。为避免重复启动，快捷启动暂时禁用。";
+            LaunchStatusText.Text = "游戏正在运行 · 快捷启动已暂时锁定以避免重复进程";
         }
         else if (!LaunchDx11Button.IsEnabled && !LaunchDx12Button.IsEnabled)
         {
-            LaunchStatusText.Text = "已找到安装目录，但尚未解析到可启动的 DX11 / DX12 可执行文件。";
+            LaunchStatusText.Text = "已找到安装目录，但尚未解析到 DX11 / DX12 可执行文件";
         }
         else
         {
-            LaunchStatusText.Text = string.Empty;
+            LaunchStatusText.Text = "✓ 启动目标已就绪";
         }
     }
 
@@ -302,6 +341,12 @@ public sealed partial class MainWindow : Window
 
     private async void DiagnosticsButton_Click(object sender, RoutedEventArgs e)
     {
+        if (_session is null)
+        {
+            ShowPage("diagnostics");
+            return;
+        }
+
         await CopyDiagnosticsAsync();
     }
 
@@ -423,13 +468,11 @@ public sealed partial class MainWindow : Window
     private void SidebarToggleButton_Click(object sender, RoutedEventArgs e)
     {
         _sidebarCollapsed = !_sidebarCollapsed;
-        SidebarColumn.Width = new GridLength(_sidebarCollapsed ? 64 : 236);
-        SidebarBrandPanel.Visibility = _sidebarCollapsed ? Visibility.Collapsed : Visibility.Visible;
+        SidebarColumn.Width = new GridLength(_sidebarCollapsed ? 64 : 220);
 
         var labelVisibility = _sidebarCollapsed ? Visibility.Collapsed : Visibility.Visible;
         HomeNavLabel.Visibility = labelVisibility;
         TrainerNavLabel.Visibility = labelVisibility;
-        LauncherNavLabel.Visibility = labelVisibility;
         SavesNavLabel.Visibility = labelVisibility;
         ModsNavLabel.Visibility = labelVisibility;
         EncyclopediaNavLabel.Visibility = labelVisibility;
@@ -450,37 +493,35 @@ public sealed partial class MainWindow : Window
         _activePage = tag;
         OverviewPanel.Visibility = tag == "overview" ? Visibility.Visible : Visibility.Collapsed;
         TrainerPanel.Visibility = tag == "trainer" ? Visibility.Visible : Visibility.Collapsed;
-        LauncherPanel.Visibility = tag == "launcher" ? Visibility.Visible : Visibility.Collapsed;
         DiagnosticsPanel.Visibility = tag == "diagnostics" ? Visibility.Visible : Visibility.Collapsed;
         SettingsPanel.Visibility = tag == "settings" ? Visibility.Visible : Visibility.Collapsed;
         PlaceholderPanel.Visibility = tag is "saves" or "mods" or "encyclopedia" ? Visibility.Visible : Visibility.Collapsed;
-
-        CurrentPageTitleText.Text = tag switch
-        {
-            "overview" => "首页",
-            "trainer" => "修改器",
-            "launcher" => "快捷启动",
-            "saves" => "存档管理",
-            "mods" => "Mod 管理",
-            "encyclopedia" => "百科",
-            "diagnostics" => "诊断",
-            "settings" => "设置",
-            _ => "Civ VI Toolkit",
-        };
 
         if (PlaceholderPanel.Visibility == Visibility.Visible)
         {
             (PlaceholderTitleText.Text, PlaceholderDescriptionText.Text) = tag switch
             {
-                "saves" => ("存档管理", "保留存档浏览、备份与恢复入口；当前版本暂不实现。"),
-                "mods" => ("Mod 管理", "保留 Mod 浏览、启停与配置入口；当前版本暂不实现。"),
-                _ => ("百科", "保留文明、领袖、单位、建筑与机制百科入口；当前版本暂不实现。"),
+                "saves" => ("存档管理", "集中查看、备份、复制与恢复 Civilization VI 存档。当前版本仅保留入口。"),
+                "mods" => ("Mod 管理", "浏览、启停与组织 Civilization VI Mod。当前版本仅保留入口。"),
+                _ => ("百科", "文明、领袖、单位、建筑与规则资料库。当前版本仅保留入口。"),
             };
         }
 
+        UpdateNavigationVisuals();
+    }
+
+    private void UpdateNavigationVisuals()
+    {
+        var selectedBrush = (Brush)RootShell.Resources["ShellAccentSubtleBrush"];
+        var selectedTextBrush = (Brush)RootShell.Resources["ShellAccentBrush"];
+        var normalTextBrush = (Brush)RootShell.Resources["ShellSecondaryTextBrush"];
+
         foreach (var button in NavigationButtons())
         {
-            button.Opacity = string.Equals(button.Tag as string, tag, StringComparison.Ordinal) ? 1 : 0.68;
+            var selected = string.Equals(button.Tag as string, _activePage, StringComparison.Ordinal);
+            button.Background = selected ? selectedBrush : null;
+            button.Foreground = selected ? selectedTextBrush : normalTextBrush;
+            button.Opacity = 1;
         }
     }
 
@@ -488,7 +529,6 @@ public sealed partial class MainWindow : Window
     {
         yield return HomeNavButton;
         yield return TrainerNavButton;
-        yield return LauncherNavButton;
         yield return SavesNavButton;
         yield return ModsNavButton;
         yield return EncyclopediaNavButton;
@@ -496,10 +536,92 @@ public sealed partial class MainWindow : Window
         yield return SettingsNavButton;
     }
 
+    private void TrainerCategoryButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button { Tag: string category } && TrainerCategoryIds.ContainsKey(category))
+        {
+            _trainerCategory = category;
+            ApplyTrainerFilter();
+        }
+    }
+
+    private void TrainerSearchBox_TextChanged(object sender, TextChangedEventArgs e)
+    {
+        ApplyTrainerFilter();
+    }
+
+    private void ApplyTrainerFilter()
+    {
+        if (!TrainerCategoryIds.TryGetValue(_trainerCategory, out var ids))
+        {
+            ids = TrainerCategoryIds["resources"];
+            _trainerCategory = "resources";
+        }
+
+        var allowed = ids.ToHashSet(StringComparer.Ordinal);
+        var query = TrainerSearchBox?.Text?.Trim() ?? string.Empty;
+        var filtered = _trainerFeatures
+            .Where(feature => allowed.Contains(feature.Id))
+            .Where(feature => string.IsNullOrWhiteSpace(query)
+                || feature.DisplayName.Contains(query, StringComparison.OrdinalIgnoreCase)
+                || feature.Shortcut.Contains(query, StringComparison.OrdinalIgnoreCase)
+                || feature.Id.Contains(query, StringComparison.OrdinalIgnoreCase)
+                || feature.Scope.Contains(query, StringComparison.OrdinalIgnoreCase))
+            .ToList();
+
+        TrainerList.ItemsSource = filtered;
+        var (title, description) = _trainerCategory switch
+        {
+            "resources" => ("资源与经济", "玩家资源、即时增量，以及对应的 AI 资源控制。"),
+            "science" => ("科技与文化", "研究、市政，以及对应的 AI 科技与文化进度控制。"),
+            "units" => ("单位与战斗", "单位移动、生命、升级、AI 移动与战斗相关能力。"),
+            _ => ("城市与建造", "城市生产、人口、建造者次数与 AI 生产控制。"),
+        };
+        TrainerCategoryTitleText.Text = title;
+        TrainerCategoryDescriptionText.Text = description;
+        TrainerCategoryCountText.Text = $"{filtered.Count} 项";
+        UpdateTrainerCategoryVisuals();
+    }
+
+    private void UpdateTrainerCategoryVisuals()
+    {
+        var selectedBrush = (Brush)RootShell.Resources["ShellAccentSubtleBrush"];
+        var selectedTextBrush = (Brush)RootShell.Resources["ShellAccentBrush"];
+        var normalTextBrush = (Brush)RootShell.Resources["ShellSecondaryTextBrush"];
+
+        foreach (var button in TrainerCategoryButtons())
+        {
+            var selected = string.Equals(button.Tag as string, _trainerCategory, StringComparison.Ordinal);
+            button.Background = selected ? selectedBrush : null;
+            button.Foreground = selected ? selectedTextBrush : normalTextBrush;
+        }
+    }
+
+    private IEnumerable<Button> TrainerCategoryButtons()
+    {
+        yield return ResourcesCategoryButton;
+        yield return ScienceCategoryButton;
+        yield return UnitsCategoryButton;
+        yield return CitiesCategoryButton;
+    }
+
+    private void CompactTrainerButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (_compactTrainerWindow is null)
+        {
+            _compactTrainerWindow = new CompactTrainerWindow(_trainerFeatures);
+            _compactTrainerWindow.Closed += (_, _) => _compactTrainerWindow = null;
+        }
+
+        _compactTrainerWindow.Activate();
+    }
+
     private void MainWindow_Closed(object sender, WindowEventArgs args)
     {
         _processTimer.Stop();
         _trainer.Dispose();
+        _compactTrainerWindow?.Close();
+        _compactTrainerWindow = null;
     }
 
     private sealed record LanguageOption(string Value, string DisplayName);
