@@ -17,6 +17,8 @@ public sealed class SteamDx12Build1023995Probe : ITrainerBuildProbe
     private const int LocalPlayerIdOffset = 0x16F8;
     private const int PlayerArrayOffset = 0x20;
     private const int PlayerStateArrayOffset = 0x2B48;
+    private const int MaximumPlayerSlots = 65;
+    private const int VerifiedSinglePlayerFallbackSlot = 0;
 
     // The live Player::Instance returned by Player::Manager does not use the
     // Player::Cache component block at +0xB0. The game's own bridge functions
@@ -99,30 +101,22 @@ public sealed class SteamDx12Build1023995Probe : ITrainerBuildProbe
             verified[check.Name] = $"0x{rva:X}";
         }
 
-        var gameRoot = ReadPointer(memory, moduleBase + GameRootGlobalRva, "game root");
-        var game = ReadPointer(memory, gameRoot + GameRootGameOffset, "game instance");
-        var localPlayerId = ReadInt32(memory, game + LocalPlayerIdOffset, "local player ID");
-        if ((uint)localPlayerId >= 0x41)
-        {
-            throw new InvalidOperationException($"Local player ID {localPlayerId} is outside the expected 0-64 range.");
-        }
-
+        // Player::Manager remains live in a loaded single-player match even when
+        // the GameContext root is transiently cleared by the game UI/state machine.
+        // Resolve it first so a null GameContext does not poison all trainer rows.
         var manager = ReadPointer(memory, moduleBase + PlayerManagerGlobalRva, "player manager");
         var states = ReadPointer(memory, manager + PlayerStateArrayOffset, "player state array");
+        var players = ReadPointer(memory, manager + PlayerArrayOffset, "player array");
+
+        var (localPlayerId, localPlayerRoute) = ResolveLocalPlayerId(memory, moduleBase, states, players);
         var state = ReadInt32(memory, states + (localPlayerId * sizeof(int)), "local player state");
         if (state == -1)
         {
             throw new InvalidOperationException("The local player slot is not active in the player manager.");
         }
 
-        var players = ReadPointer(memory, manager + PlayerArrayOffset, "player array");
         var player = ReadPointer(memory, players + (localPlayerId * IntPtr.Size), "local player");
 
-        // The first corrected live run proved that Player::Manager returns a live
-        // Player::Instance whose +0xB0 cache-component pointer is null. Static
-        // analysis of the exact DLL shows the game's own abstraction bridge takes
-        // live resources from direct pointers at +0x720/+0x748/+0x780, while the
-        // +0xB0 plus-component-offset accessors belong to Player::Cache::Instance.
         var religion = ReadPointer(memory, player + LivePlayerReligionPointerOffset, "live player religion component");
         var treasury = ReadPointer(memory, player + LivePlayerTreasuryPointerOffset, "live player treasury component");
         var influence = ReadPointer(memory, player + LivePlayerInfluencePointerOffset, "live player influence component");
@@ -142,12 +136,66 @@ public sealed class SteamDx12Build1023995Probe : ITrainerBuildProbe
             goldRaw,
             faithRaw,
             influenceRaw,
-            "Player::Manager live instance -> direct component pointers",
+            $"Player::Manager live instance -> direct component pointers; local player via {localPlayerRoute}",
             FormatAddress(manager),
             FormatAddress(player),
             FormatAddress(treasury),
             FormatAddress(religion),
             FormatAddress(influence));
+    }
+
+    private static (int PlayerId, string Route) ResolveLocalPlayerId(
+        ProcessMemoryAccessor memory,
+        nint moduleBase,
+        nint states,
+        nint players)
+    {
+        // Preferred route: the verified GameContext chain. This was validated in
+        // the initial live probes and remains the authoritative local-player ID.
+        var gameRoot = ReadPointerOrZero(memory, moduleBase + GameRootGlobalRva);
+        if (gameRoot != 0)
+        {
+            var game = ReadPointerOrZero(memory, gameRoot + GameRootGameOffset);
+            if (game != 0)
+            {
+                var playerId = ReadInt32OrDefault(memory, game + LocalPlayerIdOffset, -1);
+                if ((uint)playerId < MaximumPlayerSlots && IsUsablePlayerSlot(memory, states, players, playerId))
+                {
+                    return (playerId, "GameContext");
+                }
+            }
+        }
+
+        // Exact-build single-player fallback. Earlier live verification for this
+        // SHA-locked profile established that the human/local player occupies slot
+        // zero. We only accept it when the slot is active, has a live Player object,
+        // and exposes the already-verified Treasury/Religion/Influence components.
+        if (IsUsablePlayerSlot(memory, states, players, VerifiedSinglePlayerFallbackSlot))
+        {
+            var player = ReadPointerOrZero(memory, players + (VerifiedSinglePlayerFallbackSlot * IntPtr.Size));
+            if (player != 0
+                && ReadPointerOrZero(memory, player + LivePlayerTreasuryPointerOffset) != 0
+                && ReadPointerOrZero(memory, player + LivePlayerReligionPointerOffset) != 0
+                && ReadPointerOrZero(memory, player + LivePlayerInfluencePointerOffset) != 0)
+            {
+                return (VerifiedSinglePlayerFallbackSlot, "verified single-player manager slot 0 fallback");
+            }
+        }
+
+        throw new InvalidOperationException(
+            "The game context root is unavailable and the verified single-player slot 0 fallback could not be validated.");
+    }
+
+    private static bool IsUsablePlayerSlot(ProcessMemoryAccessor memory, nint states, nint players, int playerId)
+    {
+        if ((uint)playerId >= MaximumPlayerSlots)
+        {
+            return false;
+        }
+
+        var state = ReadInt32OrDefault(memory, states + (playerId * sizeof(int)), -1);
+        var player = ReadPointerOrZero(memory, players + (playerId * IntPtr.Size));
+        return state != -1 && player != 0;
     }
 
     private static nint ReadPointer(ProcessMemoryAccessor memory, nint address, string label)
@@ -162,6 +210,39 @@ public sealed class SteamDx12Build1023995Probe : ITrainerBuildProbe
         }
 
         return value;
+    }
+
+    private static nint ReadPointerOrZero(ProcessMemoryAccessor memory, nint address)
+    {
+        try
+        {
+            var bytes = memory.Read(address, IntPtr.Size);
+            if (bytes.Length != IntPtr.Size)
+            {
+                return 0;
+            }
+
+            return IntPtr.Size == sizeof(long)
+                ? checked((nint)BitConverter.ToInt64(bytes, 0))
+                : checked((nint)BitConverter.ToInt32(bytes, 0));
+        }
+        catch
+        {
+            return 0;
+        }
+    }
+
+    private static int ReadInt32OrDefault(ProcessMemoryAccessor memory, nint address, int fallback)
+    {
+        try
+        {
+            var bytes = memory.Read(address, sizeof(int));
+            return bytes.Length == sizeof(int) ? BitConverter.ToInt32(bytes, 0) : fallback;
+        }
+        catch
+        {
+            return fallback;
+        }
     }
 
     private static int ReadInt32(ProcessMemoryAccessor memory, nint address, string label) =>
