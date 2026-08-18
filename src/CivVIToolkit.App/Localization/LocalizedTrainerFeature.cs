@@ -1,4 +1,5 @@
 using CivVIToolkit.Core.Trainer;
+using Microsoft.UI.Xaml;
 
 namespace CivVIToolkit.App.Localization;
 
@@ -9,6 +10,8 @@ public sealed record LocalizedTrainerFeature(
     string Shortcut,
     TrainerFeatureKind Kind,
     long? DefaultValue,
+    double ActionValue,
+    Visibility ActionEditorVisibility,
     string? Notes,
     string Status,
     bool IsEnabled,
@@ -18,7 +21,8 @@ public sealed record LocalizedTrainerFeature(
         TrainerFeatureDefinition definition,
         ILocalizationService localization,
         TrainerFeatureState? state = null,
-        string? status = null)
+        string? status = null,
+        long? configuredActionValue = null)
     {
         ArgumentNullException.ThrowIfNull(definition);
         ArgumentNullException.ThrowIfNull(localization);
@@ -42,6 +46,8 @@ public sealed record LocalizedTrainerFeature(
         }
 
         var availability = state?.Availability ?? TrainerAvailability.SignaturePending;
+        var isValueAction = definition.Kind == TrainerFeatureKind.ValueAction;
+        var actionValue = configuredActionValue ?? definition.DefaultValue ?? 1;
         return new LocalizedTrainerFeature(
             definition.Id,
             group,
@@ -49,6 +55,8 @@ public sealed record LocalizedTrainerFeature(
             definition.Shortcut,
             definition.Kind,
             definition.DefaultValue,
+            actionValue,
+            isValueAction ? Visibility.Visible : Visibility.Collapsed,
             definition.Notes,
             status ?? state?.StatusMessage ?? string.Empty,
             state?.IsEnabled ?? false,
