@@ -88,6 +88,7 @@ public sealed partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
+        TrainerList.ItemTemplate = TrainerTemplateFactory.CreateMainTemplate();
         Title = _localization.GetString("AppDisplayName");
         ExtendsContentIntoTitleBar = true;
         SetTitleBar(AppTitleBar);
@@ -301,32 +302,49 @@ public sealed partial class MainWindow : Window
     private void RefreshTrainerList(bool force = false)
     {
         var states = _trainer.Features.ToDictionary(state => state.Definition.Id, StringComparer.Ordinal);
-        var items = TrainerCatalog.All.Select(feature =>
-        {
-            states.TryGetValue(feature.Id, out var state);
-            _trainerActionValues.TryGetValue(feature.Id, out var configuredValue);
-            return LocalizedTrainerFeature.From(
-                feature,
-                _localization,
-                state,
-                FormatTrainerState(feature, state),
-                feature.Kind == TrainerFeatureKind.ValueAction ? configuredValue : null);
-        }).ToList();
+        var firstBinding = _trainerFeatures.Count == 0;
 
-        var signature = string.Join(
-            '\u001F',
-            items.Select(item => $"{item.Id}|{item.Status}|{item.IsEnabled}|{item.Availability}"));
-        if (!force && string.Equals(signature, _lastTrainerUiSignature, StringComparison.Ordinal))
+        if (firstBinding)
         {
-            UpdateTrainerSummary(items);
-            return;
+            foreach (var feature in TrainerCatalog.All)
+            {
+                states.TryGetValue(feature.Id, out var state);
+                _trainerActionValues.TryGetValue(feature.Id, out var configuredValue);
+                var item = LocalizedTrainerFeature.From(
+                    feature,
+                    _localization,
+                    state,
+                    FormatTrainerState(feature, state),
+                    feature.Kind == TrainerFeatureKind.ValueAction ? configuredValue : null);
+                item.ConfigureActions(ExecuteTrainerFeatureAsync, SetTrainerActionValue);
+                _trainerFeatures.Add(item);
+            }
+
+            ApplyTrainerFilter();
+        }
+        else
+        {
+            var byId = _trainerFeatures.ToDictionary(item => item.Id, StringComparer.Ordinal);
+            foreach (var feature in TrainerCatalog.All)
+            {
+                if (!byId.TryGetValue(feature.Id, out var item))
+                {
+                    continue;
+                }
+
+                states.TryGetValue(feature.Id, out var state);
+                _trainerActionValues.TryGetValue(feature.Id, out var configuredValue);
+                item.UpdateFrom(
+                    feature,
+                    _localization,
+                    state,
+                    FormatTrainerState(feature, state),
+                    feature.Kind == TrainerFeatureKind.ValueAction ? configuredValue : null);
+            }
         }
 
-        _lastTrainerUiSignature = signature;
-        _trainerFeatures = items;
-        ApplyTrainerFilter();
-        UpdateTrainerSummary(items);
-        _compactTrainerWindow?.UpdateFeatures(items);
+        UpdateTrainerSummary(_trainerFeatures);
+        _compactTrainerWindow?.RefreshStatus();
     }
 
     private void UpdateTrainerSummary(IReadOnlyList<LocalizedTrainerFeature> items)
